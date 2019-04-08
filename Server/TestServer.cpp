@@ -130,9 +130,8 @@ int main()
 			//·µ»Ø½á¹û
 			LOGIN_RESULT _login_result;
 			send(_client_sock, (const char*)& _login_result, sizeof(LOGIN_RESULT), 0);
-
+			break;
 		}
-		break;
 		case CMD_LOGOUT:
 		{
 			std::cout << "cmd is logout" << std::endl;
