@@ -1,6 +1,12 @@
 #ifndef CLIENT_H
 #define CLIENT_H
+
+#ifdef _WIN32
 #include"../Test/Common.h"
+#else
+#include"Common.h"
+#endif // _WIN32
+
 class Client
 {
 public:

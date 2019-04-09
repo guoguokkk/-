@@ -2,10 +2,20 @@
 #define COMMOC_H
 #define WIN32_LEAN_AND_MEAN//½â¾ö<Windows.h>ºÍ<WinSock2.h>Ã¬¶Ü
 #include<iostream>
+
+#ifdef _WIN32
 #include<Windows.h>
 #include<WinSock2.h>
+#else
+#include<unistd.h>
+#include<sys/socket.h>
+#include<arpa/inet.h>
+#include<string.h>
+typedef int SOCKET;
+#endif //_WIN32
+
 #include<string>
-#define PORT 8082
+#define PORT 8003
 #define SERVER_IP "127.0.0.1"
 #define CLIENT_IP "127.0.0.1"
 

@@ -1,6 +1,12 @@
 #ifndef SERVER_H
 #define SERVER_H
+
+#ifdef _WIN32
 #include"../Test/Common.h"
+#else
+#include"Common.h"
+#endif // _WIN32
+
 #include<vector>
 class Server
 {

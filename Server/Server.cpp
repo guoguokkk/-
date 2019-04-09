@@ -1,17 +1,21 @@
 #include"Server.h"
+#include<algorithm>
 Server::Server()
 {
-
 }
 
 Server::~Server()
 {
-
 }
 
 void Server::CloseServer()
 {
+	//关闭socket  
+#ifdef _WIN32
 	closesocket(_server_sock);
+#else
+	close(_server_sock);
+#endif // _WIN32	
 }
 
 void Server::InitServer()
@@ -25,7 +29,12 @@ void Server::InitServer()
 
 	//绑定接受客户端连接的端口
 	sockaddr_in _server_addr;
-	_server_addr.sin_addr.S_un.S_addr = inet_addr(SERVER_IP);
+#ifdef _WIN32
+	_server_addr.sin_addr.S_un.S_addr = inet_addr(SERVER_IP);//inet_addr要关闭SDL
+#else
+	_server_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
+#endif
+
 	_server_addr.sin_port = htons(PORT);
 	_server_addr.sin_family = AF_INET;
 	if (-1 == bind(_server_sock, (sockaddr*)& _server_addr, sizeof(_server_addr)))
@@ -44,13 +53,13 @@ void Server::InitServer()
 int Server::processor(SOCKET _client_sock)
 {
 	char recv_buf[4096];
-	int len = recv(_client_sock, recv_buf, sizeof(Header), 0);
+	int len = (int)recv(_client_sock, recv_buf, sizeof(Header), 0);
 
 	//强制类型转换
 	Header* header = (Header*)recv_buf;
 	if (len < 0)
 	{
-		std::cout << "client "<<_client_sock<<" is exit." << std::endl;
+		std::cout << "client " << _client_sock << " is exit." << std::endl;
 		return -1;
 	}
 	else
@@ -102,17 +111,22 @@ void Server::HandleClientRequest()
 		FD_ZERO(&_fd_read);//清理集合
 		FD_SET(_server_sock, &_fd_read);//将服务器描述符加入set集合
 
+		SOCKET _max_sock = _server_sock;
 		//将客户端描述符加入set集合
 		for (int i = 0; i < _group_clients.size(); ++i)
 		{
 			FD_SET(_group_clients[i], &_fd_read);
+			if (_max_sock < _group_clients[i])
+			{
+				_max_sock = _group_clients[i];
+			}
 		}
+
 		timeval _time_val;
 		_time_val.tv_sec = 1;
 		_time_val.tv_usec = 0;
-
 		//判断描述符是否在集合中
-		int ret = select(_server_sock, &_fd_read, NULL, NULL,& _time_val);
+		int ret = select(_max_sock + 1, &_fd_read, NULL, NULL, &_time_val);
 		if (ret < 0)
 		{
 			HandleError("Server select end.");
@@ -127,7 +141,12 @@ void Server::HandleClientRequest()
 			//等待接受客户端连接
 			SOCKET _client_sock;
 			sockaddr_in _client_addr;
+
+#ifdef _WIN32
 			int _client_addr_size = sizeof(_client_addr);
+#else
+			socklen_t _client_addr_size = sizeof(_client_addr);
+#endif // _WIN32	
 			_client_sock = accept(_server_sock, (sockaddr*)& _client_addr, &_client_addr_size);
 			if (-1 == _client_sock)
 				HandleError("Server accept error.");//无效客户端
@@ -145,16 +164,31 @@ void Server::HandleClientRequest()
 			}
 		}
 
-		//依次处理所有的fd
-		for (int i = 0; i < _fd_read.fd_count; ++i)
+		//依次处理所有的fd,linux:error: ‘struct fd_set’ has no member named ‘fd_count’
+		// for (int i = 0; i < _fd_read.fd_count; ++i)
+		// {
+		// 	int ret = processor(_fd_read.fd_array[i]);
+		// 	if (ret == -1)
+		// 	{//如果某个客户端结束，则将它从数组删除
+		// 		auto iter = find(_group_clients.begin(), _group_clients.end(), _group_clients[i]);
+		// 		if (iter != _group_clients.end())
+		// 		{
+		// 			_group_clients.erase(iter);
+		// 		}
+		// 	}
+		// }
+
+		for (int i = 0; i < _group_clients.size(); ++i)
 		{
-			int ret = processor(_fd_read.fd_array[i]);
-			if (ret == -1)
-			{//如果某个客户端结束，则将它从数组删除
-				auto iter = find(_group_clients.begin(), _group_clients.end(), _group_clients[i]);
-				if (iter != _group_clients.end())
-				{
-					_group_clients.erase(iter);
+			if (FD_ISSET(_group_clients[i], &_fd_read))
+			{
+				if (processor(_group_clients[i]) == -1)
+				{//如果某个客户端结束，则将它从数组删除
+					auto iter = find(_group_clients.begin(), _group_clients.end(), _group_clients[i]);
+					if (iter != _group_clients.end())
+					{
+						_group_clients.erase(iter);
+					}
 				}
 			}
 		}
@@ -164,6 +198,11 @@ void Server::HandleClientRequest()
 
 	for (int i = 0; i < _group_clients.size(); ++i)
 	{
+		//关闭socket  
+#ifdef _WIN32
 		closesocket(_group_clients[i]);
+#else
+		close(_group_clients[i]);
+#endif // _WIN32	
 	}
 }

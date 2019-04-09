@@ -19,7 +19,7 @@ int Client::Processor(SOCKET _client_sock)
 	Header* header = (Header*)recv_buf;
 	if (ret <= 0)
 	{
-		std::cout << "与服务器断开连接." << std::endl;
+		std::cout << "Disconnect from server." << std::endl;
 		return -1;
 	}
 	switch (header->cmd)
@@ -29,7 +29,7 @@ int Client::Processor(SOCKET _client_sock)
 		//接受服务器返回的数据
 		LOGIN_RESULT _login_result;
 		recv(_client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);
-		std::cout << "收到服务端消息: CMD_LOGIN_RESULT，数据长度为 " << _login_result.data_length << std::endl;
+		std::cout << "Receive the server message: CMD_LOGIN_RESULT, Data length is " << _login_result.data_length << std::endl;
 	}
 	break;
 	case CMD_LOGOUT_RESULT:
@@ -37,7 +37,7 @@ int Client::Processor(SOCKET _client_sock)
 		//接受服务器返回的数据
 		LOGIN_RESULT _logout_result;
 		recv(_client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);
-		std::cout << "收到服务端消息: CMD_LOGIN_RESULT，数据长度为 " << _logout_result.data_length << std::endl;
+		std::cout << "Receive the server message: CMD_LOGOUT_RESULT, Data length is " << _logout_result.data_length << std::endl;
 	}
 	break;
 	case CMD_NEW_USER_JOIN:
@@ -48,7 +48,7 @@ int Client::Processor(SOCKET _client_sock)
 	}
 	break;
 	default:
-		std::cout << "不支持的命令" << std::endl;
+		std::cout << "Unsupported commands" << std::endl;
 		break;
 	}
 }
@@ -56,7 +56,7 @@ int Client::Processor(SOCKET _client_sock)
 //输入命令
 void Client::CmdThread()
 {
-	
+
 	while (true)
 	{
 		char _cmd_buf[256];
@@ -64,7 +64,7 @@ void Client::CmdThread()
 		if (0 == strcmp(_cmd_buf, "exit"))
 		{
 			g_bRun = false;//告诉主线程客户端要退出
-			std::cout << "客户端退出" << std::endl;
+			std::cout << "Client exit" << std::endl;
 			return;
 		}
 		else if (0 == strcmp(_cmd_buf, "login"))
@@ -83,9 +83,9 @@ void Client::CmdThread()
 		}
 		else
 		{
-			std::cout << "无效输入，请重新输入" << std::endl;
+			std::cout << "Invalid input, please re-enter" << std::endl;
 		}
-	}	
+	}
 }
 
 void Client::InitClient()
@@ -99,7 +99,12 @@ void Client::InitClient()
 
 	//连接服务器 connect
 	struct sockaddr_in _client_addr;
+#ifdef _WIN32
 	_client_addr.sin_addr.S_un.S_addr = inet_addr(CLIENT_IP);//inet_addr要关闭SDL
+#else
+	_client_addr.sin_addr.s_addr = inet_addr(CLIENT_IP);
+#endif
+
 	_client_addr.sin_port = htons(PORT);
 	_client_addr.sin_family = AF_INET;
 	if (connect(_client_sock, (sockaddr*)& _client_addr, sizeof(_client_addr)) < 0)
@@ -122,10 +127,10 @@ void Client::SendRequenst()
 		timeval _time_val;
 		_time_val.tv_sec = 1;
 		_time_val.tv_usec = 0;
-		int ret = select(_client_sock, &fd_read, NULL, NULL, &_time_val);
+		int ret = select(_client_sock + 1, &fd_read, NULL, NULL, &_time_val);
 		if (ret < 0)
 		{
-			std::cout << "select 任务结束" << std::endl;
+			std::cout << "select task end" << std::endl;
 			break;
 		}
 
@@ -135,7 +140,7 @@ void Client::SendRequenst()
 			FD_CLR(_client_sock, &fd_read);
 			if (-1 == Processor(_client_sock))
 			{
-				std::cout << "select 任务结束" << std::endl;
+				std::cout << "select task end" << std::endl;
 				break;
 			}
 		}
@@ -147,6 +152,9 @@ void Client::SendRequenst()
 void Client::CloseClient()
 {
 	//关闭socket  
+#ifdef _WIN32
 	closesocket(_client_sock);
+#else
+	close(_client_sock);
+#endif // _WIN32	
 }
-
