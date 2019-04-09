@@ -9,9 +9,11 @@ public:
 	void InitClient();
 	void SendRequenst();
 	void CloseClient();
-	int processor(SOCKET _client_sock);
+	int Processor(SOCKET _client_sock);
+	static void CmdThread();
 private:
-	SOCKET _client_sock;
+	static SOCKET _client_sock;
+	static bool g_bRun;
 };
 
 #endif // !CLIENT_H

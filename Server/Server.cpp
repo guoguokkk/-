@@ -97,11 +97,12 @@ void Server::HandleClientRequest()
 	//处理多个客户端的请求
 	while (true)
 	{
-		fd_set _fd_read;
-		FD_ZERO(&_fd_read);//select()会修改字符集，如果在一个循环中，则描述符集必须被重新赋值
-		FD_SET(_server_sock, &_fd_read);//将服务器fd加入set集合
+		//伯克利套接字
+		fd_set _fd_read;//描述符集合，描述符指的是socket
+		FD_ZERO(&_fd_read);//清理集合
+		FD_SET(_server_sock, &_fd_read);//将服务器描述符加入set集合
 
-		//将客户端fd加入set集合
+		//将客户端描述符加入set集合
 		for (int i = 0; i < _group_clients.size(); ++i)
 		{
 			FD_SET(_group_clients[i], &_fd_read);
@@ -110,7 +111,7 @@ void Server::HandleClientRequest()
 		_time_val.tv_sec = 1;
 		_time_val.tv_usec = 0;
 
-		//监视老socketfd的状态是否改变，一旦改变说明有新的服务器连接进来
+		//判断描述符是否在集合中
 		int ret = select(_server_sock, &_fd_read, NULL, NULL,& _time_val);
 		if (ret < 0)
 		{
