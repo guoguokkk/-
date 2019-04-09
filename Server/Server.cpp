@@ -50,12 +50,14 @@ int Server::processor(SOCKET _client_sock)
 	Header* header = (Header*)recv_buf;
 	if (len < 0)
 	{
-		std::cout << "client is exit." << std::endl;
+		std::cout << "client "<<_client_sock<<" is exit." << std::endl;
 		return -1;
 	}
 	else
 	{
-		if (header->cmd == CMD_LOGIN)
+		switch (header->cmd)
+		{
+		case CMD_LOGIN:
 		{
 			//接收客户端发送的数据
 			recv(_client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);
@@ -66,7 +68,8 @@ int Server::processor(SOCKET _client_sock)
 			LOGIN_RESULT login_result;
 			send(_client_sock, (char*)& login_result, sizeof(login_result), 0);
 		}
-		else if (header->cmd == CMD_LOGOUT)
+		break;
+		case CMD_LOGOUT:
 		{
 			//接收客户端发送的数据
 			recv(_client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);
@@ -77,10 +80,13 @@ int Server::processor(SOCKET _client_sock)
 			LOGOUT_RESULT logout_result;
 			send(_client_sock, (char*)& logout_result, sizeof(logout_result), 0);
 		}
-		else
+		break;
+		default:
 		{
-			std::cout << "client is exit." << std::endl;
-			return -1;
+			Header header = { 0,CMD_ERROR };
+			send(_client_sock, (char*)& header, sizeof(header), 0);
+		}
+		break;
 		}
 	}
 }
@@ -91,7 +97,7 @@ void Server::HandleClientRequest()
 	//处理多个客户端的请求
 	while (true)
 	{
-		FD_SET _fd_read;
+		fd_set _fd_read;
 		FD_ZERO(&_fd_read);//select()会修改字符集，如果在一个循环中，则描述符集必须被重新赋值
 		FD_SET(_server_sock, &_fd_read);//将服务器fd加入set集合
 
@@ -101,18 +107,16 @@ void Server::HandleClientRequest()
 			FD_SET(_group_clients[i], &_fd_read);
 		}
 		timeval _time_val;
-		_time_val.tv_sec = 0;
+		_time_val.tv_sec = 1;
 		_time_val.tv_usec = 0;
 
 		//监视老socketfd的状态是否改变，一旦改变说明有新的服务器连接进来
-		int ret = select(_server_sock, &_fd_read, NULL, NULL, NULL);
+		int ret = select(_server_sock, &_fd_read, NULL, NULL,& _time_val);
 		if (ret < 0)
 		{
 			HandleError("Server select end.");
 			break;
 		}
-		else
-			HandleSuccess("Server select success.");
 
 		//检查在select函数返回后，某个描述符是否准备好
 		if (FD_ISSET(_server_sock, &_fd_read))
@@ -128,6 +132,12 @@ void Server::HandleClientRequest()
 				HandleError("Server accept error.");//无效客户端
 			else
 			{//连接客户端成功
+				//告诉所有客户端有新客户端加入
+				NEW_USER_JOIN _new_user_join;
+				for (int i = 0; i < _group_clients.size(); ++i)
+				{
+					send(_group_clients[i], (const char*)& _new_user_join, sizeof(_new_user_join), 0);
+				}
 				std::cout << "New Client " << _client_sock << ", ip: "
 					<< inet_ntoa(_client_addr.sin_addr) << std::endl;//inet_ntoa
 				_group_clients.push_back(_client_sock);//保存该客户端

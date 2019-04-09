@@ -15,7 +15,8 @@ enum CMD_LINE
 	CMD_LOGIN_RESULT,
 	CMD_LOGOUT,
 	CMD_LOGOUT_RESULT,
-	CMD_ERROR
+	CMD_ERROR,
+	CMD_NEW_USER_JOIN//其他用户加入
 };
 
 //数据报头部
@@ -67,6 +68,17 @@ struct LOGOUT_RESULT :public Header
 		result = 0;
 	}
 	int result;
+};
+
+struct NEW_USER_JOIN :public Header
+{
+	NEW_USER_JOIN()
+	{
+		data_length = sizeof(NEW_USER_JOIN);
+		cmd = CMD_NEW_USER_JOIN;
+		sock = 0;
+	}
+	int sock;//新用户id
 };
 
 static void HandleError(std::string _error_s)

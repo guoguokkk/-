@@ -1,10 +1,4 @@
 #define WIN32_LEAN_AND_MEAN//½â¾ö<Windows.h>ºÍ<WinSock2.h>Ã¬¶Ü
-#include<iostream>
-#include<string>
-#include<Windows.h>
-#include<WinSock2.h>
-#include<vector>
-#include"../Test/Common.h"
 #include"Server.h"
 
 int main()
