@@ -1,208 +1,251 @@
 #include"Server.h"
+#include<iostream>
+#ifdef _WIN32
+
+#else
 #include<algorithm>
+#endif // _WIN32
+using std::cout;
+using std::endl;
+using std::cin;
 Server::Server()
 {
+	InitServer();
 }
 
 Server::~Server()
 {
+	CloseServer();
 }
 
-void Server::CloseServer()
-{
-	//关闭socket  
-#ifdef _WIN32
-	closesocket(_server_sock);
-#else
-	close(_server_sock);
-#endif // _WIN32	
-}
-
+//初始化服务器
 void Server::InitServer()
 {
-	//建立一个socket,ipv4，面向连接的，tcp协议
-	_server_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+#ifdef _WIN32
+	WORD version = MAKEWORD(2, 2);
+	WSADATA data;
+	WSAStartup(version, &data);//LPWSADATA是一个指向WSADATA结构的指针
+#endif // _WIN32
+
+	//防止重复初始化
 	if (_server_sock < 0)
-		HandleError("Server socket error.");
-	else
-		HandleSuccess("Server socket success.");
-
-	//绑定接受客户端连接的端口
-	sockaddr_in _server_addr;
-#ifdef _WIN32
-	_server_addr.sin_addr.S_un.S_addr = inet_addr(SERVER_IP);//inet_addr要关闭SDL
-#else
-	_server_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
-#endif
-
-	_server_addr.sin_port = htons(PORT);
-	_server_addr.sin_family = AF_INET;
-	if (-1 == bind(_server_sock, (sockaddr*)& _server_addr, sizeof(_server_addr)))
-		HandleError("Server bind error.");
-	else
-		HandleSuccess("Server bind success.");
-
-	//监听网络端口
-	if (-1 == listen(_server_sock, 5))
-		HandleError("Server listen error.");
-	else
-		HandleSuccess("Server listen success.");
-}
-
-//接收请求，返回请求结果
-int Server::processor(SOCKET _client_sock)
-{
-	char recv_buf[4096];
-	int len = (int)recv(_client_sock, recv_buf, sizeof(Header), 0);
-
-	//强制类型转换
-	Header* header = (Header*)recv_buf;
-	if (len < 0)
 	{
-		std::cout << "client " << _client_sock << " is exit." << std::endl;
-		return -1;
+		_server_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		if (_server_sock < 0)
+			cout << "Server socket error." << endl;
+		else
+			cout << "Server socket success." << endl;
 	}
 	else
 	{
-		switch (header->cmd)
-		{
-		case CMD_LOGIN:
-		{
-			//接收客户端发送的数据
-			recv(_client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);
-			LOGIN* login = (LOGIN*)recv_buf;
-			std::cout << login->_user_name << " : " << login->_user_password << std::endl;
-
-			//返回数据
-			LOGIN_RESULT login_result;
-			send(_client_sock, (char*)& login_result, sizeof(login_result), 0);
-		}
-		break;
-		case CMD_LOGOUT:
-		{
-			//接收客户端发送的数据
-			recv(_client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);
-			LOGOUT* logout = (LOGOUT*)recv_buf;
-			std::cout << logout->_user_name << " : " << logout->_user_password << std::endl;
-
-			//返回数据
-			LOGOUT_RESULT logout_result;
-			send(_client_sock, (char*)& logout_result, sizeof(logout_result), 0);
-		}
-		break;
-		default:
-		{
-			Header header = { 0,CMD_ERROR };
-			send(_client_sock, (char*)& header, sizeof(header), 0);
-		}
-		break;
-		}
+		CloseServer();//有连接要先关闭
+		cout << "Server " << _server_sock << " close." << endl;
 	}
 }
 
-void Server::HandleClientRequest()
+//绑定ip和端口号
+int Server::Bind(const char* ip, const unsigned short port)
 {
-
-	//处理多个客户端的请求
-	while (true)
-	{
-		//伯克利套接字
-		fd_set _fd_read;//描述符集合，描述符指的是socket
-		FD_ZERO(&_fd_read);//清理集合
-		FD_SET(_server_sock, &_fd_read);//将服务器描述符加入set集合
-
-		SOCKET _max_sock = _server_sock;
-		//将客户端描述符加入set集合
-		for (int i = 0; i < _group_clients.size(); ++i)
-		{
-			FD_SET(_group_clients[i], &_fd_read);
-			if (_max_sock < _group_clients[i])
-			{
-				_max_sock = _group_clients[i];
-			}
-		}
-
-		timeval _time_val;
-		_time_val.tv_sec = 1;
-		_time_val.tv_usec = 0;
-		//判断描述符是否在集合中
-		int ret = select(_max_sock + 1, &_fd_read, NULL, NULL, &_time_val);
-		if (ret < 0)
-		{
-			HandleError("Server select end.");
-			break;
-		}
-
-		//检查在select函数返回后，某个描述符是否准备好
-		if (FD_ISSET(_server_sock, &_fd_read))
-		{
-			FD_CLR(_server_sock, &_fd_read);
-
-			//等待接受客户端连接
-			SOCKET _client_sock;
-			sockaddr_in _client_addr;
-
+	sockaddr_in server_addr;
 #ifdef _WIN32
-			int _client_addr_size = sizeof(_client_addr);
+	if (ip)
+		server_addr.sin_addr.S_un.S_addr = inet_addr(ip);
+	else
+		server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
 #else
-			socklen_t _client_addr_size = sizeof(_client_addr);
+	if (ip)
+		server_addr.sin_addr.s_addr = inet_addr(ip);
+	else
+		server_addr.sin_addr.s_addr = INADDR_ANY;
 #endif // _WIN32	
-			_client_sock = accept(_server_sock, (sockaddr*)& _client_addr, &_client_addr_size);
-			if (-1 == _client_sock)
-				HandleError("Server accept error.");//无效客户端
-			else
-			{//连接客户端成功
-				//告诉所有客户端有新客户端加入
-				NEW_USER_JOIN _new_user_join;
-				for (int i = 0; i < _group_clients.size(); ++i)
-				{
-					send(_group_clients[i], (const char*)& _new_user_join, sizeof(_new_user_join), 0);
-				}
-				std::cout << "New Client " << _client_sock << ", ip: "
-					<< inet_ntoa(_client_addr.sin_addr) << std::endl;//inet_ntoa
-				_group_clients.push_back(_client_sock);//保存该客户端
-			}
-		}
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(port);
+	int ret = bind(_server_sock, (const sockaddr*)& server_addr, sizeof(server_addr));
+	if (ret < 0)
+		cout << "Server " << _server_sock << " bind error." << endl;
+	else
+		cout << "Server " << _server_sock << " bind success." << endl;
+	return ret;
+}
 
-		//依次处理所有的fd,linux:error: ‘struct fd_set’ has no member named ‘fd_count’
-		// for (int i = 0; i < _fd_read.fd_count; ++i)
-		// {
-		// 	int ret = processor(_fd_read.fd_array[i]);
-		// 	if (ret == -1)
-		// 	{//如果某个客户端结束，则将它从数组删除
-		// 		auto iter = find(_group_clients.begin(), _group_clients.end(), _group_clients[i]);
-		// 		if (iter != _group_clients.end())
-		// 		{
-		// 			_group_clients.erase(iter);
-		// 		}
-		// 	}
-		// }
+void Server::Listen(int n)
+{
+	int ret = listen(_server_sock, n);
+	if (ret < 0)
+		cout << "Server " << _server_sock << " listen error." << endl;
+	else
+		cout << "Server " << _server_sock << " listen success." << endl;
+}
 
-		for (int i = 0; i < _group_clients.size(); ++i)
-		{
-			if (FD_ISSET(_group_clients[i], &_fd_read))
-			{
-				if (processor(_group_clients[i]) == -1)
-				{//如果某个客户端结束，则将它从数组删除
-					auto iter = find(_group_clients.begin(), _group_clients.end(), _group_clients[i]);
-					if (iter != _group_clients.end())
-					{
-						_group_clients.erase(iter);
-					}
-				}
-			}
-		}
-
-		std::cout << "do other things." << std::endl;
+void Server::Accept()
+{
+	int client_sock;
+	sockaddr_in client_addr;
+	int client_addr_size = sizeof(client_addr);
+#ifdef _WIN32
+	client_sock = accept(_server_sock, (sockaddr*)& client_addr, &client_addr_size);
+#else
+	client_sock = accept(_server_sock, (sockaddr*)& client_addr, (size_t*)& client_addr_size);
+#endif // _WIN32
+	if (client_sock < 0)
+		cout << "Invalid Received Client" << endl;
+	else
+	{
+		//给其他客户端发送消息
+		NewUserJoin new_user_join;
+		SendData2All(&new_user_join);
+		//加入到客户端数组
+		_group_clients.push_back(client_sock);
+		cout << "New Client join : " << "IP= " << inet_ntoa(client_addr.sin_addr) << endl;
 	}
+}
 
+//关闭服务器
+void Server::CloseServer()
+{
+	//防止重复关闭
+	if (_server_sock < 0)
+	{
+		return;
+	}
+#ifdef _WIN32
+	closesocket(_server_sock);
+	WSACleanup();
+#else
+	close(_server_sock);
+#endif // _WIN32
+	_server_sock = -1;
+}
+
+//select
+bool Server::OnRun()
+{
+	if (!IsRun())
+		return false;
+
+	fd_set fds_read, fds_write, fds_exc;
+	FD_ZERO(&fds_read);
+	FD_ZERO(&fds_write);
+	FD_ZERO(&fds_exc);
+
+	FD_SET(_server_sock, &fds_read);
+	FD_SET(_server_sock, &fds_write);
+	FD_SET(_server_sock, &fds_exc);
 	for (int i = 0; i < _group_clients.size(); ++i)
 	{
-		//关闭socket  
-#ifdef _WIN32
-		closesocket(_group_clients[i]);
-#else
-		close(_group_clients[i]);
-#endif // _WIN32	
+		FD_SET(_group_clients[i], &fds_read);
+	}
+
+	//设置时间
+	timeval time_val;
+	time_val.tv_sec = 1;//秒
+	time_val.tv_usec = 0;//毫秒
+	int ret = select(_server_sock, &fds_read, &fds_write, &fds_exc, &time_val);	
+	if (ret < 0)
+	{
+		cout << "Server " << _server_sock << "select task end 1." << endl;
+		CloseServer();
+		return false;
+	}	
+	
+	if (FD_ISSET(_server_sock, &fds_read))
+	{
+		FD_CLR(_server_sock, &fds_read);
+		Accept();		
+	}
+	//依次处理所有客户端的请求
+	for (int i = 0; i < _group_clients.size(); ++i)
+	{
+		if (FD_ISSET(_group_clients[i], &fds_read))
+		{
+			int ret = RecvData(_group_clients[i]);
+			if (ret == -1)
+			{//该客户端退出，需要从客户端数组中删除
+				auto iter = _group_clients.begin() + i;
+				if (iter != _group_clients.end())
+					_group_clients.erase(iter);
+			}
+		}
+	}
+	cout << "do other things" << endl;
+	return false;
+}
+
+bool Server::IsRun()
+{
+	return _server_sock >= 0;
+}
+
+//接收数据
+int Server::RecvData(int client_sock)
+{
+	char recv_buf[4096];//接收缓冲区
+	int len = (int)recv(client_sock, recv_buf, sizeof(Header), 0);//接受数据的头部	
+	if (len <= 0)
+	{
+		cout << "Client exit." << endl;
+		return -1;
+	}
+	Header* header = (Header*)recv_buf;//头部
+	recv(client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);//接受除头部外的其他数据
+	OnNetMsg(client_sock,header, recv_buf);
+	return 0;
+
+}
+
+void Server::OnNetMsg(int client_sock,Header* header, char* recv_buf)
+{
+	switch (header->cmd)
+	{
+	case CMD_LOGIN:
+	{
+		Login* login = (Login*)recv_buf;
+		cout << "login: name is " << login->name << " , password is " << login->password<< endl;
+				
+		LoginResult login_result;//返回结果
+		SendData2All(client_sock, &login_result);
+	}
+	break;
+	case CMD_LOGOUT:
+	{
+		Logout* logout = (Logout*)recv_buf;
+		cout << "Logout: name is " << logout->name << endl;
+		
+		LogoutResult logout_result;//返回结果
+		SendData2All(client_sock, &logout_result);
+	}
+	break;
+	default:
+	{
+		Header header;
+		header.cmd = CMD_ERROR;
+		header.data_length = 0;
+		SendData2All(client_sock, &header);
+	}
+	break;
 	}
 }
+
+int Server::SendData2All(int client_sock, Header* header)
+{
+	//判断消息是否为空
+	if (IsRun() && header)
+	{
+		send(client_sock, (const char*)header, header->data_length, 0);
+		return 0;
+	}
+	return -1;
+}
+
+void Server::SendData2All(Header* header)
+{
+	//判断消息是否为空
+	if (IsRun() && header)
+	{
+		for (int i = 0; i < _group_clients.size(); ++i)
+		{
+			send(_group_clients[i], (const char*)header, header->data_length, 0);
+		}		
+	}
+}
+

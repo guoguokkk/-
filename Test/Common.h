@@ -1,103 +1,84 @@
-#ifndef COMMOC_H
-#define COMMOC_H
-#define WIN32_LEAN_AND_MEAN//解决<Windows.h>和<WinSock2.h>矛盾
-#include<iostream>
-
+#ifndef COMMON_H
+#define COMMON_H
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include<Windows.h>
 #include<WinSock2.h>
 #else
-#include<unistd.h>
-#include<sys/socket.h>
-#include<arpa/inet.h>
+#include<unistd>
+#include<arpr/inet.h>
 #include<string.h>
-typedef int SOCKET;
-#endif //_WIN32
-
+#endif // _WIN32
 #include<string>
-#define PORT 8003
-#define SERVER_IP "127.0.0.1"
-#define CLIENT_IP "127.0.0.1"
 
-enum CMD_LINE
+#define PORT 8087
+#define SERVER_IP "202.114.7.16"//win 台式机
+//#define SERVER_IP "222.20.79.232"//linux
+enum CMD
 {
 	CMD_LOGIN,
 	CMD_LOGIN_RESULT,
 	CMD_LOGOUT,
 	CMD_LOGOUT_RESULT,
-	CMD_ERROR,
-	CMD_NEW_USER_JOIN//其他用户加入
+	CMD_NEW_UER_JOIN,
+	CMD_ERROR
 };
 
-//数据报头部
 struct Header
 {
-	int data_length;//数据长度
 	int cmd;//命令
+	int data_length;//数据长度
 };
 
-struct LOGIN :public Header
+struct Login :public Header
 {
-	LOGIN()
+	Login()
 	{
-		data_length = sizeof(LOGIN);
 		cmd = CMD_LOGIN;
+		data_length = sizeof(Login);
 	}
-	char _user_name[32];
-	char _user_password[32];
+	char name[32];//用户名
+	char password[32];//密码
 };
 
-struct LOGIN_RESULT :public Header
+struct LoginResult :public Header
 {
-	LOGIN_RESULT()
+	LoginResult()
 	{
-		data_length = sizeof(LOGIN_RESULT);
 		cmd = CMD_LOGIN_RESULT;
-		result = 0;
+		data_length = sizeof(LoginResult);
 	}
-	int result;
+	int result = 0;//登录结果
 };
 
-struct LOGOUT :public Header
+struct Logout :public Header
 {
-	LOGOUT()
+	Logout()
 	{
-		data_length = sizeof(LOGOUT);
 		cmd = CMD_LOGOUT;
+		data_length = sizeof(Logout);
 	}
-	char _user_name[32];
-	char _user_password[32];
+	char name[32];//用户名
 };
 
-struct LOGOUT_RESULT :public Header
+struct LogoutResult :public Header
 {
-	LOGOUT_RESULT()
+	LogoutResult()
 	{
-		data_length = sizeof(LOGOUT_RESULT);
 		cmd = CMD_LOGOUT_RESULT;
-		result = 0;
+		data_length = sizeof(LogoutResult);
 	}
-	int result;
+	int result = 0;//登出结果
 };
 
-struct NEW_USER_JOIN :public Header
+struct NewUserJoin :public Header
 {
-	NEW_USER_JOIN()
+	NewUserJoin()
 	{
-		data_length = sizeof(NEW_USER_JOIN);
-		cmd = CMD_NEW_USER_JOIN;
-		sock = 0;
+		cmd = CMD_NEW_UER_JOIN;
+		data_length = sizeof(NewUserJoin);
 	}
-	int sock;//新用户id
+	int sock = 0;//新用户
 };
 
-static void HandleError(std::string _error_s)
-{
-	std::cout << _error_s << std::endl;
-}
-
-static void HandleSuccess(std::string _success_s)
-{
-	std::cout << _success_s << std::endl;
-}
-#endif // !COMMOC_H
+#endif // !COMMON_H
