@@ -1,23 +1,27 @@
 #ifndef SERVER_H
 #define SERVER_H
+#ifdef _WIN32
 #include"../Test/Common.h"
+#else
+#include"Common.h"
+#endif // _WIN32
 #include<vector>
 class Server
 {
 public:
 	Server();
 	virtual ~Server();
-	void InitServer();//³õÊ¼»¯·şÎñÆ÷
-	int Bind(const char* ip, const unsigned short port);//°ó¶¨ipºÍ¶Ë¿ÚºÅ
-	void Listen(int n);//¼àÌı¶Ë¿Ú
-	void Accept();//½ÓÊÕ¿Í»§¶ËÁ¬½Ó
-	void CloseServer();//¹Ø±Õ¿Í»§¶Ë
-	bool OnRun();//²éÑ¯
-	bool IsRun();//ÅĞ¶ÏÊÇ·ñ¿ÉÒÔÕı³£ÔËĞĞ
-	int RecvData(int client_sock);//½ÓÊÕÊı¾İ
-	void OnNetMsg(int client_sock,Header* header, char* recv_buf);//´¦ÀíÍøÂçÏûÏ¢
-	int SendData2All(int client_sock, Header* header);//µ¥·¢
-	void SendData2All(Header* header);//Èº·¢
+	void InitServer();//åˆå§‹åŒ–æœåŠ¡å™¨
+	int Bind(const char* ip, const unsigned short port);//ç»‘å®šåœ°å€å’Œç«¯å£
+	void Listen(int n);//ç›‘å¬
+	void Accept();//æ¥æ”¶å®¢æˆ·ç«¯
+	void CloseServer();//å…³é—­æœåŠ¡å™¨
+	bool OnRun();//æ‰§è¡Œ
+	bool IsRun();//æ˜¯å¦æ­£å¸¸æ‰§è¡Œ
+	int RecvData(int client_sock);//æ¥å—æ•°æ®
+	void OnNetMsg(int client_sock,Header* header, char* recv_buf);//å¤„ç†æ¶ˆæ¯
+	int SendData(int client_sock, Header* header);//å‘é€æ¶ˆæ¯
+	void SendData2All(Header* header);//å¹¿æ’­æ¶ˆæ¯
 private:
 	int _server_sock;
 	std::vector<int> _group_clients;

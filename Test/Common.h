@@ -5,15 +5,17 @@
 #include<Windows.h>
 #include<WinSock2.h>
 #else
-#include<unistd>
-#include<arpr/inet.h>
+#include<unistd.h>
+#include<arpa/inet.h>
 #include<string.h>
 #endif // _WIN32
 #include<string>
 
-#define PORT 8087
-#define SERVER_IP "202.114.7.16"//win 台式机
+#define PORT 9050
+//#define SERVER_IP "192.168.32.1"//win ws
+#define SERVER_IP "202.114.7.16"//win kzj
 //#define SERVER_IP "222.20.79.232"//linux
+//#define SERVER_IP "127.0.0.1"
 enum CMD
 {
 	CMD_LOGIN,
@@ -26,8 +28,8 @@ enum CMD
 
 struct Header
 {
-	int cmd;//命令
-	int data_length;//数据长度
+	int cmd;//cmd 命令
+	int data_length;//数据总长度
 };
 
 struct Login :public Header
@@ -37,7 +39,7 @@ struct Login :public Header
 		cmd = CMD_LOGIN;
 		data_length = sizeof(Login);
 	}
-	char name[32];//用户名
+	char name[32];//姓名
 	char password[32];//密码
 };
 
@@ -58,7 +60,7 @@ struct Logout :public Header
 		cmd = CMD_LOGOUT;
 		data_length = sizeof(Logout);
 	}
-	char name[32];//用户名
+	char name[32];//姓名
 };
 
 struct LogoutResult :public Header
@@ -78,7 +80,7 @@ struct NewUserJoin :public Header
 		cmd = CMD_NEW_UER_JOIN;
 		data_length = sizeof(NewUserJoin);
 	}
-	int sock = 0;//新用户
+	int sock = 0;//新加入的用户
 };
 
 #endif // !COMMON_H

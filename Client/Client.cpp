@@ -13,16 +13,14 @@ Client::~Client()
 	CloseClient();
 }
 
-//³õÊ¼»¯¿Í»§¶Ë£º³õÊ¼»¯»·¾³£¬½¨Á¢Ì×½Ó×Ö
 void Client::InitClient()
 {
 #ifdef _WIN32
 	WORD version = MAKEWORD(2, 2);
 	WSADATA data;
-	WSAStartup(version, &data);//LPWSADATAÊÇÒ»¸öÖ¸ÏòWSADATA½á¹¹µÄÖ¸Õë
+	WSAStartup(version, &data);
 #endif // _WIN32
 
-	//·ÀÖ¹ÖØ¸´³õÊ¼»¯
 	if (_client_sock < 0)
 	{
 		_client_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -33,15 +31,13 @@ void Client::InitClient()
 	}
 	else
 	{
-		CloseClient();//ÓĞÁ¬½ÓÒªÏÈ¹Ø±Õ
+		CloseClient();
 		cout << "Client " << _client_sock << " close old connections." << endl;
 	}
 }
 
-//Á¬½Óµ½·şÎñÆ÷
 int Client::Connect(const char* ip, const unsigned short port)
 {
-	//Ã»ÓĞ³õÊ¼»¯ĞèÒªÏÈ³õÊ¼»¯
 	if (_client_sock <= 0)
 	{
 		InitClient();
@@ -51,7 +47,7 @@ int Client::Connect(const char* ip, const unsigned short port)
 #ifdef _WIN32
 	server_addr.sin_addr.S_un.S_addr = inet_addr(ip);
 #else
-	_serv_addr.sin_addr.s_addr = inet_addr(ip);
+	server_addr.sin_addr.s_addr = inet_addr(ip);
 #endif // _WIN32
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
@@ -63,10 +59,8 @@ int Client::Connect(const char* ip, const unsigned short port)
 	return ret;
 }
 
-//¹Ø±Õ¿Í»§¶Ë
 void Client::CloseClient()
 {
-	//·ÀÖ¹ÖØ¸´¹Ø±Õ
 	if (_client_sock < 0)
 	{
 		return;
@@ -80,21 +74,19 @@ void Client::CloseClient()
 	_client_sock = -1;
 }
 
-//²éÑ¯
 bool Client::OnRun()
 {
-	//ÅĞ¶ÏÊÇ·ñÕı³£ÔËĞĞ
 	if (!IsRun())
 		return false;
 
-	fd_set fds_read;//ÃèÊö·û¼¯ºÏ£¬ÊÇ·ñ¿ÉÒÔ´ÓÕâĞ©ÎÄ¼şÖĞ¶ÁÈ¡Êı¾İ
-	FD_ZERO(&fds_read);//ÇåÁãÃèÊö·û¼¯ºÏ
-	FD_SET(_client_sock, &fds_read);//¿Í»§¶Ë¼ÓÈë¿É¶Á¼¯ºÏ
+	fd_set fds_read;//æè¿°ç¬¦é›†åˆ
+	FD_ZERO(&fds_read);//æ¸…ç©ºé›†åˆ
+	FD_SET(_client_sock, &fds_read);//å®¢æˆ·ç«¯æè¿°ç¬¦åŠ å…¥é›†åˆ
 
-	//ÉèÖÃÊ±¼ä
+	//æ—¶é—´é—´éš”
 	timeval time_val;
-	time_val.tv_sec = 1;//Ãë
-	time_val.tv_usec = 0;//ºÁÃë
+	time_val.tv_sec = 1;//ç§’
+	time_val.tv_usec = 0;//æ¯«ç§’
 	int ret = select(_client_sock + 1, &fds_read, nullptr, nullptr, &time_val);
 	if (ret < 0)
 	{
@@ -104,10 +96,9 @@ bool Client::OnRun()
 
 	if (FD_ISSET(_client_sock, &fds_read))
 	{
-		FD_CLR(_client_sock, &fds_read);//Çå³ı¸Ã¿Í»§¶Ë
+		FD_CLR(_client_sock, &fds_read);//æ¸…é™¤å®¢æˆ·ç«¯
 
-		//¿Í»§¶ËÍË³ö
-		int ret = RecvData();//½ÓÊÕÊı¾İ
+		int ret = RecvData();
 		if (ret == -1)
 		{
 			cout << "Client " << _client_sock << " select task end 2." << endl;
@@ -119,31 +110,28 @@ bool Client::OnRun()
 	return true;
 }
 
-//ÅĞ¶ÏÊÇ·ñ¿ÉÒÔÕı³£ÔËĞĞ
 bool Client::IsRun()
 {
 	return _client_sock >= 0;
 }
 
-//½ÓÊÕÊı¾İ
 int Client::RecvData()
 {
-	char recv_buf[4096];//½ÓÊÕ»º³åÇø
-	int len = (int)recv(_client_sock, recv_buf, sizeof(Header), 0);//½ÓÊÜÊı¾İµÄÍ·²¿	
+	char recv_buf[4096];
+	int len = (int)recv(_client_sock, recv_buf, sizeof(Header), 0);
 	if (len <= 0)
 	{
 		cout << "Disconnect from server." << endl;
 		return -1;
 	}
-	Header* header = (Header*)recv_buf;//Í·²¿
-	recv(_client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);//½ÓÊÜ³ıÍ·²¿ÍâµÄÆäËûÊı¾İ
+	Header* header = (Header*)recv_buf;
+	recv(_client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);
 	OnNetMsg(header, recv_buf);
 	return 0;
 }
 
 int Client::SendData(Header* header)
 {
-	//ÅĞ¶ÏÏûÏ¢ÊÇ·ñÎª¿Õ
 	if (IsRun() && header)
 	{
 		send(_client_sock, (const char*)header, header->data_length, 0);
@@ -152,7 +140,6 @@ int Client::SendData(Header* header)
 	return -1;
 }
 
-//´¦ÀíÍøÂçÏûÏ¢
 void Client::OnNetMsg(Header* header, char* recv_buf)
 {
 	switch (header->cmd)
@@ -172,7 +159,7 @@ void Client::OnNetMsg(Header* header, char* recv_buf)
 	case CMD_NEW_UER_JOIN:
 	{
 		NewUserJoin* new_user_join = (NewUserJoin*)recv_buf;
-		cout << "New User is " << new_user_join->sock << endl;
+		cout << "New User join , it is " << new_user_join->sock << endl;
 	}
 	default:
 		break;

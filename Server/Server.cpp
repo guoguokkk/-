@@ -1,7 +1,6 @@
 #include"Server.h"
 #include<iostream>
 #ifdef _WIN32
-
 #else
 #include<algorithm>
 #endif // _WIN32
@@ -18,16 +17,14 @@ Server::~Server()
 	CloseServer();
 }
 
-//³õÊ¼»¯·şÎñÆ÷
 void Server::InitServer()
 {
 #ifdef _WIN32
 	WORD version = MAKEWORD(2, 2);
 	WSADATA data;
-	WSAStartup(version, &data);//LPWSADATAÊÇÒ»¸öÖ¸ÏòWSADATA½á¹¹µÄÖ¸Õë
+	WSAStartup(version, &data);
 #endif // _WIN32
-
-	//·ÀÖ¹ÖØ¸´³õÊ¼»¯
+		
 	if (_server_sock < 0)
 	{
 		_server_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -38,12 +35,11 @@ void Server::InitServer()
 	}
 	else
 	{
-		CloseServer();//ÓĞÁ¬½ÓÒªÏÈ¹Ø±Õ
+		CloseServer();
 		cout << "Server " << _server_sock << " close." << endl;
 	}
 }
 
-//°ó¶¨ipºÍ¶Ë¿ÚºÅ
 int Server::Bind(const char* ip, const unsigned short port)
 {
 	sockaddr_in server_addr;
@@ -81,29 +77,26 @@ void Server::Accept()
 {
 	int client_sock;
 	sockaddr_in client_addr;
-	int client_addr_size = sizeof(client_addr);
 #ifdef _WIN32
-	client_sock = accept(_server_sock, (sockaddr*)& client_addr, &client_addr_size);
+	int client_addr_size = sizeof(client_addr);	
 #else
-	client_sock = accept(_server_sock, (sockaddr*)& client_addr, (size_t*)& client_addr_size);
+	socklen_t client_addr_size = sizeof(client_addr);
 #endif // _WIN32
+	client_sock = accept(_server_sock, (sockaddr*)& client_addr, & client_addr_size);
+	
 	if (client_sock < 0)
 		cout << "Invalid Received Client" << endl;
 	else
 	{
-		//¸øÆäËû¿Í»§¶Ë·¢ËÍÏûÏ¢
 		NewUserJoin new_user_join;
 		SendData2All(&new_user_join);
-		//¼ÓÈëµ½¿Í»§¶ËÊı×é
 		_group_clients.push_back(client_sock);
 		cout << "New Client join : " << "IP= " << inet_ntoa(client_addr.sin_addr) << endl;
 	}
 }
 
-//¹Ø±Õ·şÎñÆ÷
 void Server::CloseServer()
 {
-	//·ÀÖ¹ÖØ¸´¹Ø±Õ
 	if (_server_sock < 0)
 	{
 		return;
@@ -131,36 +124,39 @@ bool Server::OnRun()
 	FD_SET(_server_sock, &fds_read);
 	FD_SET(_server_sock, &fds_write);
 	FD_SET(_server_sock, &fds_exc);
+	int max_sock=_server_sock;
 	for (int i = 0; i < _group_clients.size(); ++i)
 	{
 		FD_SET(_group_clients[i], &fds_read);
-	}
+		if(_group_clients[i]>max_sock)
+			max_sock=_group_clients[i];
+	}	
 
-	//ÉèÖÃÊ±¼ä
 	timeval time_val;
-	time_val.tv_sec = 1;//Ãë
-	time_val.tv_usec = 0;//ºÁÃë
-	int ret = select(_server_sock, &fds_read, &fds_write, &fds_exc, &time_val);	
+	time_val.tv_sec = 1;//ç§’
+	time_val.tv_usec = 0;//æ¯«ç§’
+	int ret = select(max_sock+1, &fds_read, &fds_write, &fds_exc, &time_val);
 	if (ret < 0)
 	{
 		cout << "Server " << _server_sock << "select task end 1." << endl;
 		CloseServer();
 		return false;
-	}	
-	
+	}
+
 	if (FD_ISSET(_server_sock, &fds_read))
 	{
-		FD_CLR(_server_sock, &fds_read);
-		Accept();		
+		FD_CLR(_server_sock, &fds_read);		
+		Accept();
 	}
-	//ÒÀ´Î´¦ÀíËùÓĞ¿Í»§¶ËµÄÇëÇó
+	
+	//éå†æ‰€æœ‰å®¢æˆ·ç«¯
 	for (int i = 0; i < _group_clients.size(); ++i)
-	{
+	{		
 		if (FD_ISSET(_group_clients[i], &fds_read))
 		{
 			int ret = RecvData(_group_clients[i]);
 			if (ret == -1)
-			{//¸Ã¿Í»§¶ËÍË³ö£¬ĞèÒª´Ó¿Í»§¶ËÊı×éÖĞÉ¾³ı
+			{//åˆ é™¤å·²ç»é€€å‡ºçš„å®¢æˆ·ç«¯
 				auto iter = _group_clients.begin() + i;
 				if (iter != _group_clients.end())
 					_group_clients.erase(iter);
@@ -176,43 +172,42 @@ bool Server::IsRun()
 	return _server_sock >= 0;
 }
 
-//½ÓÊÕÊı¾İ
 int Server::RecvData(int client_sock)
 {
-	char recv_buf[4096];//½ÓÊÕ»º³åÇø
-	int len = (int)recv(client_sock, recv_buf, sizeof(Header), 0);//½ÓÊÜÊı¾İµÄÍ·²¿	
+	char recv_buf[4096];
+	int len = (int)recv(client_sock, recv_buf, sizeof(Header), 0);//æ¥æ”¶å¤´éƒ¨ä¿¡æ¯
 	if (len <= 0)
 	{
 		cout << "Client exit." << endl;
 		return -1;
 	}
-	Header* header = (Header*)recv_buf;//Í·²¿
-	recv(client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);//½ÓÊÜ³ıÍ·²¿ÍâµÄÆäËûÊı¾İ
-	OnNetMsg(client_sock,header, recv_buf);
+	Header* header = (Header*)recv_buf;
+	recv(client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);//æ•°æ®éƒ¨åˆ†
+	OnNetMsg(client_sock, header, recv_buf);
 	return 0;
 
 }
 
-void Server::OnNetMsg(int client_sock,Header* header, char* recv_buf)
+void Server::OnNetMsg(int client_sock, Header * header, char* recv_buf)
 {
 	switch (header->cmd)
 	{
 	case CMD_LOGIN:
 	{
 		Login* login = (Login*)recv_buf;
-		cout << "login: name is " << login->name << " , password is " << login->password<< endl;
-				
-		LoginResult login_result;//·µ»Ø½á¹û
-		SendData2All(client_sock, &login_result);
+		cout << "login: name is " << login->name << " , password is " << login->password << endl;
+
+		LoginResult login_result;
+		SendData(client_sock, &login_result);
 	}
 	break;
 	case CMD_LOGOUT:
 	{
 		Logout* logout = (Logout*)recv_buf;
 		cout << "Logout: name is " << logout->name << endl;
-		
-		LogoutResult logout_result;//·µ»Ø½á¹û
-		SendData2All(client_sock, &logout_result);
+
+		LogoutResult logout_result;
+		SendData(client_sock, &logout_result);
 	}
 	break;
 	default:
@@ -220,15 +215,14 @@ void Server::OnNetMsg(int client_sock,Header* header, char* recv_buf)
 		Header header;
 		header.cmd = CMD_ERROR;
 		header.data_length = 0;
-		SendData2All(client_sock, &header);
+		SendData(client_sock, &header);
 	}
 	break;
 	}
 }
 
-int Server::SendData2All(int client_sock, Header* header)
+int Server::SendData(int client_sock, Header * header)
 {
-	//ÅĞ¶ÏÏûÏ¢ÊÇ·ñÎª¿Õ
 	if (IsRun() && header)
 	{
 		send(client_sock, (const char*)header, header->data_length, 0);
@@ -237,15 +231,14 @@ int Server::SendData2All(int client_sock, Header* header)
 	return -1;
 }
 
-void Server::SendData2All(Header* header)
+void Server::SendData2All(Header * header)
 {
-	//ÅĞ¶ÏÏûÏ¢ÊÇ·ñÎª¿Õ
 	if (IsRun() && header)
 	{
 		for (int i = 0; i < _group_clients.size(); ++i)
 		{
 			send(_group_clients[i], (const char*)header, header->data_length, 0);
-		}		
+		}
 	}
 }
 

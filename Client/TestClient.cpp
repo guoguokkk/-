@@ -48,9 +48,13 @@ int main()
 	std::thread t(cmd_thread, &client);
 	t.detach();
 
+	Login login;
+	strcpy(login.name, "ws");
+	strcpy(login.password, "111");
 	while (client.IsRun())
 	{
 		client.OnRun();
+	//	client.SendData(&login);
 	}
 	client.CloseClient();
 	return 0;
