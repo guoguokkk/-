@@ -13,9 +13,9 @@
 
 #define PORT 8304
 //#define SERVER_IP "192.168.32.1"//win ws
-//#define SERVER_IP "202.114.7.16"//win kzj
+#define SERVER_IP "202.114.7.16"//win kzj
 //#define SERVER_IP "222.20.79.232"//linux
-#define SERVER_IP "11.11.11.10"
+//#define SERVER_IP "11.11.11.10"
 //#define SERVER_IP "127.0.0.1"
 enum CMD
 {
@@ -52,6 +52,7 @@ struct LoginResult :public Header
 		data_length = sizeof(LoginResult);
 	}
 	int result = 0;//µÇÂ¼½á¹û
+	char data[1024];
 };
 
 struct Logout :public Header

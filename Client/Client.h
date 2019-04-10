@@ -6,6 +6,7 @@
 #include"Common.h"
 #endif // _WIN32
 #include<vector>
+#define RECV_BUF_SIZE 10240 //缓冲区区域最小单元大小
 class Client
 {
 public:
@@ -18,9 +19,12 @@ public:
 	bool IsRun();//判断是否可以正常运行
 	int RecvData();//接收数据
 	int SendData(Header* header);//发送
-	void OnNetMsg(Header* header, char* recv_buf);//处理网络消息
+	void OnNetMsg(Header* header);//处理网络消息
 private:
 	int _client_sock;
+	char _recv_buf[RECV_BUF_SIZE];//接收缓冲区
+	char _msg_buf[RECV_BUF_SIZE * 10];//消息缓冲区
+	int _last_pos = 0;//上次存放的位置（消息缓冲区）
 };
 
 #endif // !CLIENT_H

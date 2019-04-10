@@ -117,16 +117,30 @@ bool Client::IsRun()
 
 int Client::RecvData()
 {
-	char recv_buf[4096];
-	int len = (int)recv(_client_sock, recv_buf, sizeof(Header), 0);
+	int len = (int)recv(_client_sock, _recv_buf, RECV_BUF_SIZE, 0);//接收数据到接收缓冲区
 	if (len <= 0)
 	{
 		cout << "Disconnect from server." << endl;
 		return -1;
 	}
-	Header* header = (Header*)recv_buf;
-	recv(_client_sock, recv_buf + sizeof(Header), header->data_length - sizeof(Header), 0);
-	OnNetMsg(header, recv_buf);
+
+	memcpy(_msg_buf + _last_pos, _recv_buf, len);//把收到的数据拷贝消息缓冲区
+	_last_pos += len;//消息缓冲区尾部位置后移
+	while (_last_pos >= sizeof(Header))//循环：粘包
+	{
+		Header* header = (Header*)_msg_buf;
+		if (_last_pos >= header->data_length)//少包
+		{
+			int data_size = _last_pos - header->data_length;//剩余未处理消息缓冲区的数据的长度
+			OnNetMsg(header);//处理网络消息
+			memcpy(_msg_buf, _recv_buf + header->data_length, data_size);//移除处理完毕的数据
+			_last_pos = data_size;//偏移位置
+		}
+		else
+		{
+			break;//剩余消息不够一个消息，不处理
+		}
+	}
 	return 0;
 }
 
@@ -140,28 +154,37 @@ int Client::SendData(Header* header)
 	return -1;
 }
 
-void Client::OnNetMsg(Header* header, char* recv_buf)
+void Client::OnNetMsg(Header* header)
 {
 	switch (header->cmd)
 	{
 	case CMD_LOGIN_RESULT:
 	{
-		LoginResult* login_result = (LoginResult*)recv_buf;
-		cout << "Login result is " << login_result->result << " ,data length is " << login_result->data_length << endl;
+		LoginResult* login_result = (LoginResult*)_recv_buf;
+	//	cout << "Login result is " << login_result->result << " ,data length is " << login_result->data_length << endl;
 	}
 	break;
 	case CMD_LOGOUT_RESULT:
 	{
-		LogoutResult* logout_result = (LogoutResult*)recv_buf;
+		LogoutResult* logout_result = (LogoutResult*)_recv_buf;
 		cout << "Logout result is " << logout_result->result << " ,data length is " << logout_result->data_length << endl;
 	}
 	break;
 	case CMD_NEW_UER_JOIN:
 	{
-		NewUserJoin* new_user_join = (NewUserJoin*)recv_buf;
-		cout << "New User join , it is " << new_user_join->sock << endl;
+		NewUserJoin* new_user_join = (NewUserJoin*)_recv_buf;
+		cout << "New User join , it is " << new_user_join->sock<< " ,data length is " << new_user_join->data_length << endl;
 	}
+	break;
+	case CMD_ERROR:
+	{
+		cout << "Error " << " ,data length is " << header->data_length << endl;
+	}
+	break;
 	default:
-		break;
+	{
+		cout << "Undefined data , data length is " << header->data_length << endl;
+	}
+	break;
 	}
 }

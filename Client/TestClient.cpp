@@ -54,7 +54,7 @@ int main()
 	while (client.IsRun())
 	{
 		client.OnRun();
-	//	client.SendData(&login);
+		client.SendData(&login);
 	}
 	client.CloseClient();
 	return 0;
