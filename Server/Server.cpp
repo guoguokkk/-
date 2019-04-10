@@ -9,6 +9,7 @@ using std::endl;
 using std::cin;
 Server::Server()
 {
+	_server_sock = -1;
 	InitServer();
 }
 
