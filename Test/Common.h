@@ -10,12 +10,11 @@
 #include<string.h>
 #endif // _WIN32
 #include<string>
-
+#define RECV_BUF_SIZE 10240 //缓冲区区域最小单元大小
 #define PORT 8304
-//#define SERVER_IP "192.168.32.1"//win ws
+//#define SERVER_IP "202.118.19.190"//win ws
 #define SERVER_IP "202.114.7.16"//win kzj
 //#define SERVER_IP "222.20.79.232"//linux
-//#define SERVER_IP "11.11.11.10"
 //#define SERVER_IP "127.0.0.1"
 enum CMD
 {
@@ -29,6 +28,10 @@ enum CMD
 
 struct Header
 {
+	Header()
+	{
+		data_length = sizeof(Header);
+	}
 	int cmd;//cmd 命令
 	int data_length;//数据总长度
 };
@@ -42,6 +45,7 @@ struct Login :public Header
 	}
 	char name[32];//姓名
 	char password[32];//密码
+	char data[2048];
 };
 
 struct LoginResult :public Header

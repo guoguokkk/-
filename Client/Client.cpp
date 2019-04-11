@@ -106,7 +106,7 @@ bool Client::OnRun()
 			return false;
 		}
 	}
-	cout << "do other things" << endl;
+	//cout << "do other things" << endl;
 	return true;
 }
 
@@ -167,13 +167,13 @@ void Client::OnNetMsg(Header* header)
 	case CMD_LOGOUT_RESULT:
 	{
 		LogoutResult* logout_result = (LogoutResult*)_recv_buf;
-		cout << "Logout result is " << logout_result->result << " ,data length is " << logout_result->data_length << endl;
+		//cout << "Logout result is " << logout_result->result << " ,data length is " << logout_result->data_length << endl;
 	}
 	break;
 	case CMD_NEW_UER_JOIN:
 	{
 		NewUserJoin* new_user_join = (NewUserJoin*)_recv_buf;
-		cout << "New User join , it is " << new_user_join->sock<< " ,data length is " << new_user_join->data_length << endl;
+		//cout << "New User join , it is " << new_user_join->sock<< " ,data length is " << new_user_join->data_length << endl;
 	}
 	break;
 	case CMD_ERROR:

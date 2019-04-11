@@ -6,9 +6,7 @@
 #include"Common.h"
 #endif // _WIN32
 #include<vector>
-#define RECV_BUF_SIZE 10240 //缓冲区区域最小单元大小
-class Client
-{
+class Client{
 public:
 	Client();
 	virtual ~Client();
