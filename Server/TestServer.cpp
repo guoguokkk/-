@@ -39,5 +39,6 @@ int main()
 		server.OnRun();
 	}
 	server.CloseServer();
+	cout << "EXIT...." << endl;
 	return 0;
 }

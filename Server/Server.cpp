@@ -4,7 +4,7 @@ using std::cout;
 using std::endl;
 using std::cin;
 
-int Server::InitServer()
+SOCKET Server::InitServer()
 {
 #ifdef _WIN32
 	WORD version = MAKEWORD(2, 2);
@@ -51,13 +51,14 @@ int Server::Bind(const char* ip, const unsigned short port)
 	return ret;
 }
 
-void Server::Listen(int n)
+int Server::Listen(int n)
 {
 	int ret = listen(_server_sock, n);
 	if (ret == SOCKET_ERROR)
 		cout << "Server " << _server_sock << " listen error." << endl;
 	else
 		cout << "Server " << _server_sock << " listen success." << endl;
+	return ret;
 }
 
 SOCKET Server::Accept()
@@ -87,9 +88,8 @@ void Server::CloseServer()
 {
 	//避免重复关闭
 	if (_server_sock == INVALID_SOCKET)
-	{
 		return;
-	}
+	
 #ifdef _WIN32
 	for (int i = 0; i < _clients.size(); ++i)
 	{
@@ -112,12 +112,12 @@ void Server::CloseServer()
 //select
 bool Server::OnRun()
 {
-	if (!IsRun())//如果没有有效的socket
+	if (!IsRun())//如果没有有效的服务器socket
 		return false;
 
-	fd_set fds_read, fds_write, fds_exc;
-	FD_ZERO(&fds_read);
-	FD_SET(_server_sock, &fds_read);
+	fd_set fds_read, fds_write, fds_exc;//windows默认64个，linux默认1024个
+	FD_ZERO(&fds_read);//清理集合
+	FD_SET(_server_sock, &fds_read);//将服务器描述符加入集合
 	int max_sock = _server_sock;
 	for (int i = 0; i < _clients.size(); ++i)
 	{
@@ -198,14 +198,12 @@ int Server::RecvData(ClientSocket * p_client)
 			p_client->SetLastPos(data_size);
 		}
 		else
-		{
 			break;//消息不足以处理
-		}
 	}
 	return 0;
 }
 
-void Server::OnNetMsg(int client_sock, Header * header)
+void Server::OnNetMsg(SOCKET client_sock, Header * header)
 {
 	switch (header->cmd)
 	{
@@ -235,21 +233,16 @@ void Server::OnNetMsg(int client_sock, Header * header)
 	}
 }
 
-int Server::SendData(int client_sock, Header * header)
+int Server::SendData(SOCKET client_sock, Header * header)
 {
 	if (IsRun() && header)
-	{
-		send(client_sock, (const char*)header, header->data_length, 0);
-		return 0;
-	}
-	return -1;
+		return send(client_sock, (const char*)header, header->data_length, 0);	
+	return SOCKET_ERROR;
 }
 
 void Server::SendData2All(Header * header)
 {
 	for (int i = 0; i < _clients.size(); ++i)
-	{
-		send(_clients[i]->GetSockfd(), (const char*)header, header->data_length, 0);
-	}
+		SendData(_clients[i]->GetSockfd(), header);
 }
 

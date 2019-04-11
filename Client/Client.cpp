@@ -5,7 +5,7 @@ using std::endl;
 using std::cin;
 Client::Client()
 {
-	_client_sock = -1;
+	_client_sock = INVALID_SOCKET;
 }
 
 Client::~Client()
@@ -20,39 +20,34 @@ void Client::InitClient()
 	WSADATA data;
 	WSAStartup(version, &data);
 #endif // _WIN32
-
-	if (_client_sock < 0)
+	if (_client_sock != INVALID_SOCKET)
 	{
-		_client_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (_client_sock < 0)
-			cout << "Client socket error." << endl;
-		else
-			cout << "Client socket success." << endl;
-	}
-	else
-	{
+		cout << "Close " << _client_sock << " old connections." << endl;
 		CloseClient();
-		cout << "Client " << _client_sock << " close old connections." << endl;
 	}
+	_client_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (_client_sock < 0)
+		cout << "Client " << _client_sock << " socket error." << endl;
+	else
+		cout << "Client " << _client_sock << " socket success." << endl;
+
 }
 
 int Client::Connect(const char* ip, const unsigned short port)
 {
-	if (_client_sock <= 0)
-	{
+	if (_client_sock == INVALID_SOCKET)
 		InitClient();
-	}
 
 	sockaddr_in server_addr;
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(port);
 #ifdef _WIN32
 	server_addr.sin_addr.S_un.S_addr = inet_addr(ip);
 #else
 	server_addr.sin_addr.s_addr = inet_addr(ip);
-#endif // _WIN32
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(port);
+#endif // _WIN32	
 	int ret = connect(_client_sock, (sockaddr*)& server_addr, sizeof(sockaddr_in));
-	if (ret < 0)
+	if (ret == SOCKET_ERROR)
 		cout << "Client " << _client_sock << " connect error." << endl;
 	else
 		cout << "Client " << _client_sock << " connect success." << endl;
@@ -61,17 +56,16 @@ int Client::Connect(const char* ip, const unsigned short port)
 
 void Client::CloseClient()
 {
-	if (_client_sock < 0)
-	{
+	if (_client_sock == INVALID_SOCKET)
 		return;
-	}
+
 #ifdef _WIN32
 	closesocket(_client_sock);
 	WSACleanup();
 #else
 	close(_client_sock);
 #endif // _WIN32
-	_client_sock = -1;
+	_client_sock = INVALID_SOCKET;
 }
 
 bool Client::OnRun()
@@ -98,7 +92,7 @@ bool Client::OnRun()
 	{
 		FD_CLR(_client_sock, &fds_read);//清除客户端
 
-		int ret = RecvData();
+		int ret = RecvData(_client_sock);
 		if (ret == -1)
 		{
 			cout << "Client " << _client_sock << " select task end 2." << endl;
@@ -112,15 +106,15 @@ bool Client::OnRun()
 
 bool Client::IsRun()
 {
-	return _client_sock >= 0;
+	return _client_sock != INVALID_SOCKET;
 }
 
-int Client::RecvData()
+int Client::RecvData(SOCKET client_sock)
 {
-	int len = (int)recv(_client_sock, _recv_buf, RECV_BUF_SIZE, 0);//接收数据到接收缓冲区
+	int len = (int)recv(client_sock, _recv_buf, RECV_BUF_SIZE, 0);//接收数据到接收缓冲区
 	if (len <= 0)
 	{
-		cout << "Disconnect from server." << endl;
+		cout << client_sock << " disconnect from server." << endl;
 		return -1;
 	}
 
@@ -137,42 +131,37 @@ int Client::RecvData()
 			_last_pos = data_size;//偏移位置
 		}
 		else
-		{
 			break;//剩余消息不够一个消息，不处理
-		}
 	}
 	return 0;
 }
 
-int Client::SendData(Header* header)
+int Client::SendData(Header * header)
 {
 	if (IsRun() && header)
-	{
-		send(_client_sock, (const char*)header, header->data_length, 0);
-		return 0;
-	}
-	return -1;
+		return send(_client_sock, (const char*)header, header->data_length, 0);
+	return SOCKET_ERROR;
 }
 
-void Client::OnNetMsg(Header* header)
+void Client::OnNetMsg(Header * header)
 {
 	switch (header->cmd)
 	{
 	case CMD_LOGIN_RESULT:
 	{
-		LoginResult* login_result = (LoginResult*)_recv_buf;
-	//	cout << "Login result is " << login_result->result << " ,data length is " << login_result->data_length << endl;
+		LoginResult* login_result = (LoginResult*)header;
+		//	cout << "Login result is " << login_result->result << " ,data length is " << login_result->data_length << endl;
 	}
 	break;
 	case CMD_LOGOUT_RESULT:
 	{
-		LogoutResult* logout_result = (LogoutResult*)_recv_buf;
+		LogoutResult* logout_result = (LogoutResult*)header;
 		//cout << "Logout result is " << logout_result->result << " ,data length is " << logout_result->data_length << endl;
 	}
 	break;
 	case CMD_NEW_UER_JOIN:
 	{
-		NewUserJoin* new_user_join = (NewUserJoin*)_recv_buf;
+		NewUserJoin* new_user_join = (NewUserJoin*)header;
 		//cout << "New User join , it is " << new_user_join->sock<< " ,data length is " << new_user_join->data_length << endl;
 	}
 	break;
@@ -185,6 +174,5 @@ void Client::OnNetMsg(Header* header)
 	{
 		cout << "Undefined data , data length is " << header->data_length << endl;
 	}
-	break;
 	}
 }

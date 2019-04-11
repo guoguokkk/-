@@ -5,57 +5,55 @@ using std::cout;
 using std::endl;
 using std::cin;
 
+bool g_bRun = true;
 //绑定一个线程负责发送请求
-void cmd_thread(Client* client_p)
+void cmd_thread()
 {
 	while (true)
 	{
-		char send_buf[128];
-		cin >> send_buf;
-		if (strcmp(send_buf, "exit") == 0)
+		char cmd_buf[256];
+		cin >> cmd_buf;
+		if (strcmp(cmd_buf, "exit") == 0)
 		{
+			g_bRun = false;
 			cout << "Client exit." << endl;
-			client_p->CloseClient();
 			break;
 		}
-		else if (strcmp(send_buf, "login")==0)
-		{
-			Login login;
-			strcpy(login.name, "kzj");
-			strcpy(login.password, "12345");
-			client_p->SendData(&login);
-		}
-		else if (strcmp(send_buf, "logout") == 0)
-		{
-			Logout logout;
-			strcpy(logout.name, "kzj");
-			client_p->SendData(&logout);
-		}
 		else
-		{
 			cout << "Invalid input, please re-enter." << endl;
-		}
 	}
 }
 
 int main()
 {
-	Client client;
-	client.InitClient();
-	client.Connect(SERVER_IP, PORT);
+	//const int client_count = FD_SETSIZE - 1;
+	const int client_count = 1;
+	Client* client[client_count];
+	for (int i = 0; i < client_count; ++i)
+		client[i] = new Client();
+
+	for (int i = 0; i < client_count; ++i)
+		client[i]->Connect(SERVER_IP, PORT);
 
 	//启动线程
-	std::thread t(cmd_thread, &client);
+	std::thread t(cmd_thread);
 	t.detach();
 
 	Login login;
 	strcpy(login.name, "ws");
 	strcpy(login.password, "111");
-	while (client.IsRun())
+	while (g_bRun)
 	{
-		client.OnRun();
-		client.SendData(&login);
+		for (int i = 0; i < client_count; ++i)
+		{
+			client[i]->SendData(&login);
+			client[i]->OnRun();
+		}
 	}
-	client.CloseClient();
+
+	for (int i = 0; i < client_count; ++i)
+		client[i]->CloseClient();
+
+	cout << "EXIT...." << endl;
 	return 0;
 }
