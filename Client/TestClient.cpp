@@ -6,7 +6,7 @@ using std::endl;
 using std::cin;
 
 bool g_bRun = true;
-//绑定一个线程负责发送请求
+
 void cmd_thread()
 {
 	while (true)
@@ -26,16 +26,15 @@ void cmd_thread()
 
 int main()
 {
-	//const int client_count = FD_SETSIZE - 1;
-	const int client_count = 1;
+	const int client_count = 60;
+	//const int client_count = 1;
 	Client* client[client_count];
 	for (int i = 0; i < client_count; ++i)
+	{
 		client[i] = new Client();
-
-	for (int i = 0; i < client_count; ++i)
 		client[i]->Connect(SERVER_IP, PORT);
+	}
 
-	//启动线程
 	std::thread t(cmd_thread);
 	t.detach();
 
