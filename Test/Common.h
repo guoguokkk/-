@@ -1,8 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 #ifdef _WIN32
+//#define FD_SETSIZE 64
 #define WIN32_LEAN_AND_MEAN
-#define FD_SETSIZE 1024
 #include<Windows.h>
 #include<WinSock2.h>
 #else
@@ -83,9 +83,9 @@ struct Logout :public Header
 struct LogoutResult :public Header
 {
 	LogoutResult()
-	{
-		cmd = CMD_LOGOUT_RESULT;
+	{		
 		data_length = sizeof(LogoutResult);
+		cmd = CMD_LOGOUT_RESULT;
 		result = 0;
 	}
 	int result;

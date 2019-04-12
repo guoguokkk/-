@@ -174,5 +174,6 @@ void Client::OnNetMsg(Header * header)
 	{
 		cout << "Undefined data , data length is " << header->data_length << endl;
 	}
+	break;
 	}
 }

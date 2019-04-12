@@ -115,13 +115,26 @@ bool Server::OnRun()
 	if (!IsRun())//如果没有有效的服务器socket
 		return false;
 
-	fd_set fds_read, fds_write, fds_exc;//windows默认64个，linux默认1024个
-	FD_ZERO(&fds_read);//清理集合
-	FD_SET(_server_sock, &fds_read);//将服务器描述符加入集合
-	int max_sock = _server_sock;
+	//windows默认64个，linux默认1000个
+	fd_set fds_read; 
+	fd_set fds_write;
+	fd_set fds_exc;
+
+	//清理集合
+	FD_ZERO(&fds_read);
+	FD_ZERO(&fds_write);
+	FD_ZERO(&fds_exc);
+
+	//将服务器描述符加入集合
+	FD_SET(_server_sock, &fds_read);
+	FD_SET(_server_sock, &fds_write);
+	FD_SET(_server_sock, &fds_exc);
+
+	SOCKET max_sock = _server_sock;
 	for (int i = 0; i < _clients.size(); ++i)
 	{
-		FD_SET(_clients[i]->GetSockfd(), &fds_read);
+		FD_SET(_clients[i]->GetSockfd(), &fds_read);		
+		
 		if (_clients[i]->GetSockfd() > max_sock)
 			max_sock = _clients[i]->GetSockfd();
 	}
@@ -129,7 +142,7 @@ bool Server::OnRun()
 	timeval time_val;
 	time_val.tv_sec = 1;//秒
 	time_val.tv_usec = 0;//毫秒
-	int ret = select(max_sock + 1, &fds_read, nullptr, nullptr, &time_val);
+	int ret = select(max_sock + 1, &fds_read, &fds_write, &fds_exc, &time_val);
 	if (ret < 0)
 	{
 		cout << "Server " << _server_sock << "select task end 1." << endl;
@@ -142,7 +155,11 @@ bool Server::OnRun()
 		FD_CLR(_server_sock, &fds_read);
 		Accept();
 	}
-
+	for (int i = 0; i < FD_SETSIZE; ++i)
+	{
+		cout << fds_read.fd_array[i] << "\t";
+	}
+	cout << endl;
 	//遍历所有客户端
 	for (int i = 0; i < _clients.size(); ++i)
 	{
@@ -161,7 +178,7 @@ bool Server::OnRun()
 		}
 	}
 	//cout << "do other things" << endl;
-	return false;
+	return true;
 }
 
 bool Server::IsRun()

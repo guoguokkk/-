@@ -26,8 +26,7 @@ void cmd_thread()
 
 int main()
 {
-	const int client_count = 60;
-	//const int client_count = 1;
+	const int client_count = FD_SETSIZE - 1;
 	Client* client[client_count];
 	for (int i = 0; i < client_count; ++i)
 	{
