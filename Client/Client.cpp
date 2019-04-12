@@ -26,14 +26,14 @@ void Client::InitClient()
 		CloseClient();
 	}
 	_client_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (_client_sock < 0)
+	if (_client_sock==INVALID_SOCKET)
 		cout << "Client " << _client_sock << " socket error." << endl;
-	else
-		cout << "Client " << _client_sock << " socket success." << endl;
+	//else
+		//cout << "Client " << _client_sock << " socket success." << endl;
 
 }
 
-int Client::Connect(const char* ip, const unsigned short port)
+int Client::Connect(const char* ip, unsigned short port)
 {
 	if (_client_sock == INVALID_SOCKET)
 		InitClient();
@@ -50,7 +50,7 @@ int Client::Connect(const char* ip, const unsigned short port)
 	if (ret == SOCKET_ERROR)
 		cout << "Client " << _client_sock << " connect error." << endl;
 	else
-		cout << "Client " << _client_sock << " connect success." << endl;
+		//cout << "Client " << _client_sock << " connect success." << endl;
 	return ret;
 }
 
@@ -79,12 +79,13 @@ bool Client::OnRun()
 
 	//时间间隔
 	timeval time_val;
-	time_val.tv_sec = 1;//秒
+	time_val.tv_sec = 0;//秒
 	time_val.tv_usec = 0;//毫秒
 	int ret = select(_client_sock + 1, &fds_read, nullptr, nullptr, &time_val);
 	if (ret < 0)
 	{
 		cout << "Client " << _client_sock << "select task end 1." << endl;
+		CloseClient();
 		return false;
 	}
 
@@ -127,7 +128,9 @@ int Client::RecvData(SOCKET client_sock)
 		{
 			int data_size = _last_pos - header->data_length;//剩余未处理消息缓冲区的数据的长度
 			OnNetMsg(header);//处理网络消息
-			memcpy(_msg_buf, _recv_buf + header->data_length, data_size);//移除处理完毕的数据
+
+			//之前_msg_buf + header->data_length
+			memcpy(_msg_buf, _msg_buf + header->data_length, data_size);//移除处理完毕的数据
 			_last_pos = data_size;//偏移位置
 		}
 		else

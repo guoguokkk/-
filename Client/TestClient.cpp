@@ -26,14 +26,22 @@ void cmd_thread()
 
 int main()
 {
-	const int client_count = FD_SETSIZE - 1;
+	const int client_count = 2000;
 	Client* client[client_count];
+	
 	for (int i = 0; i < client_count; ++i)
 	{
+		if (!g_bRun)
+			return 0;
 		client[i] = new Client();
-		client[i]->Connect(SERVER_IP, PORT);
 	}
-
+	for (int i = 0; i < client_count; ++i)
+	{
+		if (!g_bRun)
+			return 0;
+		client[i]->Connect(SERVER_IP, PORT);
+		cout << "Client " << i << endl;
+	}
 	std::thread t(cmd_thread);
 	t.detach();
 
@@ -45,7 +53,7 @@ int main()
 		for (int i = 0; i < client_count; ++i)
 		{
 			client[i]->SendData(&login);
-			client[i]->OnRun();
+			//client[i]->OnRun();
 		}
 	}
 

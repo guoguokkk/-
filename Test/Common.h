@@ -1,7 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 #ifdef _WIN32
-//#define FD_SETSIZE 64
+#define FD_SETSIZE 4024 //winÄ¬ÈÏ64,linuxÄ¬ÈÏ1024¸ö
 #define WIN32_LEAN_AND_MEAN
 #include<Windows.h>
 #include<WinSock2.h>
@@ -9,7 +9,7 @@
 #include<unistd.h>
 #include<arpa/inet.h>
 #include<string.h>
-typedef int SOCKET;
+#define SOCKET int
 #define INVALID_SOCKET (SOCKET)(~0)
 #define SOCKET_ERROR (-1)
 #endif // _WIN32

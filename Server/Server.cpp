@@ -20,7 +20,7 @@ SOCKET Server::InitServer()
 	if (_server_sock < 0)
 		cout << "Server socket error." << endl;
 	else
-		cout << "Server " << _server_sock << " socket success." << endl;
+		//cout << "Server " << _server_sock << " socket success." << endl;
 	return _server_sock;
 }
 
@@ -47,7 +47,7 @@ int Server::Bind(const char* ip, const unsigned short port)
 	if (ret == SOCKET_ERROR)
 		cout << "Server " << _server_sock << " bind error." << endl;
 	else
-		cout << "Server " << _server_sock << " bind success." << endl;
+		//cout << "Server " << _server_sock << " bind success." << endl;
 	return ret;
 }
 
@@ -57,7 +57,7 @@ int Server::Listen(int n)
 	if (ret == SOCKET_ERROR)
 		cout << "Server " << _server_sock << " listen error." << endl;
 	else
-		cout << "Server " << _server_sock << " listen success." << endl;
+		//cout << "Server " << _server_sock << " listen success." << endl;
 	return ret;
 }
 
@@ -72,14 +72,14 @@ SOCKET Server::Accept()
 #endif // _WIN32
 	client_sock = accept(_server_sock, (sockaddr*)& client_addr, &client_addr_size);
 
-	if (client_sock==INVALID_SOCKET)
+	if (client_sock == INVALID_SOCKET)
 		cout << "Invalid Received Client" << endl;
 	else
 	{
 		NewUserJoin new_user_join;
 		SendData2All(&new_user_join);
 		_clients.push_back(new ClientSocket(client_sock));//new 返回的是指针
-		cout << "New Client join : " << "IP= " << inet_ntoa(client_addr.sin_addr) << endl;
+		//cout << "New Client " << _clients.size() << " join : " << "IP= " << inet_ntoa(client_addr.sin_addr) << endl;
 	}
 	return client_sock;
 }
@@ -89,7 +89,7 @@ void Server::CloseServer()
 	//避免重复关闭
 	if (_server_sock == INVALID_SOCKET)
 		return;
-	
+
 #ifdef _WIN32
 	for (int i = 0; i < _clients.size(); ++i)
 	{
@@ -115,8 +115,7 @@ bool Server::OnRun()
 	if (!IsRun())//如果没有有效的服务器socket
 		return false;
 
-	//windows默认64个，linux默认1000个
-	fd_set fds_read; 
+	fd_set fds_read;
 	fd_set fds_write;
 	fd_set fds_exc;
 
@@ -133,8 +132,8 @@ bool Server::OnRun()
 	SOCKET max_sock = _server_sock;
 	for (int i = 0; i < _clients.size(); ++i)
 	{
-		FD_SET(_clients[i]->GetSockfd(), &fds_read);		
-		
+		FD_SET(_clients[i]->GetSockfd(), &fds_read);
+
 		if (_clients[i]->GetSockfd() > max_sock)
 			max_sock = _clients[i]->GetSockfd();
 	}
@@ -145,7 +144,7 @@ bool Server::OnRun()
 	int ret = select(max_sock + 1, &fds_read, &fds_write, &fds_exc, &time_val);
 	if (ret < 0)
 	{
-		cout << "Server " << _server_sock << "select task end 1." << endl;
+		cout << "Server" << _server_sock << "select task end 1." << endl;
 		CloseServer();
 		return false;
 	}
@@ -155,11 +154,6 @@ bool Server::OnRun()
 		FD_CLR(_server_sock, &fds_read);
 		Accept();
 	}
-	for (int i = 0; i < FD_SETSIZE; ++i)
-	{
-		cout << fds_read.fd_array[i] << "\t";
-	}
-	cout << endl;
 	//遍历所有客户端
 	for (int i = 0; i < _clients.size(); ++i)
 	{
@@ -222,24 +216,33 @@ int Server::RecvData(ClientSocket * p_client)
 
 void Server::OnNetMsg(SOCKET client_sock, Header * header)
 {
+	++_recv_count;
+	auto t1 = _tTime.GetElapsedSecond();
+	if (t1 >= 1.0)
+	{
+		cout << "time:\t" << t1 << "\t\tclients\t"<<_clients.size()
+			<< "\tsocket:\t" << _server_sock << "\t,recv count:\t" << _recv_count/t1 << endl;
+		_recv_count = 0;
+		_tTime.Update();
+	}
 	switch (header->cmd)
 	{
 	case CMD_LOGIN:
 	{
 		Login* login = (Login*)header;
-		cout << "login: name is " << login->name << " , password is " << login->password << endl;
+		/*cout << "login: name is " << login->name << " , password is " << login->password << endl;
 
 		LoginResult login_result;
-		SendData(client_sock, &login_result);
+		SendData(client_sock, &login_result);*/
 	}
 	break;
 	case CMD_LOGOUT:
 	{
 		Logout* logout = (Logout*)header;
-		cout << "Logout: name is " << logout->name << endl;
+		/*	cout << "Logout: name is " << logout->name << endl;
 
-		LogoutResult logout_result;
-		SendData(client_sock, &logout_result);
+			LogoutResult logout_result;
+			SendData(client_sock, &logout_result);*/
 	}
 	break;
 	default:
@@ -253,7 +256,7 @@ void Server::OnNetMsg(SOCKET client_sock, Header * header)
 int Server::SendData(SOCKET client_sock, Header * header)
 {
 	if (IsRun() && header)
-		return send(client_sock, (const char*)header, header->data_length, 0);	
+		return send(client_sock, (const char*)header, header->data_length, 0);
 	return SOCKET_ERROR;
 }
 
