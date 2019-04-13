@@ -17,11 +17,11 @@
 #ifndef RECV_BUF_SIZE
 #define RECV_BUF_SIZE 10240 
 #endif // !RECV_BUF_SIZE
-#define PORT 8010
+#define PORT 900
 //#define SERVER_IP "202.118.19.190"//win ws
-#define SERVER_IP "202.114.7.16"//win kzj
+//#define SERVER_IP "202.114.7.16"//win kzj
 //#define SERVER_IP "222.20.79.232"//linux
-//#define SERVER_IP "127.0.0.1"
+#define SERVER_IP "127.0.0.1"
 //#define SERVER_IP "192.168.153.129"
 
 enum CMD

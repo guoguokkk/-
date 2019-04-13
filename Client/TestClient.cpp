@@ -19,47 +19,63 @@ void cmd_thread()
 			cout << "Client exit." << endl;
 			break;
 		}
-		else
+		else 
 			cout << "Invalid input, please re-enter." << endl;
 	}
 }
 
-int main()
+const int client_count = 4000;
+Client* client[client_count];
+const int t_count = 4;//发送线程数量
+
+void send_thread(int id)//0-3，四个线程
 {
-	const int client_count = 2000;
-	Client* client[client_count];
-	
-	for (int i = 0; i < client_count; ++i)
-	{
-		if (!g_bRun)
-			return 0;
+	int c = client_count / t_count;
+	int begin = id * c;
+	int end = (id + 1) * c;
+	for (int i = begin; i < end; ++i)
+	{		
 		client[i] = new Client();
 	}
-	for (int i = 0; i < client_count; ++i)
+
+	for (int i = begin; i < end; ++i)
 	{
-		if (!g_bRun)
-			return 0;
 		client[i]->Connect(SERVER_IP, PORT);
 		cout << "Client " << i << endl;
 	}
-	std::thread t(cmd_thread);
-	t.detach();
 
 	Login login;
 	strcpy(login.name, "ws");
 	strcpy(login.password, "111");
 	while (g_bRun)
 	{
-		for (int i = 0; i < client_count; ++i)
+		for (int i = begin; i < end; ++i)
 		{
 			client[i]->SendData(&login);
 			//client[i]->OnRun();
 		}
 	}
 
-	for (int i = 0; i < client_count; ++i)
+	for (int i = begin; i < end; ++i)
 		client[i]->CloseClient();
+}
 
+int main()
+{
+	//启动ui线程 
+	std::thread t(cmd_thread);
+	t.detach();
+	
+	//启动发送线程
+	for (int i = 0; i < t_count; ++i)
+	{
+		std::thread t(send_thread,i);//传递的是线程的编号
+		t.detach();
+	}		
+	while (g_bRun)
+	{
+		Sleep(100);
+	}
 	cout << "EXIT...." << endl;
 	return 0;
 }
