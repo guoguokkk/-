@@ -1,44 +1,40 @@
 #include"Server.h"
-#include<thread>
 #include<iostream>
-using std::cout;
-using std::endl;
-using std::cin;
+#include<thread>
+bool run = true;
 
-bool g_bRun = true;
-//绑定一个线程负责发送请求
-void cmd_thread(Server* server)
+void cmd_thread()
 {
 	while (true)
 	{
-		char send_buf[128];
-		cin >> send_buf;
-		if (strcmp(send_buf, "exit") == 0)
+		char cmd_buf[128];
+		std::cin >> cmd_buf;
+		if (strcmp(cmd_buf, "exit") == 0)
 		{
-			cout << "Server exit." << endl;
-			g_bRun = false;
+			run = false;
+			std::cout << "Server exit" << std::endl;
 			break;
 		}
 		else
 		{
-			cout << "Invalid input, please re-enter." << endl;
+			std::cout << "Invalid input, please re-enter." << std::endl;
 		}
 	}
 }
-
 int main()
 {
+	//输入线程
+	std::thread cmd_t(cmd_thread);
+	cmd_t.detach();
+
 	Server server;
-	server.Bind(SERVER_IP, PORT);
+	server.Bind(IP, PORT);
 	server.Listen(5);
-	//启动线程
-	std::thread t(cmd_thread, &server);
-	t.detach();
-	while (g_bRun)
+	while (run)
 	{
 		server.OnRun();
 	}
 	server.CloseServer();
-	cout << "EXIT...." << endl;
+	std::cout << "EXIT...." << std::endl;
 	return 0;
 }

@@ -15,11 +15,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="Message.h">
+      <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="TimeStamp.h">
-      <Filter>头文件</Filter>
+      <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

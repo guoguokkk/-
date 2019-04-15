@@ -1,268 +1,292 @@
-#include"Server.h"
+#include "Server.h"
 #include<iostream>
-using std::cout;
-using std::endl;
-using std::cin;
+Server::~Server()
+{
+	CloseServer();
+	_server_sock = INVALID_SOCKET;
+}
 
-SOCKET Server::InitServer()
+void Server::InitServer()
 {
 #ifdef _WIN32
+	//启动 windows 环境
 	WORD version = MAKEWORD(2, 2);
 	WSADATA data;
 	WSAStartup(version, &data);
 #endif // _WIN32
+
+	//建立 socket
 	if (_server_sock != INVALID_SOCKET)
 	{
-		cout << "Close old connections." << endl;
+		std::cout << "Server " << _server_sock << " close old connections." << std::endl;
 		CloseServer();
 	}
 	_server_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (_server_sock < 0)
-		cout << "Server socket error." << endl;
+	if (_server_sock == INVALID_SOCKET)
+	{
+		std::cout << "Server " << _server_sock << " socket error." << std::endl;
+	}
 	else
-		//cout << "Server " << _server_sock << " socket success." << endl;
-	return _server_sock;
+	{
+		std::cout << "Server " << _server_sock << " socket success." << std::endl;
+	}
 }
 
-int Server::Bind(const char* ip, const unsigned short port)
+void Server::CloseServer()
 {
+	//避免重复关闭！
 	if (_server_sock == INVALID_SOCKET)
-		InitServer();
+	{
+		return;
+	}
 
+#ifdef _WIN32
+	//关闭每个客户端！
+	for (int i = 0; i < _client_groups.size(); ++i)
+	{
+		closesocket(_client_groups[i]->GetSock());
+		delete _client_groups[i];
+	}
+	closesocket(_server_sock);
+	WSACleanup();//关闭 windows 环境
+#else
+	//关闭每个客户端！
+	for (int i = 0; i < _client_groups.size(); ++i)
+	{
+		close(_client_groups[i]->GetSock());
+		delete _client_groups[i];
+	}
+	close(_server_sock);
+#endif // _WIN32
+}
+
+//!注意参数
+void Server::Bind(const char* ip, const short port)
+{
 	sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
 #ifdef _WIN32
 	if (ip)
+	{
 		server_addr.sin_addr.S_un.S_addr = inet_addr(ip);
+	}
 	else
+	{
 		server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
+	}
 #else
 	if (ip)
-		server_addr.sin_addr.s_addr = inet_addr(ip);
+	{
+		_server_addr.sin_addr.s_addr = inet_addr(ip);
+	}
 	else
-		server_addr.sin_addr.s_addr = INADDR_ANY;
-#endif // _WIN32		
-	int ret = bind(_server_sock, (const sockaddr*)& server_addr, sizeof(server_addr));
+	{
+		_server_addr.sin_addr.s_addr = INADDR_ANY;
+	}
+#endif // _WIN32	
+	int ret = bind(_server_sock, (sockaddr*)& server_addr, sizeof(server_addr));
 	if (ret == SOCKET_ERROR)
-		cout << "Server " << _server_sock << " bind error." << endl;
+	{
+		std::cout << "Server " << _server_sock << " bind error." << std::endl;
+	}
 	else
-		//cout << "Server " << _server_sock << " bind success." << endl;
-	return ret;
+	{
+		std::cout << "Server " << _server_sock << " bind success." << std::endl;
+	}
 }
 
-int Server::Listen(int n)
+void Server::Listen(int n)
 {
-	int ret = listen(_server_sock, n);
+	int ret = listen(_server_sock, 5);
 	if (ret == SOCKET_ERROR)
-		cout << "Server " << _server_sock << " listen error." << endl;
+	{
+		std::cout << "Server " << _server_sock << " listen error." << std::endl;
+	}
 	else
-		//cout << "Server " << _server_sock << " listen success." << endl;
-	return ret;
+	{
+		std::cout << "Server " << _server_sock << " listen success." << std::endl;
+	}
 }
 
-SOCKET Server::Accept()
+void Server::Accept()
 {
 	SOCKET client_sock = INVALID_SOCKET;
 	sockaddr_in client_addr;
 #ifdef _WIN32
 	int client_addr_size = sizeof(client_addr);
 #else
-	socklen_t client_addr_size = sizeof(client_addr);
+	socksize_t client_addr_size = sizeof(client_addr);
 #endif // _WIN32
 	client_sock = accept(_server_sock, (sockaddr*)& client_addr, &client_addr_size);
-
 	if (client_sock == INVALID_SOCKET)
-		cout << "Invalid Received Client" << endl;
+	{
+		std::cout << "Server " << _server_sock << " accept error." << std::endl;
+	}
 	else
 	{
 		NewUserJoin new_user_join;
-		SendData2All(&new_user_join);
-		_clients.push_back(new ClientSocket(client_sock));//new 返回的是指针
-		//cout << "New Client " << _clients.size() << " join : " << "IP= " << inet_ntoa(client_addr.sin_addr) << endl;
+		SendToAll(&new_user_join);
+		_client_groups.push_back(new ClientSock(client_sock));
+		std::cout << "New client  " << client_sock << " join." << std::endl;
 	}
-	return client_sock;
 }
 
-void Server::CloseServer()
-{
-	//避免重复关闭
-	if (_server_sock == INVALID_SOCKET)
-		return;
-
-#ifdef _WIN32
-	for (int i = 0; i < _clients.size(); ++i)
-	{
-		closesocket(_clients[i]->GetSockfd());
-		delete _clients[i];
-	}
-	closesocket(_server_sock);
-	WSACleanup();
-#else
-	for (int i = 0; i < _clients.size(); ++i)
-	{
-		close(_clients[i]->GetSockfd());
-		delete _clients[i];
-	}
-	close(_server_sock);
-#endif // _WIN32
-	_clients.clear();
-}
-
-//select
 bool Server::OnRun()
 {
-	if (!IsRun())//如果没有有效的服务器socket
-		return false;
-
-	fd_set fds_read;
-	fd_set fds_write;
-	fd_set fds_exc;
-
-	//清理集合
-	FD_ZERO(&fds_read);
-	FD_ZERO(&fds_write);
-	FD_ZERO(&fds_exc);
-
-	//将服务器描述符加入集合
-	FD_SET(_server_sock, &fds_read);
-	FD_SET(_server_sock, &fds_write);
-	FD_SET(_server_sock, &fds_exc);
-
-	SOCKET max_sock = _server_sock;
-	for (int i = 0; i < _clients.size(); ++i)
+	if (_server_sock == INVALID_SOCKET)
 	{
-		FD_SET(_clients[i]->GetSockfd(), &fds_read);
-
-		if (_clients[i]->GetSockfd() > max_sock)
-			max_sock = _clients[i]->GetSockfd();
+		return false;
 	}
 
-	timeval time_val;
-	time_val.tv_sec = 1;//秒
-	time_val.tv_usec = 0;//毫秒
-	int ret = select(max_sock + 1, &fds_read, &fds_write, &fds_exc, &time_val);
+	fd_set fd_read;
+	FD_ZERO(&fd_read);
+	FD_SET(_server_sock, &fd_read);
+
+	SOCKET max_sock = _server_sock;
+	for (int i = 0; i < _client_groups.size(); ++i)
+	{
+		FD_SET(_client_groups[i]->GetSock(), &fd_read);
+		if (max_sock < _client_groups[i]->GetSock())
+		{
+			max_sock = _client_groups[i]->GetSock();
+		}
+	}
+
+	timeval time;
+	time.tv_sec = 1;//秒
+	time.tv_usec = 0;
+	int ret = select(_server_sock, &fd_read, nullptr, nullptr, &time);
 	if (ret < 0)
 	{
-		cout << "Server" << _server_sock << "select task end 1." << endl;
+		std::cout << "Server " << _server_sock << " select error." << std::endl;
 		CloseServer();
 		return false;
 	}
 
-	if (FD_ISSET(_server_sock, &fds_read))
+	if (FD_ISSET(_server_sock, &fd_read))
 	{
-		FD_CLR(_server_sock, &fds_read);
+		FD_CLR(_server_sock, &fd_read);
 		Accept();
 	}
-	//遍历所有客户端
-	for (int i = 0; i < _clients.size(); ++i)
+	for (int i = 0; i < _client_groups.size(); ++i)
 	{
-		if (FD_ISSET(_clients[i]->GetSockfd(), &fds_read))
+		if (FD_ISSET(_client_groups[i]->GetSock(), &fd_read))
 		{
-			int ret = RecvData(_clients[i]);//接收客户端数据
+
+			int ret = RecvMessages(_client_groups[i]);//接收消息
 			if (ret == -1)
-			{//删除已经退出的客户端
-				auto iter = _clients.begin() + i;
-				if (iter != _clients.end())
-				{
-					delete _clients[i];//new delete
-					_clients.erase(iter);
-				}
+			{
+				//要删delete再erase，会出错！！！！
+				delete _client_groups[i];
+				_client_groups.erase(_client_groups.begin() + i);
 			}
 		}
 	}
-	//cout << "do other things" << endl;
 	return true;
 }
 
-bool Server::IsRun()
+void Server::SendToAll(Header * header)
 {
-	return _server_sock != INVALID_SOCKET;
+	for (int i = 0; i < _client_groups.size(); ++i)
+	{
+		SendToOne(_client_groups[i]->GetSock(), header);
+	}
 }
 
-//接收数据 处理粘包 拆分包
-int Server::RecvData(ClientSocket * p_client)
+//参数：接收对象，要发送的内容
+void Server::SendToOne(SOCKET client_sock, Header * header)
 {
-	int len = (int)recv(p_client->GetSockfd(), _recv_buf, RECV_BUF_SIZE, 0);//接收头部信息
+	if (_server_sock != INVALID_SOCKET && header)
+	{
+		send(client_sock, (char*)header, header->data_length, 0);
+	}
+}
+
+int Server::RecvMessages(ClientSock * client)
+{
+	//接收客户端消息
+	int len = recv(client->GetSock(), _recv_buf, RECV_BUF_SIZE, 0);
+	//判断客户端是否退出
 	if (len <= 0)
 	{
-		cout << "Client " << p_client->GetSockfd() << " exit." << endl;
+		std::cout << "Client " << client->GetSock() << " exit." << std::endl;
 		return -1;
 	}
 
-	//接收到的数据全部放入对应客户端的消息缓冲区
-	memcpy(p_client->GetMsgBuf() + p_client->GetLastPos(), _recv_buf, len);
-	p_client->SetLastPos(p_client->GetLastPos() + len);//更改消息缓冲区指针位置
+	//接收到的数据放入对应客户端消息缓冲区
+	memcpy(client->GetMsgBuf() + client->GetLastPos(), _recv_buf, len);
+	client->SetLastPos(client->GetLastPos() + len);
 
-	//该客户端的消息缓冲区数据长度大于头部长度，则可以识别命令
-	while (p_client->GetLastPos() >= sizeof(Header))
+	//处理粘包、少包问题
+	while (client->GetLastPos() >= sizeof(Header))
 	{
-		Header* header = (Header*)p_client->GetMsgBuf();
-		//该客户端的消息缓冲区数据长度大于消息总长度，则可以处理消息
-		if (p_client->GetLastPos() >= header->data_length)
+		Header* header = (Header*)client->GetMsgBuf();
+		if (client->GetLastPos() >= header->data_length)
 		{
-			int data_size = p_client->GetLastPos() - header->data_length;
-			OnNetMsg(p_client->GetSockfd(), header);
-
-			//删除已经处理的部分
-			memcpy(p_client->GetMsgBuf(), p_client->GetMsgBuf() + header->data_length, data_size);
-			p_client->SetLastPos(data_size);
+			//更新消息缓冲区
+			int temp_last_pos = client->GetLastPos() - header->data_length;
+			HandleMessages(client->GetLastPos(), header);
+			memcpy(client->GetMsgBuf(), client->GetMsgBuf() + header->data_length, temp_last_pos);
+			client->SetLastPos(temp_last_pos);
 		}
 		else
-			break;//消息不足以处理
+		{
+			break;
+		}
 	}
 	return 0;
 }
 
-void Server::OnNetMsg(SOCKET client_sock, Header * header)
+void Server::HandleMessages(SOCKET client_sock, Header * header)
 {
 	++_recv_count;
 	auto t1 = _tTime.GetElapsedSecond();
 	if (t1 >= 1.0)
 	{
-		cout << "time:\t" << t1 << "\t\tclients\t"<<_clients.size()
-			<< "\tsocket:\t" << _server_sock << "\t,recv count:\t" << _recv_count/t1 << endl;
+		std::cout << "time:\t" << t1 << "\t\tclients\t" << _client_groups.size()
+			<< "\tsocket:\t" << _server_sock << "\t,recv count:\t" << _recv_count << std::endl;
 		_recv_count = 0;
 		_tTime.Update();
 	}
+
 	switch (header->cmd)
 	{
 	case CMD_LOGIN:
 	{
 		Login* login = (Login*)header;
-		/*cout << "login: name is " << login->name << " , password is " << login->password << endl;
+		/*std::cout << "Login : cmd= " << login->cmd
+			<< " , data length= " << login->data_length
+			<< " , user name=" << login->name
+			<< " , password=" << login->password << std::endl;*/
 
 		LoginResult login_result;
-		SendData(client_sock, &login_result);*/
+		recv(client_sock, (char*)& login_result, login_result.data_length, 0);
 	}
 	break;
 	case CMD_LOGOUT:
 	{
 		Logout* logout = (Logout*)header;
-		/*	cout << "Logout: name is " << logout->name << endl;
+		std::cout << "Logout : cmd= " << logout->cmd
+			<< " , data length= " << logout->data_length
+			<< " , user name=" << logout->name << std::endl;
 
-			LogoutResult logout_result;
-			SendData(client_sock, &logout_result);*/
+		LogoutResult logout_result;
+		recv(client_sock, (char*)& logout_result, logout_result.data_length, 0);
+	}
+	break;
+	case CMD_ERROR:
+	{
+		std::cout << "error : cmd= " << header->cmd
+			<< " , data length= " << header->data_length
+			<< std::endl;
 	}
 	break;
 	default:
 	{
-		cout << "Undefined data , data length is " << header->data_length << endl;
+		std::cout << "Undefined data : data length= " << header->data_length
+			<< std::endl;
 	}
 	break;
 	}
 }
-
-int Server::SendData(SOCKET client_sock, Header * header)
-{
-	if (IsRun() && header)
-		return send(client_sock, (const char*)header, header->data_length, 0);
-	return SOCKET_ERROR;
-}
-
-void Server::SendData2All(Header * header)
-{
-	for (int i = 0; i < _clients.size(); ++i)
-		SendData(_clients[i]->GetSockfd(), header);
-}
-
