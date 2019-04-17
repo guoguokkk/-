@@ -10,30 +10,30 @@
 //客户端数据类型
 class ClientSock {
 public:
-	ClientSock(SOCKET client_sock = INVALID_SOCKET) :_client_sock(client_sock)
+	ClientSock(SOCKET clientSock = INVALID_SOCKET)
 	{
-		memset(_msg_buf, 0, sizeof(_msg_buf));//初始化消息缓冲区
-		_last_pos = 0;
+		_sockfd = clientSock;
+		memset(_msgBuf, 0, sizeof(_msgBuf));//初始化消息缓冲区
+		_lastPos = 0;
 	}
-	~ClientSock() = default;
-	void SetLastPos(int pos) { _last_pos = pos; }
-	int GetLastPos() { return _last_pos; }
-	char* GetMsgBuf() { return _msg_buf; }
-	SOCKET GetSock() { return _client_sock; }
+	SOCKET getSock() { return _sockfd; }
+	char* getMsgBuf() { return _msgBuf; }	
+	int getLastPos() { return _lastPos; }
+	void setLastPos(int pos) { _lastPos = pos; }	
 
 	//发送数据
-	int SendData(Header* header)
+	int sendData(Header* header)
 	{
 		if (header)
 		{
 			//return send(_client_sock, (char*) &header, header->data_length, 0);//!!!画蛇添足，一直不能识别数据
-			return send(_client_sock, (char*) header, header->data_length, 0);
+			return send(_sockfd, (const char*)header, header->data_length, 0);
 		}
 		return SOCKET_ERROR;
 	}
 private:
-	char _msg_buf[RECV_BUF_SIZE * 10];//消息缓冲区，!!!一定要大于接收缓冲区
-	int _last_pos;//消息缓冲区最后一个位置
-	SOCKET _client_sock;//客户端socket
+	char _msgBuf[RECV_BUF_SIZE * 5];//消息缓冲区，!!!一定要大于接收缓冲区
+	int _lastPos;//消息缓冲区最后一个位置
+	SOCKET _sockfd;//客户端socket
 };
 #endif // !CLIENT_SOCK_H_

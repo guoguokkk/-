@@ -6,21 +6,21 @@
 class MyServer :public Server
 {
 public:
-	virtual void OnNetJoin(ClientSock* pClient)//只会被一个线程触发，安全
+	virtual void onNetJoin(ClientSock* pClient)//只会被一个线程触发，安全
 	{
-		++_client_count;
+		++_clientCount;
 		//printf("Client<%d> join\n", (int)pClient->GetSock());
 	}
 
-	virtual void OnNetLeave(ClientSock* pClient)//有客户端离开事件
+	virtual void onNetLeave(ClientSock* pClient)//有客户端离开事件
 	{
-		--_client_count;
+		--_clientCount;
 		//printf("Client<%d> leave\n", (int)pClient->GetSock());
 	}
 
-	virtual void OnNetMsg(ClientSock* pClient, Header* header)//有客户端离开时
+	virtual void onNetMsg(ClientSock* pClient, Header* header)//有客户端离开时
 	{
-		++_recv_count;
+		++_recvCount;
 		switch (header->cmd)
 		{
 		case CMD_LOGIN:
@@ -30,7 +30,7 @@ public:
 				(int)pClient->GetSock(), login->userName, login->passWord);*/
 
 			LoginResult login_result;
-			pClient->SendData(&login_result);
+			pClient->sendData(&login_result);
 		}
 		break;
 		case CMD_LOGOUT:
@@ -40,25 +40,24 @@ public:
 				(int)pClient->GetSock(), logout->userName);*/
 
 			LogoutResult logout_result;
-			pClient->SendData(&logout_result);
+			pClient->sendData(&logout_result);
 		}
 		break;
 		case CMD_ERROR:
 		{
 			printf("error : socket = %d , data length= %d\n",
-				(int)pClient->GetSock(), header->data_length);
+				(int)pClient->getSock(), header->data_length);
 		}
 		break;
 		default:
 		{
 			printf("Undefined data : socket = %d , data length=  %d\n",
-				(int)pClient->GetSock(), header->data_length);
+				(int)pClient->getSock(), header->data_length);
 		}
 		break;
 		}
 	}
 };
-
 
 #endif // !MY_SERVER_H_
 

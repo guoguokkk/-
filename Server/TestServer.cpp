@@ -3,9 +3,8 @@
 #include<iostream>
 #include<thread>
 
-bool run = true;
-
-void cmd_thread()
+bool g_bRun = true;
+void cmdThread()
 {
 	while (true)
 	{
@@ -13,7 +12,7 @@ void cmd_thread()
 		std::cin >> cmd_buf;
 		if (strcmp(cmd_buf, "exit") == 0)
 		{
-			run = false;
+			g_bRun = false;
 			std::cout << "Server exit" << std::endl;
 			break;
 		}
@@ -26,20 +25,20 @@ void cmd_thread()
 int main()
 {
 	MyServer server;
-	server.InitServer();
+	server.initServer();
 	server.Bind(IP, PORT);
 	server.Listen(5);
-	server.StartServer(4);
+	server.startServer(4);
 
 	//Æô¶¯UIÏß³Ì
-	std::thread cmd_t(cmd_thread);
+	std::thread cmd_t(cmdThread);
 	cmd_t.detach();
 		
-	while (run)
+	while (g_bRun)
 	{
-		server.OnRun();
+		server.onRun();
 	}
-	server.CloseServer();
+	server.closeServer();
 	std::cout << "EXIT...." << std::endl;
 	return 0;
 }

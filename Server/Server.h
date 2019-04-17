@@ -19,29 +19,30 @@ class Server :public INetEvent
 public:
 	Server()
 	{
-		_server_sock = INVALID_SOCKET;
-		_recv_count = 0;//!一定要初始化
-		_client_count = 0;//!一定要初始化
+		_serverSock = INVALID_SOCKET;
+		_recvCount = 0;//!一定要初始化
+		_clientCount = 0;//!一定要初始化
 	}
 	~Server();
-	SOCKET InitServer();//初始化服务器
-	int Bind(const char* ip, const short port);//绑定ip地址和端口
+	SOCKET initServer();//初始化服务器
+	int Bind(const char* ip, unsigned short port);//绑定ip地址和端口
 	int Listen(int n);//监听客户端
 	SOCKET Accept();//接收客户端
-	void AddClientToCellServer(ClientSock* p_client);
-	void StartServer(int n_cell_server);
-	void CloseServer();//关闭服务器	   	 
-	bool OnRun();//select
-	void Time4Msg();//计算并输出每秒收到的网络消息
-	virtual void OnNetJoin(ClientSock* p_client);//只会被一个线程触发，安全
-	virtual void OnNetLeave(ClientSock* p_client);//有客户端离开事件
-	virtual void OnNetMsg(ClientSock* p_client,Header* header);
+	void addClientToCellServer(ClientSock* pClient);
+	void startServer(int n_cellServer);
+	void closeServer();//关闭服务器	   	 
+	bool onRun();//select
+	bool isRun();
+	void time4Msg();//计算并输出每秒收到的网络消息
+	virtual void onNetJoin(ClientSock* pClient);//只会被一个线程触发，安全
+	virtual void onNetLeave(ClientSock* pClient);//有客户端离开事件
+	virtual void onNetMsg(ClientSock* pClient,Header* header);
 private:
-	SOCKET _server_sock;
-	std::vector<CellServer*> _cell_servers;//消息处理对象，内部会创建线程	
+	SOCKET _serverSock;
+	std::vector<CellServer*> _cellServers;//消息处理对象，内部会创建线程	
 	TimeStamp _tTime;
 protected:
-	std::atomic_int _recv_count;//收到消息计数
-	std::atomic_int _client_count;//客户端计数
+	std::atomic_int _recvCount;//收到消息计数
+	std::atomic_int _clientCount;//客户端计数
 };
 #endif // !SERVER_H_

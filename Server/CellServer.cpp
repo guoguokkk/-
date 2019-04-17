@@ -3,22 +3,21 @@
 #include<functional>
 #include<chrono>
 
-CellServer::CellServer(SOCKET server_sock = INVALID_SOCKET)
-{
-	_server_sock = server_sock;
-	_pEvent = nullptr;
-}
-
 CellServer::~CellServer()
 {
-	CloseServer();
-	_server_sock = INVALID_SOCKET;
+	closeServer();
+	_serverSock = INVALID_SOCKET;
 }
 
-void CellServer::CloseServer()
+void CellServer::setEventObj(INetEvent* event)
+{
+	_pEvent = event;
+}
+
+void CellServer::closeServer()
 {
 	//避免重复关闭！
-	if (_server_sock == INVALID_SOCKET)
+	if (_serverSock == INVALID_SOCKET)
 	{
 		return;
 	}
@@ -27,30 +26,26 @@ void CellServer::CloseServer()
 	//关闭每个客户端！
 	for (int i = 0; i < _clients.size(); ++i)
 	{
-		closesocket(_clients[i]->GetSock());
+		closesocket(_clients[i]->getSock());
 		delete _clients[i];
 	}
-	closesocket(_server_sock);
+	closesocket(_serverSock);
 #else
-	for (int i = 0; i < _client_groups.size(); ++i)
+	//关闭每个客户端！
+	for (int i = 0; i < _clients.size(); ++i)
 	{
-		close(_client_groups[i]->GetSock());
-		delete _client_groups[i];
+		close(_clients[i]->getSock());
+		delete _clients[i];
 	}
-	close(_server_sock);
+	close(_serverSock);
 #endif // _WIN32
 	_clients.clear();
 }
 
-bool CellServer::OnRun()
+bool CellServer::onRun()
 {
-	while (true)
+	while (isRun())
 	{
-		if (_server_sock == INVALID_SOCKET)
-		{
-			return false;
-		}
-
 		//从缓冲队列里取出客户数据，加入正式客户队列
 		if (_clientsBuf.size() > 0)
 		{
@@ -73,29 +68,29 @@ bool CellServer::OnRun()
 		fd_set fd_read;
 		FD_ZERO(&fd_read);
 
-		SOCKET max_sock = _clients[0]->GetSock();
+		SOCKET maxSock = _clients[0]->getSock();
 		for (int i = 0; i < _clients.size(); ++i)
 		{
-			FD_SET(_clients[i]->GetSock(), &fd_read);
-			if (max_sock < _clients[i]->GetSock())
+			FD_SET(_clients[i]->getSock(), &fd_read);
+			if (maxSock < _clients[i]->getSock())
 			{
-				max_sock = _clients[i]->GetSock();
+				maxSock = _clients[i]->getSock();
 			}
 		}
 
-		int ret = select(max_sock + 1, &fd_read, nullptr, nullptr, nullptr);//不需要阻塞
+		int ret = select(maxSock + 1, &fd_read, nullptr, nullptr, nullptr);//不需要阻塞
 		if (ret < 0)
 		{
-			printf("Server %d select error.\n", (int)_server_sock);
-			CloseServer();
+			printf("Server %d select error.\n", (int)_serverSock);
+			closeServer();
 			return false;
 		}
 
 		for (int i = 0; i < _clients.size(); ++i)
 		{
-			if (FD_ISSET(_clients[i]->GetSock(), &fd_read))
+			if (FD_ISSET(_clients[i]->getSock(), &fd_read))
 			{
-				int ret = RecvData(_clients[i]);//接收消息
+				int ret = recvData(_clients[i]);//接收消息
 				if (ret == -1)
 				{
 					auto iter = _clients.begin() + i;
@@ -103,7 +98,7 @@ bool CellServer::OnRun()
 					{
 						if (_pEvent)
 						{
-							_pEvent->OnNetLeave(_clients[i]);
+							_pEvent->onNetLeave(_clients[i]);
 						}
 
 						//要删delete再erase，会出错！！！！
@@ -116,33 +111,38 @@ bool CellServer::OnRun()
 	}
 }
 
+bool CellServer::isRun()
+{
+	return _serverSock != INVALID_SOCKET;
+}
+
 //接收消息，处理粘包、少包
-int CellServer::RecvData(ClientSock* pClient)
+int CellServer::recvData(ClientSock* pClient)
 {
 	//接收客户端消息
-	int len = (int)recv(pClient->GetSock(), _recv_buf, RECV_BUF_SIZE, 0);
+	int nLen = (int)recv(pClient->getSock(), _recvBuf, RECV_BUF_SIZE, 0);
 	//判断客户端是否退出
-	if (len <= 0)
+	if (nLen <= 0)
 	{
-		printf("Client %d exit.\n", (int)pClient->GetSock());
+		printf("Client %d exit.\n", (int)pClient->getSock());
 		return -1;
 	}
 
 	//接收到的数据放入对应客户端消息缓冲区
-	memcpy(pClient->GetMsgBuf() + pClient->GetLastPos(), _recv_buf, len);
-	pClient->SetLastPos(pClient->GetLastPos() + len);
+	memcpy(pClient->getMsgBuf() + pClient->getLastPos(), _recvBuf, nLen);
+	pClient->setLastPos(pClient->getLastPos() + nLen);
 
 	//处理粘包、少包问题
-	while (pClient->GetLastPos() >= sizeof(Header))
+	while (pClient->getLastPos() >= sizeof(Header))
 	{
-		Header* header = (Header*)pClient->GetMsgBuf();
-		if (pClient->GetLastPos() >= header->data_length)
+		Header* header = (Header*)pClient->getMsgBuf();
+		if (pClient->getLastPos() >= header->data_length)
 		{
 			//更新消息缓冲区
-			int temp_last_pos = pClient->GetLastPos() - (header->data_length);
-			OnNetMsg(pClient, header);
-			memcpy(pClient->GetMsgBuf(), pClient->GetMsgBuf() + (header->data_length), temp_last_pos);
-			pClient->SetLastPos(temp_last_pos);
+			int temp_pos = pClient->getLastPos() - header->data_length;
+			onNetMsg(pClient, header);
+			memcpy(pClient->getMsgBuf(), pClient->getMsgBuf() + header->data_length, temp_pos);
+			pClient->setLastPos(temp_pos);
 		}
 		else
 		{
@@ -153,25 +153,25 @@ int CellServer::RecvData(ClientSock* pClient)
 }
 
 //响应网络数据
-void CellServer::OnNetMsg(ClientSock* pClient, Header* header)
+void CellServer::onNetMsg(ClientSock* pClient, Header* header)
 {
-	_pEvent->OnNetMsg(pClient, header);
+	_pEvent->onNetMsg(pClient, header);
 }
 
 //消费者取出缓冲队列中的客户端
-void CellServer::AddClient(ClientSock* pClient)
+void CellServer::addClient(ClientSock* pClient)
 {
 	//加锁，自解锁
 	std::lock_guard<std::mutex> lock(_mutex);
 	_clientsBuf.push_back(pClient);
 }
 
-void CellServer::StartCellServer()
+void CellServer::startCellServer()
 {
-	_pThread = new std::thread(std::mem_fun(&CellServer::OnRun), this);//适配器 std::mem_fun
+	_thread = std::thread(std::mem_fn(&CellServer::onRun), this);//适配器 std::mem_fun
 }
 
-size_t CellServer::GetClientCount()
+size_t CellServer::getClientCount()
 {
-	return size_t(_clients.size()+_clientsBuf.size());
+	return size_t(_clients.size() + _clientsBuf.size());
 }

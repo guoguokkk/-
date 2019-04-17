@@ -3,19 +3,16 @@
 #include<stdio.h>
 Client::Client()
 {
-	_client_sock = INVALID_SOCKET;
-	memset(_msg_buf, 0, sizeof(_msg_buf));//初始化消息缓冲区
-	_last_pos = 0;
-	_is_connect = false;
+	_clientSock = INVALID_SOCKET;
+	_isConnect = false;
 }
 
 Client::~Client()
 {
-	CloseClient();
-	_client_sock = INVALID_SOCKET;
+	closeClient();
 }
 
-void Client::InitClient()
+void Client::initClient()
 {
 #ifdef _WIN32
 	//启动 windows 环境
@@ -25,15 +22,15 @@ void Client::InitClient()
 #endif // _WIN32
 
 	//建立 socket
-	if (_client_sock != INVALID_SOCKET)
+	if (_clientSock != INVALID_SOCKET)
 	{
-		printf("<socket=%d> close old connections.\n", (int)_client_sock);// cout语句不是原子操作
-		CloseClient();
+		printf("<socket=%d> close old connections.\n", (int)_clientSock);// cout语句不是原子操作
+		closeClient();
 	}
-	_client_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (_client_sock == INVALID_SOCKET)
+	_clientSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (_clientSock == INVALID_SOCKET)
 	{
-		printf("<socket=%d> build socket error.\n", (int)_client_sock);
+		printf("<socket=%d> build socket error.\n", (int)_clientSock);
 	}
 	else
 	{
@@ -41,11 +38,11 @@ void Client::InitClient()
 	}
 }
 
-int Client::Connect(const char* ip, const short port)
+int Client::connectToServer(const char* ip, unsigned short port)
 {
-	if (_client_sock == INVALID_SOCKET)
+	if (_clientSock == INVALID_SOCKET)
 	{
-		InitClient();
+		initClient();
 	}
 
 	sockaddr_in server_addr;
@@ -57,96 +54,101 @@ int Client::Connect(const char* ip, const short port)
 	server_addr.sin_addr.s_addr = inet_addr(ip);
 #endif // _WIN32
 
-	int ret = connect(_client_sock, (sockaddr*)& server_addr, sizeof(server_addr));
+	int ret = connect(_clientSock, (sockaddr*)& server_addr, sizeof(server_addr));
 	if (ret == SOCKET_ERROR)
 	{
-		printf("<socket=%d> connect error.\n", (int)_client_sock);
+		printf("<socket=%d> connect error.\n", (int)_clientSock);
 	}
 	else
 	{
-		_is_connect = true;
+		_isConnect = true;
 		//printf("<socket=%d> connect success.\n", _client_sock);
 	}
 	return ret;
 }
 
 //关闭客户端
-void Client::CloseClient()
+void Client::closeClient()
 {
-	if (_client_sock == INVALID_SOCKET)
+	if (_clientSock == INVALID_SOCKET)
 	{
-		_is_connect = false;
+		_isConnect = false;
 		return;
 	}
 #ifdef _WIN32
-	closesocket(_client_sock);
+	closesocket(_clientSock);
 	WSACleanup();//关闭 windows 环境
 #else
-	close(_client_sock);
+	close(_clientSock);
 #endif // _WIN32
-	_client_sock = INVALID_SOCKET;
+	_clientSock = INVALID_SOCKET;
 }
 
-bool Client::OnRun()
+bool Client::onRun()
 {
-	if (_client_sock == INVALID_SOCKET)
+	if (!isRun())
 	{
 		return false;
 	}
 
 	fd_set fd_read;
 	FD_ZERO(&fd_read);
-	FD_SET(_client_sock, &fd_read);
+	FD_SET(_clientSock, &fd_read);
 	timeval time;
 	time.tv_sec = 0;//秒
 	time.tv_usec = 0;
-	int ret = select(_client_sock, &fd_read, nullptr, nullptr, &time);
+	int ret = select(_clientSock + 1, &fd_read, nullptr, nullptr, &time);//linux 需要+1
 	if (ret < 0)
 	{
-		printf("<socket=%d> select error 1.\n", (int)_client_sock);
-		CloseClient();
+		printf("<socket=%d> select error 1.\n", (int)_clientSock);
+		closeClient();
 		return false;
 	}
 
-	if (FD_ISSET(_client_sock, &fd_read))
+	if (FD_ISSET(_clientSock, &fd_read))
 	{
-		FD_CLR(_client_sock, &fd_read);
+		FD_CLR(_clientSock, &fd_read);
 
-		int ret = RecvData(_client_sock);//处理收到的消息
+		int ret = recvData(_clientSock);//处理收到的消息
 		if (ret == -1)
 		{
-			printf("<socket=%d> select error 2.\n", (int)_client_sock);
-			CloseClient();
+			printf("<socket=%d> select error 2.\n", (int)_clientSock);
+			closeClient();
 			return false;
 		}
 	}
 	return true;
 }
 
-int Client::RecvData(SOCKET client_sock)
+bool Client::isRun()
 {
-	int len = (int)recv(client_sock, _recv_buf, RECV_BUF_SIZE, 0);
+	return _clientSock != INVALID_SOCKET && _isConnect;
+}
+
+int Client::recvData(SOCKET clientSock)
+{
+	int nLen = (int)recv(clientSock, _recvBuf, RECV_BUF_SIZE, 0);
 
 	//判断是否断开
-	if (len <= 0)
+	if (nLen <= 0)
 	{
-		printf("<socket=%d> disconnect from server.\n", (int)_client_sock);
+		printf("<socket=%d> disconnect from server.\n", (int)_clientSock);
 		return -1;
 	}
 
 	//放入消息缓冲区	
-	memcpy(_msg_buf + _last_pos, _recv_buf, len);
-	_last_pos = _last_pos + len;
+	memcpy(_msgBuf + _lastPos, _recvBuf, nLen);
+	_lastPos += nLen;
 
-	while (_last_pos >= sizeof(Header))
+	while (_lastPos >= sizeof(Header))
 	{
-		Header* header = (Header*)_msg_buf;
-		if (_last_pos >= header->data_length)
+		Header* header = (Header*)_msgBuf;
+		if (_lastPos >= header->data_length)
 		{
-			int temp_last_pos = _last_pos - (header->data_length);
-			OnNetMsg(header);
-			memcpy(_msg_buf, _msg_buf + (header->data_length), temp_last_pos);
-			_last_pos = temp_last_pos;
+			int temp_pos = _lastPos - header->data_length;
+			onNetMsg(header);
+			memcpy(_msgBuf, _msgBuf + header->data_length, temp_pos);
+			_lastPos = temp_pos;
 		}
 		else
 		{
@@ -157,7 +159,7 @@ int Client::RecvData(SOCKET client_sock)
 }
 
 //处理消息
-void Client::OnNetMsg(Header* header)
+void Client::onNetMsg(Header* header)
 {
 	switch (header->cmd)
 	{
@@ -165,7 +167,7 @@ void Client::OnNetMsg(Header* header)
 	{
 		LoginResult* login_result = (LoginResult*)header;
 		/*printf("Login result : socket = %d , data length= %d , result= %d\n",
-			(int)_client_sock, login_result->data_length, login_result->result);*/
+			(int)_clientSock, login_result->data_length, login_result->result);*/
 	}
 	break;
 	case CMD_LOGOUT_RESULT:
@@ -185,28 +187,28 @@ void Client::OnNetMsg(Header* header)
 	case CMD_ERROR:
 	{
 		printf("error : socket = %d , data length= %d\n",
-			(int)_client_sock, header->data_length);
+			(int)_clientSock, header->data_length);
 	}
 	break;
 	default:
 	{
 		printf("Undefined data : socket = %d , data length=  %d\n",
-			(int)_client_sock, header->data_length);
+			(int)_clientSock, header->data_length);
 	}
 	break;
 	}
 }
 
 //参数：接收对象，要发送的内容
-int Client::SendData(Header* header, int len)
+int Client::sendData(Header* header, int nLen)
 {
 	int ret = SOCKET_ERROR;
-	if (_client_sock != INVALID_SOCKET && header)
+	if (isRun() && header)
 	{
-		ret = send(_client_sock, (char*)header, len, 0);
+		ret = send(_clientSock, (const char*)header, nLen, 0);
 		if (ret == SOCKET_ERROR)
 		{
-			CloseClient();
+			closeClient();
 		}
 	}
 	return ret;

@@ -2,10 +2,10 @@
 #include<iostream>
 Server::~Server()
 {
-	CloseServer();
+	closeServer();
 }
 
-SOCKET Server::InitServer()
+SOCKET Server::initServer()
 {
 #ifdef _WIN32
 	//启动 windows 环境
@@ -15,25 +15,25 @@ SOCKET Server::InitServer()
 #endif // _WIN32
 
 	//建立 socket
-	if (_server_sock != INVALID_SOCKET)
+	if (_serverSock != INVALID_SOCKET)
 	{
-		printf("<socket=%d> close old connections.\n",(int)_server_sock);
-		CloseServer();
+		printf("<socket=%d> close old connections.\n", (int)_serverSock);
+		closeServer();
 	}
-	_server_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (_server_sock == INVALID_SOCKET)
+	_serverSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (_serverSock == INVALID_SOCKET)
 	{
-		printf("<socket=%d> socket error.\n", (int)_server_sock);
+		printf("<socket=%d> socket error.\n", (int)_serverSock);
 	}
 	else
 	{
 		//printf("<socket=%d> socket success.\n",(int)_server_sock);
 	}
-	return _server_sock;
+	return _serverSock;
 }
 
 //!注意参数
-int Server::Bind(const char* ip, const short port)
+int Server::Bind(const char* ip, unsigned short port)
 {
 	sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
@@ -50,18 +50,18 @@ int Server::Bind(const char* ip, const short port)
 #else
 	if (ip)
 	{
-		_server_addr.sin_addr.s_addr = inet_addr(ip);
+		server_addr.sin_addr.s_addr = inet_addr(ip);
 	}
 	else
 	{
-		_server_addr.sin_addr.s_addr = INADDR_ANY;
+		server_addr.sin_addr.s_addr = INADDR_ANY;
 	}
 #endif // _WIN32
 
-	int ret = bind(_server_sock, (sockaddr*)& server_addr, sizeof(server_addr));
+	int ret = bind(_serverSock, (sockaddr*)& server_addr, sizeof(server_addr));
 	if (ret == SOCKET_ERROR)
 	{
-		printf("<socket=%d> bind error.\n", (int)_server_sock);
+		printf("<socket=%d> bind error.\n", (int)_serverSock);
 	}
 	else
 	{
@@ -72,10 +72,10 @@ int Server::Bind(const char* ip, const short port)
 
 int Server::Listen(int n)
 {
-	int ret = listen(_server_sock, 5);
+	int ret = listen(_serverSock, n);
 	if (ret == SOCKET_ERROR)
 	{
-		printf("<socket=%d> listen error.\n", (int)_server_sock);
+		printf("<socket=%d> listen error.\n", (int)_serverSock);
 	}
 	else
 	{
@@ -93,123 +93,128 @@ SOCKET Server::Accept()
 #else
 	socklen_t client_addr_size = sizeof(client_addr);
 #endif // _WIN32
-	client_sock = accept(_server_sock, (sockaddr*)& client_addr, &client_addr_size);
+	client_sock = accept(_serverSock, (sockaddr*)& client_addr, &client_addr_size);
 
 	if (client_sock == INVALID_SOCKET)
 	{
-		printf("<socket=%d> accept error.\n", (int)_server_sock);
+		printf("<socket=%d> accept error.\n", (int)_serverSock);
 	}
 	else
 	{
 		//NewUserJoin new_user_join;
 		//SendToAll(&new_user_join);
-		AddClientToCellServer(new ClientSock(client_sock));
+		addClientToCellServer(new ClientSock(client_sock));
 		//printf("New client %d join.\n", (int)client_sock);
 	}
 	return client_sock;
 }
 
-void Server::AddClientToCellServer(ClientSock* p_client)
+void Server::addClientToCellServer(ClientSock* pClient)
 {
 	//查找客户数量最少的CellServer消息处理对象
-	auto p_min_server = _cell_servers[0];
-	for (auto p_cell_server : _cell_servers)
+	auto pMinServer = _cellServers[0];
+	for (auto pCellServer : _cellServers)
 	{
-		if (p_min_server->GetClientCount() > p_cell_server->GetClientCount())
+		if (pMinServer->getClientCount() > pCellServer->getClientCount())
 		{
-			p_min_server = p_cell_server;
+			pMinServer = pCellServer;
 		}
 	}
-	p_min_server->AddClient(p_client);//加入客户端数量最小的消息处理线程	
-	OnNetJoin(p_client);
+	pMinServer->addClient(pClient);//加入客户端数量最小的消息处理线程	
+	onNetJoin(pClient);
 }
 
-void Server::StartServer(int n_cell_server)
+void Server::startServer(int n_cellServer)
 {
 	//启动四个线程来负责消息处理业务
-	for (int i = 0; i < n_cell_server; ++i)
+	for (int i = 0; i < n_cellServer; ++i)
 	{
-		auto cell_server = new CellServer(_server_sock);//新建一个服务器来负责消息处理业务
-		_cell_servers.push_back(cell_server);
-		cell_server->SetEventObj(this);//注册网络事件接受对象
-		cell_server->StartCellServer();//启动消息处理线程
+		auto cell_server = new CellServer(_serverSock);//新建一个服务器来负责消息处理业务
+		_cellServers.push_back(cell_server);
+		cell_server->setEventObj(this);//注册网络事件接受对象
+		cell_server->startCellServer();//启动消息处理线程
 	}
 }
 
-void Server::CloseServer()
+void Server::closeServer()
 {
 	//避免重复关闭！
-	if (_server_sock == INVALID_SOCKET)
+	if (_serverSock == INVALID_SOCKET)
 	{
 		return;
 	}
 
 #ifdef _WIN32
-	closesocket(_server_sock);
+	closesocket(_serverSock);
 	WSACleanup();//关闭 windows 环境
 #else
-	close(_server_sock);
+	close(_serverSock);
 #endif // _WIN32
 }
 
 //只负责连接新客户端，有其他线程负责消息处理
-bool Server::OnRun()
+bool Server::onRun()
 {
-	if (_server_sock == INVALID_SOCKET)
+	if (!isRun())
 	{
 		return false;
 	}
 
-	Time4Msg();
+	time4Msg();
 	fd_set fd_read;
 	FD_ZERO(&fd_read);
-	FD_SET(_server_sock, &fd_read);
+	FD_SET(_serverSock, &fd_read);
 
 	timeval time;
 	time.tv_sec = 0;//秒
 	time.tv_usec = 10;
-	int ret = select(_server_sock + 1, &fd_read, nullptr, nullptr, &time);
+	int ret = select(_serverSock + 1, &fd_read, nullptr, nullptr, &time);
 	if (ret < 0)
 	{
-		printf("<socket=%d> select error.\n",(int)_server_sock);
-		CloseServer();
+		printf("<socket=%d> select error.\n", (int)_serverSock);
+		closeServer();
 		return false;
 	}
 
-	if (FD_ISSET(_server_sock, &fd_read))
+	if (FD_ISSET(_serverSock, &fd_read))
 	{
-		FD_CLR(_server_sock, &fd_read);
+		FD_CLR(_serverSock, &fd_read);
 		Accept();
 		return true;
 	}
-	return true;
+	return false;
 }
 
-void Server::Time4Msg()
+bool Server::isRun()
+{
+	return _serverSock != INVALID_SOCKET;
+}
+
+void Server::time4Msg()
 {
 	auto t1 = _tTime.GetElapsedSecond();
 	if (t1 >= 1.0)
 	{
 		printf("thread<%d>,time<%lf>,socket<%d>,clients<%d>,recvCount<%d>\n",
-			(int)_cell_servers.size(),(double) t1, (int)_server_sock, (int)(_client_count), (int)(_recv_count));
-		_recv_count = 0;
+			(int)_cellServers.size(), (double)t1, (int)_serverSock, (int)(_clientCount), (int)(_recvCount));
+		_recvCount = 0;
 		_tTime.Update();
 	}
 }
 
-void Server::OnNetJoin(ClientSock * p_client)
+void Server::onNetJoin(ClientSock* pClient)
 {
-	++_client_count;
+	++_clientCount;
 }
 
 //cellServer 4 多个线程触发 不安全
 //如果只开启1个cellServer就是安全的
-void Server::OnNetLeave(ClientSock * p_client)
+void Server::onNetLeave(ClientSock* pClient)
 {
-	--_client_count;
+	--_clientCount;
 }
 
-void Server::OnNetMsg(ClientSock * p_client, Header * header)
+void Server::onNetMsg(ClientSock* pClient, Header* header)
 {
-	++_recv_count;
+	++_recvCount;
 }

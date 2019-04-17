@@ -3,37 +3,37 @@
 #include<thread>
 #include<chrono>
 #include<stdio.h>
-#define CLIENT_COUNT 10000
-bool run = true;
-void cmd_thread()
+#define CLIENT_COUNT 8
+bool g_bRun = true;
+void cmdThread()
 {
 	while (true)
 	{
-		char cmd_buf[256];
-		scanf("%s", cmd_buf);
-		if (strcmp(cmd_buf, "exit") == 0)
+		char cmdBuf[256] = {};
+		scanf("%s", cmdBuf);
+		if (strcmp(cmdBuf, "exit") == 0)
 		{
-			run = false;
-			std::cout << "Client exit" << std::endl;
+			g_bRun = false;
+			printf("Client exit.\n");
 			break;
 		}
 		else
 		{
-			std::cout << "Invalid input, please re-enter." << std::endl;
+			printf("Invalid input, please re-enter.\n");
 		}
 	}
 }
 
 const int client_count = CLIENT_COUNT;//客户端数量
-Client* client[client_count];////客户端数组
+Client* client[client_count];//客户端数组
 const int thread_count = 4;//发送线程的数量
 
-void send_thread(int id)//0-3，四个线程
+void sendThread(int id)//1-4，四个线程
 {
 	printf("thread<%d>,start\n", id);
 	int c = client_count / thread_count;
-	int begin = id * c;
-	int end = (id + 1) * c;
+	int begin = (id - 1) * c;
+	int end = id * c;
 	for (int i = begin; i < end; ++i)
 	{
 		client[i] = new Client();
@@ -41,12 +41,12 @@ void send_thread(int id)//0-3，四个线程
 
 	for (int i = begin; i < end; ++i)
 	{
-		client[i]->Connect(IP, PORT);
+		client[i]->connectToServer(IP, PORT);
 	}
 
 	printf("thread<%d>,Connect<begin=%d, end=%d>\n", id, begin, end);
 
-	std::chrono::milliseconds t(300);//3000毫秒
+	std::chrono::milliseconds t(3000);//3000毫秒
 	std::this_thread::sleep_for(t);
 
 	Login login[10];//提高发送频率，每次发送十个消息包
@@ -56,19 +56,19 @@ void send_thread(int id)//0-3，四个线程
 		strcpy(login[i].passWord, "12345");
 	}
 
-	const int len = sizeof(login);
-	while (run)
+	const int nLen = sizeof(login);
+	while (g_bRun)
 	{
 		for (int i = begin; i < end; ++i)
 		{
-			client[i]->SendData(login, len);
-			client[i]->OnRun();
+			client[i]->sendData(login, nLen);
+			client[i]->onRun();
 		}
 	}
 
 	for (int i = begin; i < end; ++i)
 	{
-		client[i]->CloseClient();
+		client[i]->closeClient();
 		delete client[i];
 	}
 
@@ -78,18 +78,23 @@ void send_thread(int id)//0-3，四个线程
 int main()
 {
 	//输入线程
-	std::thread cmd_t(cmd_thread);
+	std::thread cmd_t(cmdThread);
 	cmd_t.detach();
 
 	//启动发送线程
 	for (int i = 0; i < thread_count; ++i)
 	{
-		std::thread t(send_thread, i);//传递的是线程的编号
+		std::thread t(sendThread, i + 1);//传递的是线程的编号
 		t.detach();
 	}
-	while (run)
+	while (g_bRun)
 	{
+
+#ifdef _WIN32
 		Sleep(100);
+#else
+		sleep(100);
+#endif // _WIN32
 	}
 	std::cout << "EXIT...." << std::endl;
 	return 0;

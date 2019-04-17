@@ -12,20 +12,21 @@
 class Client {
 public:
 	Client();
-	~Client();
-	void InitClient();//初始化客户端
-	int Connect(const char* ip, const short port);//连接服务器
-	void CloseClient();//关闭客户端	
-	bool OnRun();//处理网络消息
-	int RecvData(SOCKET client_sock);//接收消息
-	void OnNetMsg(Header* header);//处理消息
-	int SendData(Header* header, int len);//发送消息
+	virtual ~Client();
+	void initClient();//初始化客户端
+	int connectToServer(const char* ip, unsigned short port);//连接服务器
+	void closeClient();//关闭客户端	
+	bool onRun();//处理网络消息
+	bool isRun();
+	int recvData(SOCKET clientSock);//接收消息
+	virtual void onNetMsg(Header* header);//处理消息
+	int sendData(Header* header, int nLen);//发送消息
 private:
-	SOCKET _client_sock;
-	char _recv_buf[RECV_BUF_SIZE];
-	char _msg_buf[RECV_BUF_SIZE * 5];
-	int _last_pos;
-	bool _is_connect;
+	SOCKET _clientSock;
+	bool _isConnect;
+	char _recvBuf[RECV_BUF_SIZE] = {};
+	char _msgBuf[RECV_BUF_SIZE * 5] = {};
+	int _lastPos = 0;
 };
 
 #endif // !CLIENT_H_
