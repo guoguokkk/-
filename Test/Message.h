@@ -2,7 +2,7 @@
 #define MESSAGE_H_
 
 #ifdef _WIN32
-#define FD_SETSIZE 2506
+#define FD_SETSIZE 2056
 #define WIN32_LEAN_AND_MEAN//解决 Windows.h 和 WinSock2.h 冲突
 #include<Windows.h>
 #include<WinSock2.h>
@@ -19,7 +19,7 @@
 #endif // _WIN32
 
 #define IP "127.0.0.1"
-#define PORT 9000
+#define PORT 8080
 
 //缓冲区最小单元大小
 #ifndef RECV_BUF_SIZE

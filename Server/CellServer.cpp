@@ -2,6 +2,7 @@
 #include<iostream>
 #include<functional>
 #include<chrono>
+#include<vector>
 
 CellServer::~CellServer()
 {
@@ -24,18 +25,17 @@ void CellServer::closeServer()
 
 #ifdef _WIN32
 	//关闭每个客户端！
-	for (int i = 0; i < _clients.size(); ++i)
+	for (auto iter : _clients)
 	{
-		closesocket(_clients[i]->getSock());
-		delete _clients[i];
+		closesocket(iter.second->getSock());
+		delete iter.second;
 	}
 	closesocket(_serverSock);
 #else
-	//关闭每个客户端！
-	for (int i = 0; i < _clients.size(); ++i)
+	for (auto iter : _clients)
 	{
-		close(_clients[i]->getSock());
-		delete _clients[i];
+		close(iter.second->getSock());
+		delete iter.second;
 	}
 	close(_serverSock);
 #endif // _WIN32
@@ -44,17 +44,19 @@ void CellServer::closeServer()
 
 bool CellServer::onRun()
 {
+	_clientsChange = true;
 	while (isRun())
 	{
-		//从缓冲队列里取出客户数据，加入正式客户队列
+		//从缓冲队列里取出客户数据，加入正式客户队列，客户端加入需要改变
 		if (_clientsBuf.size() > 0)
 		{
 			std::lock_guard<std::mutex> lock(_mutex);//自解锁
 			for (auto pClient : _clientsBuf)
 			{
-				_clients.push_back(pClient);
+				_clients[pClient->getSock()] = pClient;//std::map
 			}
 			_clientsBuf.clear();
+			_clientsChange = true;
 		}
 
 		//如果没有需要处理的客户端，跳过
@@ -67,47 +69,88 @@ bool CellServer::onRun()
 
 		fd_set fd_read;
 		FD_ZERO(&fd_read);
-
-		SOCKET maxSock = _clients[0]->getSock();
-		for (int i = 0; i < _clients.size(); ++i)
+		if (_clientsChange)
 		{
-			FD_SET(_clients[i]->getSock(), &fd_read);
-			if (maxSock < _clients[i]->getSock())
+			_clientsChange = false;
+			_maxSock = _clients.begin()->second->getSock();
+			for (auto iter : _clients)
 			{
-				maxSock = _clients[i]->getSock();
+				FD_SET(iter.second->getSock(), &fd_read);
+				if (_maxSock < iter.second->getSock())
+				{
+					_maxSock = iter.second->getSock();
+				}
 			}
+			memcpy(&_fdReadBack, &fd_read, sizeof(fd_set));
+		}
+		else
+		{//如果没有改变，直接拷贝内容
+			memcpy(&fd_read, &_fdReadBack, sizeof(fd_set));
 		}
 
-		int ret = select(maxSock + 1, &fd_read, nullptr, nullptr, nullptr);//不需要阻塞
+		timeval time;
+		time.tv_sec = 0;//秒
+		time.tv_usec = 0;
+		int ret = select(_maxSock + 1, &fd_read, nullptr, nullptr, &time);//阻塞
 		if (ret < 0)
 		{
 			printf("Server %d select error.\n", (int)_serverSock);
 			closeServer();
 			return false;
 		}
-
-		for (int i = 0; i < _clients.size(); ++i)
+		else if (ret == 0)
 		{
-			if (FD_ISSET(_clients[i]->getSock(), &fd_read))
+			continue;//没有数据
+		}
+		
+#ifdef _WIN32
+		for (int i = 0; i < fd_read.fd_count; ++i)
+		{
+			auto iter = _clients.find(fd_read.fd_array[i]);
+			if (iter != _clients.end())
 			{
-				int ret = recvData(_clients[i]);//接收消息
+				int ret = recvData(iter->second);//接收消息
 				if (ret == -1)
 				{
-					auto iter = _clients.begin() + i;
-					if (iter != _clients.end())
+					if (_pEvent)
 					{
-						if (_pEvent)
-						{
-							_pEvent->onNetLeave(_clients[i]);
-						}
+						_pEvent->onNetLeave(iter->second);
+					}
 
-						//要删delete再erase，会出错！！！！
-						delete _clients[i];
-						_clients.erase(iter);
+					_clientsChange = true;
+					_clients.erase(iter->first);
+				}
+			}			
+			else
+			{
+				printf("error. if (iter != _clients.end())\n");
+			}
+		}
+
+#else
+		std::vector<ClientSock*> temp;//记录要删除的客户端
+		for (auto iter : _clients)
+		{
+			if (FD_ISSET(iter.second->getSock(), &fd_read))
+			{
+				int ret = recvData(iter.second);//接收消息
+				if (ret == -1)
+				{
+					_clientsChange = false;
+					temp.push_back(iter.second);
+					if (_pEvent)
+					{
+						_pEvent->onNetLeave(iter.second);
 					}
 				}
 			}
 		}
+		for (auto pClient : temp)
+		{
+			_clients.erase(pClient->getSock());
+			delete pClient;
+		}
+#endif // _WIN32		
 	}
 }
 

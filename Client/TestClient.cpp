@@ -3,7 +3,7 @@
 #include<thread>
 #include<chrono>
 #include<stdio.h>
-#define CLIENT_COUNT 8
+#define CLIENT_COUNT 10000
 bool g_bRun = true;
 void cmdThread()
 {

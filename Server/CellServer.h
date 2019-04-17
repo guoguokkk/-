@@ -13,7 +13,7 @@
 #include<thread>
 #include<mutex>
 #include<atomic>//原子操作
-
+#include<map>
 //消息处理
 class CellServer {
 public:
@@ -22,7 +22,7 @@ public:
 		_serverSock = serverSock;
 		_pEvent = nullptr;
 	}
-	~CellServer();	
+	~CellServer();
 	void setEventObj(INetEvent* event);
 	void closeServer();//关闭服务器
 	bool onRun();//select	
@@ -34,12 +34,15 @@ public:
 	size_t getClientCount();
 private:
 	SOCKET _serverSock;
-	std::vector<ClientSock*> _clients;//正式客户队列
+	std::map<SOCKET, ClientSock*> _clients;//正式客户队列
 	std::vector<ClientSock*> _clientsBuf;//缓冲客户队列
 	std::mutex _mutex;//缓冲队列的锁
 	std::thread _thread;
 	INetEvent* _pEvent;//网络事件对象
 	char _recvBuf[RECV_BUF_SIZE] = {};//接收缓冲区
+	fd_set _fdReadBack;//客户列表备份
+	bool _clientsChange;//客户列表是否改变
+	SOCKET _maxSock;
 };
 
 #endif // !CELL_SERVER

@@ -29,8 +29,8 @@ public:
 			/*printf("Login : socket = %d , user name = %s , password= %s\n",
 				(int)pClient->GetSock(), login->userName, login->passWord);*/
 
-			LoginResult login_result;
-			pClient->sendData(&login_result);
+			/*LoginResult login_result;
+			pClient->sendData(&login_result);*/
 		}
 		break;
 		case CMD_LOGOUT:
