@@ -5,7 +5,10 @@ using namespace std::chrono;
 //高精度计时器
 class TimeStamp {
 public:
-	TimeStamp() { Update(); }
+	TimeStamp() 
+	{
+		Update();
+	}
 	~TimeStamp() = default;
 
 	//更新时间

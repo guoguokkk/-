@@ -19,10 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CellServer.h" />
     <ClInclude Include="ClientSocket.h" />
+    <ClInclude Include="INetEvent.h" />
+    <ClInclude Include="MyServer.h" />
     <ClInclude Include="Server.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CellServer.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="TestServer.cpp" />
   </ItemGroup>
