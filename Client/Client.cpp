@@ -110,6 +110,7 @@ bool Client::onRun()
 		FD_CLR(_clientSock, &fd_read);
 
 		int ret = recvData(_clientSock);//处理收到的消息
+
 		if (ret == -1)
 		{
 			printf("<socket=%d> select error 2.\n", (int)_clientSock);
@@ -127,8 +128,8 @@ bool Client::isRun()
 
 int Client::recvData(SOCKET clientSock)
 {
-	int nLen = (int)recv(clientSock, _recvBuf, RECV_BUF_SIZE, 0);
-
+	char* recvBuf = _msgBuf + _lastPos;
+	int nLen = (int)recv(clientSock, recvBuf, RECV_BUF_SIZE - _lastPos, 0);
 	//判断是否断开
 	if (nLen <= 0)
 	{
@@ -136,8 +137,6 @@ int Client::recvData(SOCKET clientSock)
 		return -1;
 	}
 
-	//放入消息缓冲区	
-	memcpy(_msgBuf + _lastPos, _recvBuf, nLen);
 	_lastPos += nLen;
 
 	while (_lastPos >= sizeof(Header))

@@ -23,7 +23,8 @@
 
 //缓冲区最小单元大小
 #ifndef RECV_BUF_SIZE
-#define RECV_BUF_SIZE 10240
+#define RECV_BUF_SIZE 10240*5
+#define SEND_BUF_SIZE 10240*5
 #endif // !RECV_BUF_SIZE
 
 //命令

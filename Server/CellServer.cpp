@@ -102,7 +102,7 @@ bool CellServer::onRun()
 		{
 			continue;//没有数据
 		}
-		
+
 #ifdef _WIN32
 		for (int i = 0; i < fd_read.fd_count; ++i)
 		{
@@ -120,7 +120,7 @@ bool CellServer::onRun()
 					_clientsChange = true;
 					_clients.erase(iter->first);
 				}
-			}			
+			}
 			else
 			{
 				printf("error. if (iter != _clients.end())\n");
@@ -162,8 +162,11 @@ bool CellServer::isRun()
 //接收消息，处理粘包、少包
 int CellServer::recvData(ClientSock* pClient)
 {
-	//接收客户端消息
-	int nLen = (int)recv(pClient->getSock(), _recvBuf, RECV_BUF_SIZE, 0);
+	//接收客户端消息，直接使用每个客户端的消息缓冲区接收数据
+	char* recvBuf = pClient->getMsgBuf() + pClient->getLastPos();
+
+	int nLen = (int)recv(pClient->getSock(), recvBuf, RECV_BUF_SIZE - pClient->getLastPos(), 0);
+	_pEvent->onNetRecv(pClient);//计数
 	//判断客户端是否退出
 	if (nLen <= 0)
 	{
@@ -171,8 +174,6 @@ int CellServer::recvData(ClientSock* pClient)
 		return -1;
 	}
 
-	//接收到的数据放入对应客户端消息缓冲区
-	memcpy(pClient->getMsgBuf() + pClient->getLastPos(), _recvBuf, nLen);
 	pClient->setLastPos(pClient->getLastPos() + nLen);
 
 	//处理粘包、少包问题
@@ -211,7 +212,7 @@ void CellServer::addClient(ClientSock* pClient)
 
 void CellServer::startCellServer()
 {
-	_thread = std::thread(std::mem_fn(&CellServer::onRun), this);//适配器 std::mem_fun
+	_thread = std::thread(std::mem_fn(&CellServer::onRun), this);
 }
 
 size_t CellServer::getClientCount()

@@ -17,12 +17,7 @@
 class Server :public INetEvent
 {
 public:
-	Server()
-	{
-		_serverSock = INVALID_SOCKET;
-		_recvCount = 0;//!一定要初始化
-		_clientCount = 0;//!一定要初始化
-	}
+	Server();	
 	~Server();
 	SOCKET initServer();//初始化服务器
 	int Bind(const char* ip, unsigned short port);//绑定ip地址和端口
@@ -44,5 +39,6 @@ private:
 protected:
 	std::atomic_int _recvCount;//收到消息计数
 	std::atomic_int _clientCount;//客户端计数
+	std::atomic_int _msgCount;//收到消息包计数
 };
 #endif // !SERVER_H_

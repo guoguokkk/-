@@ -3,6 +3,14 @@
 #include<thread>
 #include<chrono>
 #include<stdio.h>
+#include<atomic>
+
+#ifdef _WIN32
+#include"../Test/TimeStamp.h"
+#else
+#include"TimeStamp.h"
+#endif // _WIN32
+
 #define CLIENT_COUNT 10000
 bool g_bRun = true;
 void cmdThread()
@@ -27,6 +35,8 @@ void cmdThread()
 const int client_count = CLIENT_COUNT;//客户端数量
 Client* client[client_count];//客户端数组
 const int thread_count = 4;//发送线程的数量
+std::atomic_int sendCount(0);
+std::atomic_int readyCount(0);
 
 void sendThread(int id)//1-4，四个线程
 {
@@ -46,8 +56,13 @@ void sendThread(int id)//1-4，四个线程
 
 	printf("thread<%d>,Connect<begin=%d, end=%d>\n", id, begin, end);
 
-	std::chrono::milliseconds t(3000);//3000毫秒
-	std::this_thread::sleep_for(t);
+	//等待其他线程准备好发送
+	++readyCount;
+	while (readyCount < thread_count)
+	{
+		std::chrono::milliseconds t(10);//3000毫秒
+		std::this_thread::sleep_for(t);
+	}
 
 	Login login[10];//提高发送频率，每次发送十个消息包
 	for (int i = 0; i < 10; ++i)
@@ -61,7 +76,10 @@ void sendThread(int id)//1-4，四个线程
 	{
 		for (int i = begin; i < end; ++i)
 		{
-			client[i]->sendData(login, nLen);
+			if (client[i]->sendData(login, nLen) != SOCKET_ERROR)
+			{
+				++sendCount;//发送的数量
+			}
 			client[i]->onRun();
 		}
 	}
@@ -87,15 +105,33 @@ int main()
 		std::thread t(sendThread, i + 1);//传递的是线程的编号
 		t.detach();
 	}
+
+	TimeStamp tTime;
+
 	while (g_bRun)
 	{
+		auto t = tTime.getElapsedSecond();
+		if (t >= 1.0)
+		{
+			//!"std::atomic<int>::atomic(const std::atomic<int>&)": 尝试引用已删除的函数
+			//!将类 "std::atomic<int>" 作为可变参数函数的参数的非标准用法
+			/*printf("thread<%d>,clients<%d>,time<%lf>,send<%d>\n",
+				thread_count, client_count, t, sendCount);*/
+
+			printf("thread<%d>,clients<%d>,time<%lf>,send<%d>\n",
+				thread_count, client_count, t, (int)(sendCount.load()/t));
+
+			sendCount = 0;
+			tTime.update();
+		}
 
 #ifdef _WIN32
-		Sleep(100);
+		Sleep(1);
 #else
-		sleep(100);
+		sleep(1);
 #endif // _WIN32
 	}
+
 	std::cout << "EXIT...." << std::endl;
 	return 0;
 }

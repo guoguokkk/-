@@ -1,5 +1,13 @@
 #include "Server.h"
 #include<iostream>
+Server::Server()
+{
+	_serverSock = INVALID_SOCKET;
+	_recvCount = 0;//!一定要初始化
+	_clientCount = 0;//!一定要初始化
+	_msgCount = 0;//!一定要初始化
+}
+
 Server::~Server()
 {
 	closeServer();
@@ -192,13 +200,15 @@ bool Server::isRun()
 
 void Server::time4Msg()
 {
-	auto t1 = _tTime.GetElapsedSecond();
+	auto t1 = _tTime.getElapsedSecond();
 	if (t1 >= 1.0)
 	{
-		printf("thread<%d>,time<%lf>,socket<%d>,clients<%d>,recvCount<%d>\n",
-			(int)_cellServers.size(), (double)t1, (int)_serverSock, (int)(_clientCount), (int)(_recvCount));
+		printf("thread<%d>,time<%lf>,socket<%d>,clients<%d>,msgCount<%d>,recvCount<%d>\n",
+			(int)_cellServers.size(), (double)t1, (int)_serverSock,
+			(int)(_clientCount), (int)_msgCount, (int)(_recvCount));
 		_recvCount = 0;
-		_tTime.Update();
+		_msgCount = 0;
+		_tTime.update();
 	}
 }
 

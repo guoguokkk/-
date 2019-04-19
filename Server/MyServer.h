@@ -20,7 +20,7 @@ public:
 
 	virtual void onNetMsg(ClientSock* pClient, Header* header)//有客户端离开时
 	{
-		++_recvCount;
+		++_msgCount;
 		switch (header->cmd)
 		{
 		case CMD_LOGIN:
@@ -29,10 +29,11 @@ public:
 			/*printf("Login : socket = %d , user name = %s , password= %s\n",
 				(int)pClient->GetSock(), login->userName, login->passWord);*/
 
-			/*LoginResult login_result;
-			pClient->sendData(&login_result);*/
+			//LoginResult login_result;
+			//pClient->sendData(&login_result);
+			break;
 		}
-		break;
+
 		case CMD_LOGOUT:
 		{
 			Logout* logout = (Logout*)header;
@@ -41,21 +42,29 @@ public:
 
 			LogoutResult logout_result;
 			pClient->sendData(&logout_result);
+			break;
 		}
-		break;
+
 		case CMD_ERROR:
 		{
 			printf("error : socket = %d , data length= %d\n",
 				(int)pClient->getSock(), header->data_length);
+			break;
 		}
-		break;
+
 		default:
 		{
 			printf("Undefined data : socket = %d , data length=  %d\n",
 				(int)pClient->getSock(), header->data_length);
+			break;
 		}
-		break;
+
 		}
+	}
+
+	void onNetRecv(ClientSock* pClient)
+	{
+		++_recvCount;
 	}
 };
 

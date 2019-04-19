@@ -24,8 +24,7 @@ public:
 private:
 	SOCKET _clientSock;
 	bool _isConnect;
-	char _recvBuf[RECV_BUF_SIZE] = {};
-	char _msgBuf[RECV_BUF_SIZE * 5] = {};
+	char _msgBuf[RECV_BUF_SIZE] = {};
 	int _lastPos = 0;
 };
 

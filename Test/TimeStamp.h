@@ -7,29 +7,29 @@ class TimeStamp {
 public:
 	TimeStamp() 
 	{
-		Update();
+		update();
 	}
 	~TimeStamp() = default;
 
 	//更新时间
-	void Update()
+	void update()
 	{
 		_begin = high_resolution_clock::now();
 	}
 
 	//获取秒
-	double GetElapsedSecond()
+	double getElapsedSecond()
 	{
-		return GetElapsedTimeInMicroSec()* 0.000001;
+		return getElapsedTimeInMicroSec()* 0.000001;
 	}
 
 	//获取毫秒
-	double GetElapsedTimeInMillSec()
+	double getElapsedTimeInMillSec()
 	{
-		return GetElapsedTimeInMicroSec()* 0.001;
+		return getElapsedTimeInMicroSec()* 0.001;
 	}
 	//获取微秒
-	long long GetElapsedTimeInMicroSec()
+	long long getElapsedTimeInMicroSec()
 	{
 		return duration_cast<microseconds>(high_resolution_clock::now() - _begin).count();
 	}
