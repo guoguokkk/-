@@ -27,7 +27,7 @@ public:
 		{
 			Login* login = (Login*)header;
 			/*printf("Login : socket = %d , user name = %s , password= %s\n",
-				(int)pClient->GetSock(), login->userName, login->passWord);*/
+				(int)pClient->getSock(), login->userName, login->passWord);*/
 
 			//LoginResult login_result;
 			//pClient->sendData(&login_result);

@@ -25,7 +25,7 @@ private:
 	SOCKET _clientSock;
 	bool _isConnect;
 	char _msgBuf[RECV_BUF_SIZE] = {};
-	int _lastPos = 0;
+	int _lastMsgPos = 0;
 };
 
 #endif // !CLIENT_H_

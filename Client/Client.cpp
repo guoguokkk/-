@@ -128,8 +128,8 @@ bool Client::isRun()
 
 int Client::recvData(SOCKET clientSock)
 {
-	char* recvBuf = _msgBuf + _lastPos;
-	int nLen = (int)recv(clientSock, recvBuf, RECV_BUF_SIZE - _lastPos, 0);
+	char* recvBuf = _msgBuf + _lastMsgPos;
+	int nLen = (int)recv(clientSock, recvBuf, RECV_BUF_SIZE - _lastMsgPos, 0);
 	//判断是否断开
 	if (nLen <= 0)
 	{
@@ -137,17 +137,17 @@ int Client::recvData(SOCKET clientSock)
 		return -1;
 	}
 
-	_lastPos += nLen;
+	_lastMsgPos += nLen;
 
-	while (_lastPos >= sizeof(Header))
+	while (_lastMsgPos >= sizeof(Header))
 	{
 		Header* header = (Header*)_msgBuf;
-		if (_lastPos >= header->data_length)
+		if (_lastMsgPos >= header->data_length)
 		{
-			int temp_pos = _lastPos - header->data_length;
+			int temp_pos = _lastMsgPos - header->data_length;
 			onNetMsg(header);
 			memcpy(_msgBuf, _msgBuf + header->data_length, temp_pos);
-			_lastPos = temp_pos;
+			_lastMsgPos = temp_pos;
 		}
 		else
 		{

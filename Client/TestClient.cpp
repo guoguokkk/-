@@ -11,7 +11,7 @@
 #include"TimeStamp.h"
 #endif // _WIN32
 
-#define CLIENT_COUNT 10000
+#define CLIENT_COUNT 1000
 bool g_bRun = true;
 void cmdThread()
 {
