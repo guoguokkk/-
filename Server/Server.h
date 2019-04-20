@@ -31,7 +31,8 @@ public:
 	void time4Msg();//计算并输出每秒收到的网络消息
 	virtual void onNetJoin(ClientSock* pClient);//只会被一个线程触发，安全
 	virtual void onNetLeave(ClientSock* pClient);//有客户端离开事件
-	virtual void onNetMsg(ClientSock* pClient,Header* header);
+	virtual void onNetMsg(CellServer* pCellServer, ClientSock* pClient,Header* header);
+	virtual void onNetRecv(ClientSock* pClient);
 private:
 	SOCKET _serverSock;
 	std::vector<CellServer*> _cellServers;//消息处理对象，内部会创建线程	

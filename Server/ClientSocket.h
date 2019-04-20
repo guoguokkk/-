@@ -42,7 +42,7 @@ public:
 				nSendLen = nSendLen - nCopyLen;
 				//return send(_client_sock, (char*) &header, header->data_length, 0);//!!!画蛇添足，一直不能识别数据
 				//ret = send(_sockfd, (const char*)header, header->data_length, 0);
-				ret = send(_sockfd, pSendData, SEND_BUF_SIZE, 0);
+				ret = send(_sockfd, _sendBuf, SEND_BUF_SIZE, 0);
 				_lastSendPos = 0;
 				if (ret == SOCKET_ERROR)
 				{

@@ -26,7 +26,7 @@ int main()
 {
 	MyServer server;
 	server.initServer();
-	server.Bind(IP, PORT);
+	server.Bind(nullptr, PORT);
 	server.Listen(5);
 	server.startServer(4);
 

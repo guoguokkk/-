@@ -224,7 +224,12 @@ void Server::onNetLeave(ClientSock* pClient)
 	--_clientCount;
 }
 
-void Server::onNetMsg(ClientSock* pClient, Header* header)
+void Server::onNetMsg(CellServer* pCellServer, ClientSock* pClient, Header* header)
+{
+	++_msgCount;
+}
+
+void Server::onNetRecv(ClientSock* pClient)
 {
 	++_recvCount;
 }

@@ -1,5 +1,5 @@
-#ifndef TIME_STAMP_H
-#define TIME_STAMP_H
+#ifndef TIME_STAMP_H_
+#define TIME_STAMP_H_
 #include<chrono>
 using namespace std::chrono;
 //高精度计时器
@@ -37,4 +37,4 @@ private:
 	time_point<high_resolution_clock> _begin;
 };
 
-#endif // !TIME_STAMP_H
+#endif // !TIME_STAMP_H_

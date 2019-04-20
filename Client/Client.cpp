@@ -94,23 +94,20 @@ bool Client::onRun()
 	fd_set fd_read;
 	FD_ZERO(&fd_read);
 	FD_SET(_clientSock, &fd_read);
-	timeval time;
-	time.tv_sec = 0;//秒
-	time.tv_usec = 0;
-	int ret = select(_clientSock + 1, &fd_read, nullptr, nullptr, &time);//linux 需要+1
+	timeval time = { 0,0 };
+	int ret = select(_clientSock + 1, &fd_read, 0, 0, &time);//linux 需要+1
 	if (ret < 0)
 	{
 		printf("<socket=%d> select error 1.\n", (int)_clientSock);
 		closeClient();
 		return false;
 	}
-
+	int a = FD_ISSET(_clientSock, &fd_read);
 	if (FD_ISSET(_clientSock, &fd_read))
 	{
 		FD_CLR(_clientSock, &fd_read);
 
 		int ret = recvData(_clientSock);//处理收到的消息
-
 		if (ret == -1)
 		{
 			printf("<socket=%d> select error 2.\n", (int)_clientSock);

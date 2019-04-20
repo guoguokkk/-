@@ -18,7 +18,7 @@
 #define SOCKET_ERROR -1
 #endif // _WIN32
 
-#define IP "127.0.0.1"
+#define IP "202.114.7.16"
 #define PORT 8080
 
 //缓冲区最小单元大小

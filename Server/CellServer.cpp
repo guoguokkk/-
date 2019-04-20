@@ -48,7 +48,7 @@ bool CellServer::onRun()
 	while (isRun())
 	{
 		//从缓冲队列里取出客户数据，加入正式客户队列，客户端加入需要改变
-		if (_clientsBuf.size() > 0)
+		if (!_clientsBuf.empty())
 		{
 			std::lock_guard<std::mutex> lock(_mutex);//自解锁
 			for (auto pClient : _clientsBuf)
@@ -184,7 +184,7 @@ int CellServer::recvData(ClientSock* pClient)
 		{
 			//更新消息缓冲区
 			int temp_pos = pClient->getLastPos() - header->data_length;
-			onNetMsg(pClient, header);
+			onNetMsg( pClient, header);
 			memcpy(pClient->getMsgBuf(), pClient->getMsgBuf() + header->data_length, temp_pos);
 			pClient->setLastPos(temp_pos);
 		}
@@ -199,7 +199,7 @@ int CellServer::recvData(ClientSock* pClient)
 //响应网络数据
 void CellServer::onNetMsg(ClientSock* pClient, Header* header)
 {
-	_pEvent->onNetMsg(pClient, header);
+	_pEvent->onNetMsg(this, pClient, header);
 }
 
 //消费者取出缓冲队列中的客户端
@@ -213,6 +213,7 @@ void CellServer::addClient(ClientSock* pClient)
 void CellServer::startCellServer()
 {
 	_thread = std::thread(std::mem_fn(&CellServer::onRun), this);
+	_taskServer.startTask();
 }
 
 size_t CellServer::getClientCount()

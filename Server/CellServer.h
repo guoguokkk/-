@@ -1,5 +1,5 @@
-#ifndef CELL_SERVER
-#define CELL_SERVER
+#ifndef CELL_SERVER_
+#define CELL_SERVER_
 
 #ifdef _WIN32
 #include"../Test/Message.h"
@@ -14,6 +14,33 @@
 #include<mutex>
 #include<atomic>//原子操作
 #include<map>
+#include"Task.h"
+
+
+
+//网络消息发送队列
+class SendMsgToClientTask :public Task
+{
+public:
+	SendMsgToClientTask(ClientSock* pClient, Header* header)
+	{
+		_pClient = pClient;
+		_pHeader = header;
+	}
+
+	//执行任务，发送消息
+	void doTask()
+	{
+		_pClient->sendData(_pHeader);
+		delete _pHeader;
+	}
+private:
+	ClientSock* _pClient;//目标客户端
+	Header* _pHeader;//要发送的数据
+};
+
+class INetEvent;
+
 //消息处理
 class CellServer {
 public:
@@ -32,6 +59,11 @@ public:
 	void addClient(ClientSock* pClient);//增加客户端
 	void startCellServer();
 	size_t getClientCount();
+	void addSendTask(ClientSock* pClient, Header* header)
+	{
+		SendMsgToClientTask* task = new SendMsgToClientTask(pClient, header);
+		_taskServer.addTask(task);
+	}
 private:
 	SOCKET _serverSock;
 	std::map<SOCKET, ClientSock*> _clients;//正式客户队列
@@ -42,6 +74,7 @@ private:
 	fd_set _fdReadBack;//客户列表备份
 	bool _clientsChange;//客户列表是否改变
 	SOCKET _maxSock;
+	TaskServer _taskServer;
 };
 
-#endif // !CELL_SERVER
+#endif // !CELL_SERVER_

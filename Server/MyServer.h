@@ -8,19 +8,19 @@ class MyServer :public Server
 public:
 	virtual void onNetJoin(ClientSock* pClient)//只会被一个线程触发，安全
 	{
-		++_clientCount;
+		Server::onNetJoin(pClient);
 		//printf("Client<%d> join\n", (int)pClient->GetSock());
 	}
 
 	virtual void onNetLeave(ClientSock* pClient)//有客户端离开事件
 	{
-		--_clientCount;
+		Server::onNetLeave(pClient);
 		//printf("Client<%d> leave\n", (int)pClient->GetSock());
 	}
 
-	virtual void onNetMsg(ClientSock* pClient, Header* header)//有客户端离开时
+	virtual void onNetMsg(CellServer* pCellServer, ClientSock* pClient, Header* header)
 	{
-		++_msgCount;
+		Server::onNetMsg(pCellServer, pClient, header);
 		switch (header->cmd)
 		{
 		case CMD_LOGIN:
@@ -29,8 +29,8 @@ public:
 			/*printf("Login : socket = %d , user name = %s , password= %s\n",
 				(int)pClient->getSock(), login->userName, login->passWord);*/
 
-			//LoginResult login_result;
-			//pClient->sendData(&login_result);
+			LoginResult* login_result = new LoginResult();
+			pCellServer->addSendTask(pClient, login_result);
 			break;
 		}
 
