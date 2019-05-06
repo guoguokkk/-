@@ -15,21 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test.cpp">
+    <ClCompile Include="Test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MemoryAlloc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryMgr.cpp">
+    <ClCompile Include="MemoryPool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MemoryMgr.h">
+    <ClInclude Include="MemoryAlloc.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryAlloc.h">
+    <ClInclude Include="MemoryPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
