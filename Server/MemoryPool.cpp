@@ -19,7 +19,7 @@ MemoryPool::~MemoryPool()
 }
 
 //初始化内存池
-void MemoryPool::initPool()
+void MemoryPool::initObjectPool()
 {
 	xPrintf("initPool: _nChunkSize=%d, _nChunkNum=%d\n", _nChunkSize, _nChunkNum);
 
@@ -64,7 +64,7 @@ void* MemoryPool::allocMemInPool(size_t size)
 	//避免重复初始化
 	if (_pBuf == nullptr)
 	{
-		initPool();
+		initObjectPool();
 	}
 
 	//分配内存

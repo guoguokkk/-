@@ -6,9 +6,13 @@
 #else
 #include"Message.h"
 #endif // _WIN32
+#include<memory>
+#include"ObjectPool.h"
 
 //客户端数据类型
-class ClientSock {
+//适用对象池原因：客户端频繁地退出连接
+class ClientSock:public ObjectPoolBase<ClientSock,10000>
+{
 public:
 	ClientSock(SOCKET clientSock = INVALID_SOCKET)
 	{
@@ -25,11 +29,11 @@ public:
 	void setLastPos(int pos) { _lastMsgPos = pos; }
 
 	//发送数据，定时定量发送
-	int sendData(Header* header)
+	int sendData(std::shared_ptr<Header> header)
 	{
 		int ret = SOCKET_ERROR;
 		int nSendLen = header->data_length;//需要发送数据的长度
-		const char* pSendData = (const char*)header;//需要发送的数据，不允许修改
+		const char* pSendData = (const char*)header.get();//需要发送的数据，不允许修改
 
 		//超出大小
 		while (true)

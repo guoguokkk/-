@@ -130,6 +130,7 @@
   <ItemGroup>
     <ClInclude Include="MemoryAlloc.h" />
     <ClInclude Include="MemoryPool.h" />
+    <ClInclude Include="ObjectPool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -25,6 +25,7 @@
     <ClInclude Include="MemoryAlloc.h" />
     <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="MyServer.h" />
+    <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="Task.h" />
   </ItemGroup>

@@ -32,5 +32,8 @@
     <ClInclude Include="MemoryPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ObjectPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

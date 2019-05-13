@@ -28,7 +28,6 @@ void CellServer::closeServer()
 	for (auto iter : _clients)
 	{
 		closesocket(iter.second->getSock());
-		delete iter.second;
 	}
 	closesocket(_serverSock);
 #else
@@ -160,7 +159,7 @@ bool CellServer::isRun()
 }
 
 //接收消息，处理粘包、少包
-int CellServer::recvData(ClientSock* pClient)
+int CellServer::recvData(std::shared_ptr<ClientSock> pClient)
 {
 	//接收客户端消息，直接使用每个客户端的消息缓冲区接收数据
 	char* recvBuf = pClient->getMsgBuf() + pClient->getLastPos();
@@ -197,13 +196,13 @@ int CellServer::recvData(ClientSock* pClient)
 }
 
 //响应网络数据
-void CellServer::onNetMsg(ClientSock* pClient, Header* header)
+void CellServer::onNetMsg(std::shared_ptr<ClientSock>& pClient, Header* header)
 {
 	_pEvent->onNetMsg(this, pClient, header);
 }
 
 //消费者取出缓冲队列中的客户端
-void CellServer::addClient(ClientSock* pClient)
+void CellServer::addClient(std::shared_ptr<ClientSock> pClient)
 {
 	//加锁，自解锁
 	std::lock_guard<std::mutex> lock(_mutex);

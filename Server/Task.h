@@ -40,7 +40,7 @@ protected:
 			{
 				while (!_tasks.empty())
 				{
-					Task* pTask = _tasks.front();
+					auto pTask = _tasks.front();
 					_tasks.pop_front();
 					pTask->doTask();
 				}
@@ -63,14 +63,14 @@ public:
 	}
 
 	//将任务添加到任务队列
-	virtual void addTask(Task* pTask)
+	virtual void addTask(std::shared_ptr<Task> pTask)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);//自解锁
 		_taskBuf.push_back(pTask);
 	}
 private:
-	std::list<Task*> _tasks;//任务队列
-	std::list<Task*> _taskBuf;//任务缓冲区，生产者消费者操纵的是任务缓冲区
+	std::list<std::shared_ptr<Task>> _tasks;//任务队列
+	std::list<std::shared_ptr<Task>> _taskBuf;//任务缓冲区，生产者消费者操纵的是任务缓冲区
 	std::mutex _mutex;//任务缓冲区的锁
 
 };

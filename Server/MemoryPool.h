@@ -35,7 +35,7 @@ class MemoryPool
 public:
 	MemoryPool();
 	~MemoryPool();
-	void initPool();//初始化内存池
+	void initObjectPool();//初始化内存池
 	void* allocMemInPool(size_t size);//申请内存池中内存
 	void freeMemInPool(void* pMem);//释放内存池中内存
 

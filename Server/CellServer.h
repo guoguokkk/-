@@ -22,7 +22,7 @@
 class SendMsgToClientTask :public Task
 {
 public:
-	SendMsgToClientTask(ClientSock* pClient, Header* header)
+	SendMsgToClientTask(std::shared_ptr<ClientSock> pClient, std::shared_ptr<Header> header)
 	{
 		_pClient = pClient;
 		_pHeader = header;
@@ -32,11 +32,10 @@ public:
 	void doTask()
 	{
 		_pClient->sendData(_pHeader);
-		delete _pHeader;
 	}
 private:
-	ClientSock* _pClient;//目标客户端
-	Header* _pHeader;//要发送的数据
+	std::shared_ptr<ClientSock> _pClient;//目标客户端
+	std::shared_ptr<Header> _pHeader;//要发送的数据
 };
 
 class INetEvent;
@@ -54,20 +53,20 @@ public:
 	void closeServer();//关闭服务器
 	bool onRun();//select	
 	bool isRun();
-	int recvData(ClientSock* pClient);//接收消息，处理粘包、少包
-	virtual void onNetMsg(ClientSock* pClient, Header* header);//响应网络数据
-	void addClient(ClientSock* pClient);//增加客户端
+	int recvData(std::shared_ptr<ClientSock> pClient);//接收消息，处理粘包、少包
+	virtual void onNetMsg(std::shared_ptr<ClientSock>& pClient, Header* header);//响应网络数据
+	void addClient(std::shared_ptr<ClientSock> pClient);//增加客户端
 	void startCellServer();
 	size_t getClientCount();
-	void addSendTask(ClientSock* pClient, Header* header)
+	void addSendTask(std::shared_ptr<ClientSock> pClient, std::shared_ptr<Header> header)
 	{
-		SendMsgToClientTask* task = new SendMsgToClientTask(pClient, header);
-		_taskServer.addTask(task);
+		auto task = std::make_shared<SendMsgToClientTask>(pClient, header);
+		_taskServer.addTask((std::shared_ptr<Task>)task);
 	}
 private:
 	SOCKET _serverSock;
-	std::map<SOCKET, ClientSock*> _clients;//正式客户队列
-	std::vector<ClientSock*> _clientsBuf;//缓冲客户队列
+	std::map<SOCKET, std::shared_ptr<ClientSock>> _clients;//正式客户队列
+	std::vector<std::shared_ptr<ClientSock>> _clientsBuf;//缓冲客户队列
 	std::mutex _mutex;//缓冲队列的锁
 	std::thread _thread;
 	INetEvent* _pEvent;//网络事件对象
