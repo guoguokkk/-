@@ -4,6 +4,12 @@
 #include<chrono>
 #include<vector>
 
+CellServer::CellServer(SOCKET serverSock)
+{
+	_serverSock = serverSock;
+	_pEvent = nullptr;
+}
+
 CellServer::~CellServer()
 {
 	closeServer();
@@ -27,7 +33,7 @@ void CellServer::closeServer()
 	//关闭每个客户端！
 	for (auto iter : _clients)
 	{
-		closesocket(iter.second->getSock());
+		closesocket(iter.second->getSockfd());
 	}
 	closesocket(_serverSock);
 #else
@@ -52,7 +58,7 @@ bool CellServer::onRun()
 			std::lock_guard<std::mutex> lock(_mutex);//自解锁
 			for (auto pClient : _clientsBuf)
 			{
-				_clients[pClient->getSock()] = pClient;//std::map
+				_clients[pClient->getSockfd()] = pClient;//std::map
 			}
 			_clientsBuf.clear();
 			_clientsChange = true;
@@ -71,13 +77,13 @@ bool CellServer::onRun()
 		if (_clientsChange)
 		{
 			_clientsChange = false;
-			_maxSock = _clients.begin()->second->getSock();
+			_maxSock = _clients.begin()->second->getSockfd();
 			for (auto iter : _clients)
 			{
-				FD_SET(iter.second->getSock(), &fd_read);
-				if (_maxSock < iter.second->getSock())
+				FD_SET(iter.second->getSockfd(), &fd_read);
+				if (_maxSock < iter.second->getSockfd())
 				{
-					_maxSock = iter.second->getSock();
+					_maxSock = iter.second->getSockfd();
 				}
 			}
 			memcpy(&_fdReadBack, &fd_read, sizeof(fd_set));
@@ -159,17 +165,17 @@ bool CellServer::isRun()
 }
 
 //接收消息，处理粘包、少包
-int CellServer::recvData(std::shared_ptr<ClientSock> pClient)
+int CellServer::recvData(std::shared_ptr<CellClient> pClient)
 {
 	//接收客户端消息，直接使用每个客户端的消息缓冲区接收数据
 	char* recvBuf = pClient->getMsgBuf() + pClient->getLastPos();
 
-	int nLen = (int)recv(pClient->getSock(), recvBuf, RECV_BUF_SIZE - pClient->getLastPos(), 0);
+	int nLen = (int)recv(pClient->getSockfd(), recvBuf, RECV_BUF_SIZE - pClient->getLastPos(), 0);
 	_pEvent->onNetRecv(pClient);//计数
 	//判断客户端是否退出
 	if (nLen <= 0)
 	{
-		printf("Client %d exit.\n", (int)pClient->getSock());
+		printf("Client %d exit.\n", (int)pClient->getSockfd());
 		return -1;
 	}
 
@@ -196,13 +202,13 @@ int CellServer::recvData(std::shared_ptr<ClientSock> pClient)
 }
 
 //响应网络数据
-void CellServer::onNetMsg(std::shared_ptr<ClientSock>& pClient, Header* header)
+void CellServer::onNetMsg(std::shared_ptr<CellClient>& pClient, Header* header)
 {
 	_pEvent->onNetMsg(this, pClient, header);
 }
 
 //消费者取出缓冲队列中的客户端
-void CellServer::addClient(std::shared_ptr<ClientSock> pClient)
+void CellServer::addClient(std::shared_ptr<CellClient> pClient)
 {
 	//加锁，自解锁
 	std::lock_guard<std::mutex> lock(_mutex);
@@ -219,3 +225,5 @@ size_t CellServer::getClientCount()
 {
 	return size_t(_clients.size() + _clientsBuf.size());
 }
+
+

@@ -19,18 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CellClient.h" />
     <ClInclude Include="CellServer.h" />
-    <ClInclude Include="ClientSocket.h" />
+    <ClInclude Include="CellTask.h" />
     <ClInclude Include="INetEvent.h" />
     <ClInclude Include="MemoryAlloc.h" />
     <ClInclude Include="MemoryPool.h" />
+    <ClInclude Include="Message.h" />
     <ClInclude Include="MyServer.h" />
     <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="Server.h" />
-    <ClInclude Include="Task.h" />
+    <ClInclude Include="TimeStamp.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CellClient.cpp" />
     <ClCompile Include="CellServer.cpp" />
+    <ClCompile Include="CellTask.cpp" />
     <ClCompile Include="MemoryAlloc.cpp" />
     <ClCompile Include="MemoryPool.cpp" />
     <ClCompile Include="Server.cpp" />

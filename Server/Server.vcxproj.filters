@@ -21,9 +21,6 @@
     <ClInclude Include="INetEvent.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ClientSocket.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="MyServer.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -36,10 +33,19 @@
     <ClInclude Include="MemoryPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Task.h">
+    <ClInclude Include="ObjectPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectPool.h">
+    <ClInclude Include="Message.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeStamp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CellClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CellTask.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -57,6 +63,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MemoryPool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CellClient.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CellTask.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

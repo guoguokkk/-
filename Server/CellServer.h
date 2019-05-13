@@ -1,28 +1,23 @@
-#ifndef CELL_SERVER_
-#define CELL_SERVER_
+#ifndef CELL_SERVER_H_
+#define CELL_SERVER_H_
 
-#ifdef _WIN32
-#include"../Test/Message.h"
-#else
 #include"Message.h"
-#endif // _WIN32
-
 #include<vector>
-#include"ClientSocket.h"
+#include"CellClient.h"
 #include"INetEvent.h"
 #include<thread>
 #include<mutex>
 #include<atomic>//原子操作
 #include<map>
-#include"Task.h"
+#include"CellTask.h"
 
-
+class INetEvent;
 
 //网络消息发送队列
-class SendMsgToClientTask :public Task
+class SendMsgToClientTask :public CellTask
 {
 public:
-	SendMsgToClientTask(std::shared_ptr<ClientSock> pClient, std::shared_ptr<Header> header)
+	SendMsgToClientTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<Header> header)
 	{
 		_pClient = pClient;
 		_pHeader = header;
@@ -34,39 +29,37 @@ public:
 		_pClient->sendData(_pHeader);
 	}
 private:
-	std::shared_ptr<ClientSock> _pClient;//目标客户端
+	std::shared_ptr<CellClient> _pClient;//目标客户端
 	std::shared_ptr<Header> _pHeader;//要发送的数据
 };
 
-class INetEvent;
-
-//消息处理
+//消息处理类
 class CellServer {
 public:
-	CellServer(SOCKET serverSock = INVALID_SOCKET)
-	{
-		_serverSock = serverSock;
-		_pEvent = nullptr;
-	}
+	CellServer(SOCKET serverSock = INVALID_SOCKET);
 	~CellServer();
-	void setEventObj(INetEvent* event);
-	void closeServer();//关闭服务器
-	bool onRun();//select	
-	bool isRun();
-	int recvData(std::shared_ptr<ClientSock> pClient);//接收消息，处理粘包、少包
-	virtual void onNetMsg(std::shared_ptr<ClientSock>& pClient, Header* header);//响应网络数据
-	void addClient(std::shared_ptr<ClientSock> pClient);//增加客户端
+
+	void setEventObj(INetEvent* event);//绑定网络事件	
+	void addClient(std::shared_ptr<CellClient> pClient);//增加客户端
 	void startCellServer();
 	size_t getClientCount();
-	void addSendTask(std::shared_ptr<ClientSock> pClient, std::shared_ptr<Header> header)
+	void addSendTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<Header> header)
 	{
 		auto task = std::make_shared<SendMsgToClientTask>(pClient, header);
-		_taskServer.addTask((std::shared_ptr<Task>)task);
+		_taskServer.addTask((std::shared_ptr<CellTask>)task);
 	}
+
+private:
+	void closeServer();//关闭服务器
+	bool onRun();//select	
+	bool isRun();//判断服务器是否在运行
+	int recvData(std::shared_ptr<CellClient> pClient);//接收消息，处理粘包、少包
+	virtual void onNetMsg(std::shared_ptr<CellClient>& pClient, Header* header);//响应网络数据
+	
 private:
 	SOCKET _serverSock;
-	std::map<SOCKET, std::shared_ptr<ClientSock>> _clients;//正式客户队列
-	std::vector<std::shared_ptr<ClientSock>> _clientsBuf;//缓冲客户队列
+	std::map<SOCKET, std::shared_ptr<CellClient>> _clients;//正式客户队列
+	std::vector<std::shared_ptr<CellClient>> _clientsBuf;//缓冲客户队列
 	std::mutex _mutex;//缓冲队列的锁
 	std::thread _thread;
 	INetEvent* _pEvent;//网络事件对象
@@ -76,4 +69,4 @@ private:
 	TaskServer _taskServer;
 };
 
-#endif // !CELL_SERVER_
+#endif // !CELL_SERVER_H_

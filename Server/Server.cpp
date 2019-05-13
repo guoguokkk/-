@@ -113,8 +113,8 @@ SOCKET Server::Accept()
 		//SendToAll(&new_user_join);
 
 		//加入对象池之后需要调整make_shared，否则只会在内存池中分配内存，而不进入对象池
-		//addClientToCellServer(std::make_shared<ClientSock>(client_sock));
-		std::shared_ptr<ClientSock> c(new ClientSock(client_sock));
+		//addClientToCellServer(std::make_shared<CellClient>(client_sock));
+		std::shared_ptr<CellClient> c(new CellClient(client_sock));
 		addClientToCellServer(c);
 
 		//printf("New client %d join.\n", (int)client_sock);
@@ -122,7 +122,7 @@ SOCKET Server::Accept()
 	return client_sock;
 }
 
-void Server::addClientToCellServer(std::shared_ptr<ClientSock> pClient)
+void Server::addClientToCellServer(std::shared_ptr<CellClient> pClient)
 {
 	//查找客户数量最少的CellServer消息处理对象
 	auto pMinServer = _cellServers[0];
@@ -217,24 +217,24 @@ void Server::time4Msg()
 	}
 }
 
-void Server::onNetJoin(std::shared_ptr<ClientSock> pClient)
+void Server::onNetJoin(std::shared_ptr<CellClient> pClient)
 {
 	++_clientCount;
 }
 
 //cellServer 4 多个线程触发 不安全
 //如果只开启1个cellServer就是安全的
-void Server::onNetLeave(std::shared_ptr<ClientSock> pClient)
+void Server::onNetLeave(std::shared_ptr<CellClient> pClient)
 {
 	--_clientCount;
 }
 
-void Server::onNetMsg(CellServer* pCellServer, std::shared_ptr<ClientSock> pClient, Header* header)
+void Server::onNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient> pClient, Header* header)
 {
 	++_msgCount;
 }
 
-void Server::onNetRecv(std::shared_ptr<ClientSock> pClient)
+void Server::onNetRecv(std::shared_ptr<CellClient> pClient)
 {
 	++_recvCount;
 }

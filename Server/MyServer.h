@@ -7,19 +7,19 @@
 class MyServer :public Server
 {
 public:
-	virtual void onNetJoin(std::shared_ptr<ClientSock>& pClient)//只会被一个线程触发，安全
+	virtual void onNetJoin(std::shared_ptr<CellClient>& pClient)//只会被一个线程触发，安全
 	{
 		Server::onNetJoin(pClient);
 		//printf("Client<%d> join\n", (int)pClient->GetSock());
 	}
 
-	virtual void onNetLeave(std::shared_ptr<ClientSock>& pClient)//有客户端离开事件
+	virtual void onNetLeave(std::shared_ptr<CellClient>& pClient)//有客户端离开事件
 	{
 		Server::onNetLeave(pClient);
 		//printf("Client<%d> leave\n", (int)pClient->GetSock());
 	}
 
-	virtual void onNetMsg(CellServer* pCellServer, std::shared_ptr<ClientSock>& pClient, Header* header)
+	virtual void onNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient>& pClient, Header* header)
 	{
 		Server::onNetMsg(pCellServer, pClient, header);
 		switch (header->cmd)
@@ -28,7 +28,7 @@ public:
 		{
 			Login* login = (Login*)header;
 			/*printf("Login : socket = %d , user name = %s , password= %s\n",
-				(int)pClient->getSock(), login->userName, login->passWord);*/
+				(int)pClient->getSockfd(), login->userName, login->passWord);*/
 
 			std::shared_ptr<LoginResult> login_result = std::make_shared<LoginResult>();
 			pCellServer->addSendTask(pClient, (std::shared_ptr<Header>)login_result);
@@ -46,21 +46,21 @@ public:
 		case CMD_ERROR:
 		{
 			printf("error : socket = %d , data length= %d\n",
-				(int)pClient->getSock(), header->data_length);
+				(int)pClient->getSockfd(), header->data_length);
 			break;
 		}
 
 		default:
 		{
 			printf("Undefined data : socket = %d , data length=  %d\n",
-				(int)pClient->getSock(), header->data_length);
+				(int)pClient->getSockfd(), header->data_length);
 			break;
 		}
 
 		}
 	}
 
-	void onNetRecv(std::shared_ptr<ClientSock>& pClient)
+	void onNetRecv(std::shared_ptr<CellClient>& pClient)
 	{
 		++_recvCount;
 	}

@@ -4,12 +4,7 @@
 #include<chrono>
 #include<stdio.h>
 #include<atomic>
-
-#ifdef _WIN32
-#include"../Test/TimeStamp.h"
-#else
 #include"TimeStamp.h"
-#endif // _WIN32
 
 #define CLIENT_COUNT 10000
 bool g_bRun = true;
