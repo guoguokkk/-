@@ -68,8 +68,5 @@
     <ClCompile Include="CellClient.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="CellTask.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

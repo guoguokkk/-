@@ -14,19 +14,13 @@
 class INetEvent;
 
 //网络消息发送队列
-class SendMsgToClientTask :public CellTask
+class SendMsgToClientTask
 {
 public:
 	SendMsgToClientTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<Header> header)
 	{
 		_pClient = pClient;
 		_pHeader = header;
-	}
-
-	//执行任务，发送消息
-	void doTask()
-	{
-		_pClient->sendData(_pHeader);
 	}
 private:
 	std::shared_ptr<CellClient> _pClient;//目标客户端
@@ -46,7 +40,11 @@ public:
 	void addSendTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<Header> header)
 	{
 		auto task = std::make_shared<SendMsgToClientTask>(pClient, header);
-		_taskServer.addTask((std::shared_ptr<CellTask>)task);
+
+		//执行任务
+		_taskServer.addTask([pClient, header]() {
+			pClient->sendData(header);
+			});
 	}
 
 private:
@@ -55,7 +53,7 @@ private:
 	bool isRun();//判断服务器是否在运行
 	int recvData(std::shared_ptr<CellClient> pClient);//接收消息，处理粘包、少包
 	virtual void onNetMsg(std::shared_ptr<CellClient>& pClient, Header* header);//响应网络数据
-	
+
 private:
 	SOCKET _serverSock;
 	std::map<SOCKET, std::shared_ptr<CellClient>> _clients;//正式客户队列
