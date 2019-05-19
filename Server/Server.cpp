@@ -109,7 +109,7 @@ SOCKET Server::Accept()
 	}
 	else
 	{
-		//NewUserJoin new_user_join;
+		//netmsg_NewUserJoin new_user_join;
 		//SendToAll(&new_user_join);
 
 		//加入对象池之后需要调整make_shared，否则只会在内存池中分配内存，而不进入对象池
@@ -229,7 +229,7 @@ void Server::onNetLeave(std::shared_ptr<CellClient> pClient)
 	--_clientCount;
 }
 
-void Server::onNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient> pClient, Header* header)
+void Server::onNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient> pClient, netmsg_Header* header)
 {
 	++_msgCount;
 }

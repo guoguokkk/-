@@ -136,14 +136,14 @@ int Client::recvData(SOCKET clientSock)
 
 	_lastMsgPos += nLen;
 
-	while (_lastMsgPos >= sizeof(Header))
+	while (_lastMsgPos >= sizeof(netmsg_Header))
 	{
-		Header* header = (Header*)_msgBuf;
-		if (_lastMsgPos >= header->data_length)
+		netmsg_Header* header = (netmsg_Header*)_msgBuf;
+		if (_lastMsgPos >= header->dataLength)
 		{
-			int temp_pos = _lastMsgPos - header->data_length;
+			int temp_pos = _lastMsgPos - header->dataLength;
 			onNetMsg(header);
-			memcpy(_msgBuf, _msgBuf + header->data_length, temp_pos);
+			memcpy(_msgBuf, _msgBuf + header->dataLength, temp_pos);
 			_lastMsgPos = temp_pos;
 		}
 		else
@@ -155,48 +155,48 @@ int Client::recvData(SOCKET clientSock)
 }
 
 //处理消息
-void Client::onNetMsg(Header* header)
+void Client::onNetMsg(netmsg_Header* header)
 {
 	switch (header->cmd)
 	{
 	case CMD_LOGIN_RESULT:
 	{
-		LoginResult* login_result = (LoginResult*)header;
-		/*printf("Login result : socket = %d , data length= %d , result= %d\n",
-			(int)_clientSock, login_result->data_length, login_result->result);*/
+		netmsg_LoginResult* login_result = (netmsg_LoginResult*)header;
+		/*printf("netmsg_Login result : socket = %d , data length= %d , result= %d\n",
+			(int)_clientSock, login_result->dataLength, login_result->result);*/
 	}
 	break;
 	case CMD_LOGOUT_RESULT:
 	{
-		LogoutResult* logout_result = (LogoutResult*)header;
-		/*printf("Logout result : socket = %d , data length= %d , result= %d\n",
-			(int)_client_sock, logout_result->data_length, logout_result->result);*/
+		netmsg_LogoutResult* logout_result = (netmsg_LogoutResult*)header;
+		/*printf("netmsg_Logout result : socket = %d , data length= %d , result= %d\n",
+			(int)_client_sock, logout_result->dataLength, logout_result->result);*/
 	}
 	break;
 	case CMD_NEW_USER_JOIN:
 	{
-		NewUserJoin* new_user_join = (NewUserJoin*)header;
+		netmsg_NewUserJoin* new_user_join = (netmsg_NewUserJoin*)header;
 		/*printf("New user join : socket = %d , data length = %d, sock= %d\n",
-			(int)_client_sock, new_user_join->data_length, new_user_join->sock);*/
+			(int)_client_sock, new_user_join->dataLength, new_user_join->sock);*/
 	}
 	break;
 	case CMD_ERROR:
 	{
 		printf("error : socket = %d , data length= %d\n",
-			(int)_clientSock, header->data_length);
+			(int)_clientSock, header->dataLength);
 	}
 	break;
 	default:
 	{
 		printf("Undefined data : socket = %d , data length=  %d\n",
-			(int)_clientSock, header->data_length);
+			(int)_clientSock, header->dataLength);
 	}
 	break;
 	}
 }
 
 //参数：接收对象，要发送的内容
-int Client::sendData(Header* header, int nLen)
+int Client::sendData(netmsg_Header* header, int nLen)
 {
 	int ret = SOCKET_ERROR;
 	if (isRun() && header)

@@ -6,7 +6,7 @@
 #include<atomic>
 #include"TimeStamp.h"
 
-#define CLIENT_COUNT 10000
+#define CLIENT_COUNT 1000
 bool g_bRun = true;
 void cmdThread()
 {
@@ -73,12 +73,13 @@ void sendThread(int id)//1-4，四个线程
 	std::thread t1(recvThread, begin, end);
 	t1.detach();
 
-	Login login[10];//提高发送频率，每次发送十个消息包
+	netmsg_Login login[10];//提高发送频率，每次发送十个消息包
 	for (int i = 0; i < 10; ++i)
 	{
 		strcpy(login[i].userName, "kzj");
 		strcpy(login[i].passWord, "12345");
 	}
+
 
 	const int nLen = sizeof(login);
 	while (g_bRun)
@@ -114,7 +115,7 @@ int main()
 		t.detach();
 	}
 
-	TimeStamp tTime;
+	CellTimeStamp tTime;
 
 	while (g_bRun)
 	{

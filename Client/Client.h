@@ -13,8 +13,8 @@ public:
 	void closeClient();//关闭客户端	
 	bool onRun();//处理网络消息	
 	int recvData(SOCKET clientSock);//接收消息
-	virtual void onNetMsg(Header* header);//处理消息
-	int sendData(Header* header, int nLen);//发送消息
+	virtual void onNetMsg(netmsg_Header* header);//处理消息
+	int sendData(netmsg_Header* header, int nLen);//发送消息
 
 private:
 	bool isRun();

@@ -8,6 +8,8 @@ CellClient::CellClient(SOCKET sockfd)
 
 	memset(_sendBuf, 0, SEND_BUF_SIZE);//初始化发送缓冲区
 	_lastSendPos = 0;
+
+	resetDTHeart();//心跳死亡计时初始化
 }
 
 CellClient::~CellClient()
@@ -19,10 +21,10 @@ CellClient::~CellClient()
  * @param	header	待发送数据
  * @return	是否成功
  */
-int CellClient::sendData(std::shared_ptr<Header> header)
+int CellClient::sendData(std::shared_ptr<netmsg_Header> header)
 {
 	int ret = SOCKET_ERROR;
-	int nSendLen = header->data_length;//待发送数据的长度
+	int nSendLen = header->dataLength;//待发送数据的长度
 	const char* pSendData = (const char*)header.get();//待发送数据
 
 	while (true)

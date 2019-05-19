@@ -86,7 +86,7 @@ int main()
 	//{
 	//	t[n] = thread(workFun, n);
 	//}
-	//TimeStamp tTime;
+	//CellTimeStamp tTime;
 	//for (int n = 0; n < tCount; n++)
 	//{
 	//	t[n].join();
@@ -111,7 +111,7 @@ int main()
 	/*{
 		shared_ptr<ClassA> b = make_shared<ClassA>(100);
 		b->num = 200;
-		TimeStamp tTime;
+		CellTimeStamp tTime;
 		for (int n = 0; n < 100000000; n++)
 		{
 			fun(b);
@@ -121,7 +121,7 @@ int main()
 	{
 		ClassA* b = new ClassA(100);
 		b->num = 200;
-		TimeStamp tTime;
+		CellTimeStamp tTime;
 		for (int n = 0; n < 100000000; n++)
 		{
 			fun(b);

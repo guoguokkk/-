@@ -35,27 +35,29 @@ enum CMD
 	CMD_LOGOUT,
 	CMD_LOGOUT_RESULT,
 	CMD_ERROR,
-	CMD_NEW_USER_JOIN
+	CMD_NEW_USER_JOIN,
+	CMD_C2S_HEART,
+	CMD_S2C_HEART
 };
 
 //消息头
-struct Header
+struct netmsg_Header
 {
-	Header() 
+	netmsg_Header() 
 	{
-		data_length = sizeof(Header);
+		dataLength = sizeof(netmsg_Header);
 		cmd = CMD_ERROR;		
 	}
-	short data_length;//消息的长度
+	short dataLength;//消息的长度
 	short cmd;//命令	
 };
 
 //登录消息
-struct  Login :public Header
+struct  netmsg_Login :public netmsg_Header
 {
-	Login()
+	netmsg_Login()
 	{
-		data_length = sizeof(Login);
+		dataLength = sizeof(netmsg_Login);
 		cmd = CMD_LOGIN;		
 	}
 	char userName[32];
@@ -64,11 +66,11 @@ struct  Login :public Header
 };
 
 //登录结果消息
-struct  LoginResult :public Header
+struct  netmsg_LoginResult :public netmsg_Header
 {
-	LoginResult()
+	netmsg_LoginResult()
 	{
-		data_length = sizeof(LoginResult);
+		dataLength = sizeof(netmsg_LoginResult);
 		cmd = CMD_LOGIN_RESULT;		
 		result = 0;
 	}
@@ -77,22 +79,22 @@ struct  LoginResult :public Header
 };
 
 //登出消息
-struct  Logout :public Header
+struct  netmsg_Logout :public netmsg_Header
 {
-	Logout()
+	netmsg_Logout()
 	{		
-		data_length = sizeof(Logout);
+		dataLength = sizeof(netmsg_Logout);
 		cmd = CMD_LOGOUT;
 	}
 	char userName[32];
 };
 
 //登出结果消息
-struct  LogoutResult :public Header
+struct  netmsg_LogoutResult :public netmsg_Header
 {
-	LogoutResult()
+	netmsg_LogoutResult()
 	{		
-		data_length = sizeof(LogoutResult);
+		dataLength = sizeof(netmsg_LogoutResult);
 		cmd = CMD_LOGOUT_RESULT;
 		result = 0;
 	}
@@ -100,14 +102,35 @@ struct  LogoutResult :public Header
 };
 
 //新用户加入
-struct  NewUserJoin :public Header
+struct  netmsg_NewUserJoin :public netmsg_Header
 {
-	NewUserJoin()
+	netmsg_NewUserJoin()
 	{
-		data_length = sizeof(NewUserJoin);
+		dataLength = sizeof(netmsg_NewUserJoin);
 		cmd = CMD_NEW_USER_JOIN;		
 		sock = 0;
 	}
 	int sock;
 };
+
+//心跳消息，客户端发送给服务器
+struct  netmsg_c2s_Heart :public netmsg_Header
+{
+	netmsg_c2s_Heart()
+	{
+		dataLength = sizeof(netmsg_c2s_Heart);
+		cmd = CMD_C2S_HEART;
+	}
+};
+
+//心跳消息，服务器发送给客户端
+struct  netmsg_s2c_Heart :public netmsg_Header
+{
+	netmsg_s2c_Heart()
+	{
+		dataLength = sizeof(netmsg_s2c_Heart);
+		cmd = CMD_S2C_HEART;
+	}
+};
+
 #endif // !MESSAGE_H_

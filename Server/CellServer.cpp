@@ -69,6 +69,9 @@ bool CellServer::onRun()
 		{
 			std::chrono::milliseconds t(1);//1毫秒
 			std::this_thread::sleep_for(t);//休眠
+
+			_oldTime = CellTime::getNowInMillSec();//旧的时间戳更新
+
 			continue;
 		}
 
@@ -95,7 +98,7 @@ bool CellServer::onRun()
 
 		timeval time;
 		time.tv_sec = 0;//秒
-		time.tv_usec = 0;
+		time.tv_usec = 1;
 		int ret = select(_maxSock + 1, &fd_read, nullptr, nullptr, &time);//阻塞
 		if (ret < 0)
 		{
@@ -103,59 +106,88 @@ bool CellServer::onRun()
 			closeServer();
 			return false;
 		}
-		else if (ret == 0)
-		{
-			continue;//没有数据
-		}
+
+		readData(fd_read);
+		checkTime();//检测心跳
+	}
+}
+
+void CellServer::readData(fd_set& fd_read)
+{
 
 #ifdef _WIN32
-		for (int i = 0; i < fd_read.fd_count; ++i)
+	for (int i = 0; i < fd_read.fd_count; ++i)
+	{
+		auto iter = _clients.find(fd_read.fd_array[i]);
+		if (iter != _clients.end())
 		{
-			auto iter = _clients.find(fd_read.fd_array[i]);
-			if (iter != _clients.end())
+			int ret = recvData(iter->second);//接收消息
+			if (ret == -1)
 			{
-				int ret = recvData(iter->second);//接收消息
-				if (ret == -1)
+				if (_pEvent)
 				{
-					if (_pEvent)
-					{
-						_pEvent->onNetLeave(iter->second);
-					}
-
-					_clientsChange = true;
-					_clients.erase(iter->first);
+					_pEvent->onNetLeave(iter->second);
 				}
-			}
-			else
-			{
-				printf("error. if (iter != _clients.end())\n");
+
+				_clientsChange = true;
+				closesocket(iter->first);//释放客户端socket资源
+				_clients.erase(iter->first);
 			}
 		}
+		else
+		{
+			printf("error. if (iter != _clients.end())\n");
+		}
+	}
 
 #else
-		std::vector<ClientSock*> temp;//记录要删除的客户端
-		for (auto iter : _clients)
+	std::vector<ClientSock*> temp;//记录要删除的客户端
+	for (auto iter : _clients)
+	{
+		if (FD_ISSET(iter.second->getSock(), &fd_read))
 		{
-			if (FD_ISSET(iter.second->getSock(), &fd_read))
+			int ret = recvData(iter.second);//接收消息
+			if (ret == -1)
 			{
-				int ret = recvData(iter.second);//接收消息
-				if (ret == -1)
+				_clientsChange = true;
+				temp.push_back(iter.second);
+				if (_pEvent)
 				{
-					_clientsChange = false;
-					temp.push_back(iter.second);
-					if (_pEvent)
-					{
-						_pEvent->onNetLeave(iter.second);
-					}
+					_pEvent->onNetLeave(iter.second);
 				}
 			}
 		}
-		for (auto pClient : temp)
-		{
-			_clients.erase(pClient->getSock());
-			delete pClient;
-		}
+	}
+	for (auto pClient : temp)
+	{
+		_clients.erase(pClient->getSock());
+		delete pClient;
+	}
 #endif // _WIN32		
+}
+
+//检测心跳
+void CellServer::checkTime()
+{
+	auto nowTime = CellTime::getNowInMillSec();//获取当前时间
+	auto dt = nowTime - _oldTime;
+	_oldTime = nowTime;
+	for (auto iter = _clients.begin(); iter != _clients.end();)
+	{
+		if (iter->second->checkHeart(dt))
+		{//心跳检测结果为死亡，移除对应的客户端
+			if (_pEvent != nullptr)
+				_pEvent->onNetLeave(iter->second);
+
+			_clientsChange = true;
+			auto iterOld = iter;
+			++iter;
+			_clients.erase(iterOld);
+		}
+		else
+		{
+			++iter;
+		}		
 	}
 }
 
@@ -182,15 +214,15 @@ int CellServer::recvData(std::shared_ptr<CellClient> pClient)
 	pClient->setLastPos(pClient->getLastPos() + nLen);
 
 	//处理粘包、少包问题
-	while (pClient->getLastPos() >= sizeof(Header))
+	while (pClient->getLastPos() >= sizeof(netmsg_Header))
 	{
-		Header* header = (Header*)pClient->getMsgBuf();
-		if (pClient->getLastPos() >= header->data_length)
+		netmsg_Header* header = (netmsg_Header*)pClient->getMsgBuf();
+		if (pClient->getLastPos() >= header->dataLength)
 		{
 			//更新消息缓冲区
-			int temp_pos = pClient->getLastPos() - header->data_length;
-			onNetMsg( pClient, header);
-			memcpy(pClient->getMsgBuf(), pClient->getMsgBuf() + header->data_length, temp_pos);
+			int temp_pos = pClient->getLastPos() - header->dataLength;
+			onNetMsg(pClient, header);
+			memcpy(pClient->getMsgBuf(), pClient->getMsgBuf() + header->dataLength, temp_pos);
 			pClient->setLastPos(temp_pos);
 		}
 		else
@@ -202,7 +234,7 @@ int CellServer::recvData(std::shared_ptr<CellClient> pClient)
 }
 
 //响应网络数据
-void CellServer::onNetMsg(std::shared_ptr<CellClient>& pClient, Header* header)
+void CellServer::onNetMsg(std::shared_ptr<CellClient> & pClient, netmsg_Header * header)
 {
 	_pEvent->onNetMsg(this, pClient, header);
 }

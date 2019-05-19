@@ -2,14 +2,26 @@
 #define TIME_STAMP_H_
 #include<chrono>
 using namespace std::chrono;
-//高精度计时器
-class TimeStamp {
+
+class CellTime
+{
 public:
-	TimeStamp() 
+	//获取当前时间戳，毫秒
+	static time_t getNowInMillSec()
+	{
+		return duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count();
+	}
+};
+
+//高精度计时器
+class CellTimeStamp
+{
+public:
+	CellTimeStamp()
 	{
 		update();
 	}
-	~TimeStamp() = default;
+	~CellTimeStamp() = default;
 
 	//更新时间
 	void update()
