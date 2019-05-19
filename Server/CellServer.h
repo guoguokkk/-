@@ -56,7 +56,7 @@ private:
 	virtual void onNetMsg(std::shared_ptr<CellClient>& pClient, netmsg_Header* header);//响应网络数据
 	void readData(fd_set& fd_read);//处理数据
 
-	void checkTime();//检测心跳消息
+	void checkTime();//检测心跳消息，完成定时发送数据 
 
 private:
 	SOCKET _serverSock;

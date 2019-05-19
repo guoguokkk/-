@@ -174,6 +174,7 @@ void CellServer::checkTime()
 	_oldTime = nowTime;
 	for (auto iter = _clients.begin(); iter != _clients.end();)
 	{
+		//心跳检测
 		if (iter->second->checkHeart(dt))
 		{//心跳检测结果为死亡，移除对应的客户端
 			if (_pEvent != nullptr)
@@ -186,8 +187,10 @@ void CellServer::checkTime()
 		}
 		else
 		{
+			//定时发送检测
+			iter->second->checkSend(dt);
 			++iter;
-		}		
+		}	
 	}
 }
 

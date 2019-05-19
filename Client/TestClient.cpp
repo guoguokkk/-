@@ -6,7 +6,9 @@
 #include<atomic>
 #include"TimeStamp.h"
 
-#define CLIENT_COUNT 1000
+#define CLIENT_COUNT 1000//客户端数量
+#define THREAD_COUNT 8//线程数量
+
 bool g_bRun = true;
 void cmdThread()
 {
@@ -29,7 +31,7 @@ void cmdThread()
 
 const int client_count = CLIENT_COUNT;//客户端数量
 Client* client[client_count];//客户端数组
-const int thread_count = 4;//发送线程的数量
+const int thread_count = THREAD_COUNT;//发送线程的数量
 std::atomic_int sendCount(0);
 std::atomic_int readyCount(0);
 
@@ -66,7 +68,7 @@ void sendThread(int id)//1-4，四个线程
 	++readyCount;
 	while (readyCount < thread_count)
 	{
-		std::chrono::milliseconds t(10);//3000毫秒
+		std::chrono::milliseconds t(100);
 		std::this_thread::sleep_for(t);
 	}
 
