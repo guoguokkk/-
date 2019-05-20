@@ -142,7 +142,7 @@ void Server::startServer(int n_cellServer)
 	//启动四个线程来负责消息处理业务
 	for (int i = 0; i < n_cellServer; ++i)
 	{
-		auto cell_server = new CellServer(_serverSock);//新建一个服务器来负责消息处理业务
+		auto cell_server = new CellServer(i + 1);//新建一个服务器来负责消息处理业务，参数为id
 		_cellServers.push_back(cell_server);
 		cell_server->setEventObj(this);//注册网络事件接受对象
 		cell_server->startCellServer();//启动消息处理线程
@@ -151,18 +151,26 @@ void Server::startServer(int n_cellServer)
 
 void Server::closeServer()
 {
+	printf("Server::closeServer()... 1\n");
+
 	//避免重复关闭！
-	if (_serverSock == INVALID_SOCKET)
+	if (_serverSock != INVALID_SOCKET)
 	{
-		return;
-	}
+		for (auto cell_server : _cellServers)
+		{
+			delete cell_server;
+		}
 
 #ifdef _WIN32
-	closesocket(_serverSock);
-	WSACleanup();//关闭 windows 环境
+		closesocket(_serverSock);
+		WSACleanup();//关闭 windows 环境
 #else
-	close(_serverSock);
+		close(_serverSock);
 #endif // _WIN32
+		_serverSock = INVALID_SOCKET;
+	}
+
+	printf("Server::closeServer()...2\n");
 }
 
 //只负责连接新客户端，有其他线程负责消息处理
@@ -229,7 +237,7 @@ void Server::onNetLeave(std::shared_ptr<CellClient> pClient)
 	--_clientCount;
 }
 
-void Server::onNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient> pClient, netmsg_Header* header)
+void Server::onNetMsg(CellServer * pCellServer, std::shared_ptr<CellClient> pClient, netmsg_Header * header)
 {
 	++_msgCount;
 }

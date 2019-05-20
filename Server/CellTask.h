@@ -7,7 +7,7 @@
 #include<functional>
 
 //执行任务的服务类
-class TaskServer
+class CellTaskServer
 {
 	typedef std::function<void()> CellTask;
 
@@ -15,7 +15,7 @@ protected:
 	//工作函数	
 	virtual void onRun()
 	{
-		while (true)
+		while (_isRun)
 		{
 			//从任务缓冲区取出任务，放到任务队列
 			if (!_taskBuf.empty())
@@ -50,8 +50,14 @@ public:
 	//启动工作线程
 	virtual void startTask()	
 	{
-		std::thread t(std::mem_fn(&TaskServer::onRun), this);
+		_isRun = true;
+		std::thread t(std::mem_fn(&CellTaskServer::onRun), this);
 		t.detach();
+	}
+	//关闭工作线程
+	virtual void closeTask()
+	{
+		_isRun = false;
 	}
 
 	//将任务添加到任务队列
@@ -61,10 +67,14 @@ public:
 		_taskBuf.push_back(pTask);
 	}
 
+public:
+	int _serverId = -1;//所属的服务器id
+
 private:
 	std::list<CellTask> _tasks;//任务队列
 	std::list<CellTask> _taskBuf;//任务缓冲区，生产者消费者操纵的是任务缓冲区
 	std::mutex _mutex;//任务缓冲区的锁
+	bool _isRun = false;
 };
 #endif // !CELL_TASK_H_
 

@@ -27,6 +27,7 @@ public:
 	virtual void onNetLeave(std::shared_ptr<CellClient> pClient);//有客户端离开事件
 	virtual void onNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient> pClient, netmsg_Header* header);
 	virtual void onNetRecv(std::shared_ptr<CellClient> pClient);
+
 private:
 	SOCKET _serverSock;
 	std::vector<CellServer*> _cellServers;//消息处理对象，内部会创建线程	

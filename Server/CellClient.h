@@ -6,7 +6,7 @@
 #include"ObjectPool.h"
 
 #define CLIENT_HEART_DEAD_TIME 60000//客户端心跳检测死亡计时，60秒
-#define CLIENT_SEND_DATA_TIME 200//定时发送数据的最大时间间隔，0.2秒
+#define CLIENT_SEND_BUF_TIME 200//定时发送数据的最大时间间隔，0.2秒
 
 //客户端数据类型，适用对象池原因：客户端频繁地退出连接
 class CellClient :public ObjectPoolBase<CellClient, 10000>
@@ -17,7 +17,7 @@ public:
 
 	int sendData(std::shared_ptr<netmsg_Header> header);//发送数据，定量发送
 	int sendDataDirect();//立即将缓冲区的数据发送给客户端
-	int sendDataDirect(std::shared_ptr<netmsg_Header> header);//立即发送
+	void sendDataDirect(std::shared_ptr<netmsg_Header> header);//立即发送
 
 	SOCKET getSockfd() { return _sockfd; }
 	char* getMsgBuf() { return _msgBuf; }
@@ -33,7 +33,7 @@ public:
 		_dtHeart += dt;
 		if (_dtHeart >= CLIENT_HEART_DEAD_TIME)
 		{
-			printf("checkHeart dead: _sockfd=%d, time=%d\n", (int)_sockfd, (int)_dtHeart);
+			printf("checkHeart dead:s=%d,time=%d\n", _sockfd, _dtHeart);
 			return true;
 		}
 		return false;
@@ -43,7 +43,7 @@ public:
 	bool checkSend(time_t dt)
 	{
 		_dtSend += dt;
-		if (_dtSend >= CLIENT_SEND_DATA_TIME)
+		if (_dtSend >= CLIENT_SEND_BUF_TIME)
 		{
 			//printf("checkSend: _sockfd=%d, time=%d\n", (int)_sockfd, (int)_dtSend);
 			//时间到了，立即将发送缓冲区的数据发送出去
@@ -55,14 +55,16 @@ public:
 		}
 		return false;
 	}
-
+public :
+	int id;
+	int serverId = -1;//所属server的id
 private:
 	SOCKET _sockfd;//客户端socket
 
 	char _msgBuf[RECV_BUF_SIZE];//消息缓冲区
 	int _lastMsgPos;//消息缓冲区尾部位置
 
-	char _sendBuf[SEND_BUF_SIZE];//发送缓冲区
+	char _szSendBuf[SEND_BUF_SIZE];//发送缓冲区
 	int _lastSendPos;//发送缓冲区尾部位置
 
 	time_t _dtHeart;//心跳死亡计时

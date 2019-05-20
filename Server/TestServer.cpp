@@ -41,5 +41,7 @@ int main()
 	}
 	server.closeServer();
 	std::cout << "EXIT...." << std::endl;
+	while (true)
+		Sleep(1);
 	return 0;
 }
