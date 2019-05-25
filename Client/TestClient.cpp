@@ -6,8 +6,8 @@
 #include<atomic>
 #include"TimeStamp.h"
 
-#define CLIENT_COUNT 8//¿Í»§¶ËÊıÁ¿
-#define THREAD_COUNT 4//Ïß³ÌÊıÁ¿
+#define CLIENT_COUNT 1//å®¢æˆ·ç«¯æ•°é‡
+#define THREAD_COUNT 1//çº¿ç¨‹æ•°é‡
 
 bool g_bRun = true;
 void cmdThread()
@@ -29,13 +29,13 @@ void cmdThread()
 	}
 }
 
-const int client_count = CLIENT_COUNT;//¿Í»§¶ËÊıÁ¿
-Client* client[client_count];//¿Í»§¶ËÊı×é
-const int thread_count = THREAD_COUNT;//·¢ËÍÏß³ÌµÄÊıÁ¿
+const int client_count = CLIENT_COUNT;//å®¢æˆ·ç«¯æ•°é‡
+Client* client[client_count];//å®¢æˆ·ç«¯æ•°ç»„
+const int thread_count = THREAD_COUNT;//å‘é€çº¿ç¨‹çš„æ•°é‡
 std::atomic_int sendCount(0);
 std::atomic_int readyCount(0);
 
-void recvThread(int begin, int end)//1-4£¬ËÄ¸öÏß³Ì
+void recvThread(int begin, int end)//1-4ï¼Œå››ä¸ªçº¿ç¨‹
 {
 	while (g_bRun)
 	{
@@ -46,7 +46,7 @@ void recvThread(int begin, int end)//1-4£¬ËÄ¸öÏß³Ì
 	}
 }
 
-void sendThread(int id)//1-4£¬ËÄ¸öÏß³Ì
+void sendThread(int id)//1-4ï¼Œå››ä¸ªçº¿ç¨‹
 {
 	printf("thread<%d>,start\n", id);
 	int c = client_count / thread_count;
@@ -64,7 +64,7 @@ void sendThread(int id)//1-4£¬ËÄ¸öÏß³Ì
 
 	printf("thread<%d>,Connect<begin=%d, end=%d>\n", id, begin, end);
 
-	//µÈ´ıÆäËûÏß³Ì×¼±¸ºÃ·¢ËÍ
+	//ç­‰å¾…å…¶ä»–çº¿ç¨‹å‡†å¤‡å¥½å‘é€
 	++readyCount;
 	while (readyCount < thread_count)
 	{
@@ -75,7 +75,7 @@ void sendThread(int id)//1-4£¬ËÄ¸öÏß³Ì
 	std::thread t1(recvThread, begin, end);
 	t1.detach();
 
-	netmsg_Login login[10];//Ìá¸ß·¢ËÍÆµÂÊ£¬Ã¿´Î·¢ËÍÊ®¸öÏûÏ¢°ü
+	netmsg_Login login[10];//æé«˜å‘é€é¢‘ç‡ï¼Œæ¯æ¬¡å‘é€åä¸ªæ¶ˆæ¯åŒ…
 	for (int i = 0; i < 10; ++i)
 	{
 		strcpy(login[i].userName, "kzj");
@@ -90,7 +90,7 @@ void sendThread(int id)//1-4£¬ËÄ¸öÏß³Ì
 		{
 			if (client[i]->sendData(login, nLen) != SOCKET_ERROR)
 			{
-				++sendCount;//·¢ËÍµÄÊıÁ¿
+				++sendCount;//å‘é€çš„æ•°é‡
 			}
 		}
 	}
@@ -106,14 +106,14 @@ void sendThread(int id)//1-4£¬ËÄ¸öÏß³Ì
 
 int main()
 {
-	//ÊäÈëÏß³Ì
+	//è¾“å…¥çº¿ç¨‹
 	std::thread cmd_t(cmdThread);
 	cmd_t.detach();
 
-	//Æô¶¯·¢ËÍÏß³Ì
+	//å¯åŠ¨å‘é€çº¿ç¨‹
 	for (int i = 0; i < thread_count; ++i)
 	{
-		std::thread t(sendThread, i + 1);//´«µİµÄÊÇÏß³ÌµÄ±àºÅ
+		std::thread t(sendThread, i + 1);//ä¼ é€’çš„æ˜¯çº¿ç¨‹çš„ç¼–å·
 		t.detach();
 	}
 
@@ -124,8 +124,8 @@ int main()
 		auto t = tTime.getElapsedSecond();
 		if (t >= 1.0)
 		{
-			//!"std::atomic<int>::atomic(const std::atomic<int>&)": ³¢ÊÔÒıÓÃÒÑÉ¾³ıµÄº¯Êı
-			//!½«Àà "std::atomic<int>" ×÷Îª¿É±ä²ÎÊıº¯ÊıµÄ²ÎÊıµÄ·Ç±ê×¼ÓÃ·¨
+			//!"std::atomic<int>::atomic(const std::atomic<int>&)": å°è¯•å¼•ç”¨å·²åˆ é™¤çš„å‡½æ•°
+			//!å°†ç±» "std::atomic<int>" ä½œä¸ºå¯å˜å‚æ•°å‡½æ•°çš„å‚æ•°çš„éæ ‡å‡†ç”¨æ³•
 			/*printf("thread<%d>,clients<%d>,time<%lf>,send<%d>\n",
 				thread_count, client_count, t, sendCount);*/
 

@@ -1,19 +1,20 @@
 #ifndef CELL_SERVER_H_
 #define CELL_SERVER_H_
 
+#include"CellTask.h"
 #include<thread>
 #include<mutex>
-#include<atomic>//Ô­×Ó²Ù×÷
+#include<atomic>//åŸå­æ“ä½œ
 #include<map>
 #include<vector>
 #include"Message.h"
 #include"CellClient.h"
 #include"INetEvent.h"
-#include"CellTask.h"
 #include"TimeStamp.h"
 #include"CellSemaphore.h"
+#include"CellThread.h"
 
-//ÍøÂçÏûÏ¢·¢ËÍ¶ÓÁĞ
+//ç½‘ç»œæ¶ˆæ¯å‘é€é˜Ÿåˆ—
 class SendMsgToClientTask
 {
 public:
@@ -23,57 +24,50 @@ public:
 		_pHeader = header;
 	}
 private:
-	std::shared_ptr<CellClient> _pClient;//Ä¿±ê¿Í»§¶Ë
-	std::shared_ptr<netmsg_Header> _pHeader;//Òª·¢ËÍµÄÊı¾İ
+	std::shared_ptr<CellClient> _pClient;//ç›®æ ‡å®¢æˆ·ç«¯
+	std::shared_ptr<netmsg_Header> _pHeader;//è¦å‘é€çš„æ•°æ®
 };
 
 
 class INetEvent;
 
-//ÏûÏ¢´¦ÀíÀà
+//æ¶ˆæ¯å¤„ç†ç±»
 class CellServer {
 public:
 	CellServer(int id = -1);
 	~CellServer();
 
-	void setEventObj(INetEvent* event);//°ó¶¨ÍøÂçÊÂ¼ş	
-	void addClient(std::shared_ptr<CellClient> pClient);//Ôö¼Ó¿Í»§¶Ë
-	void startCellServer();//Æô¶¯¹¤×÷Ïß³Ì	
+	void setEventObj(INetEvent* event);//ç»‘å®šç½‘ç»œäº‹ä»¶	
+	void addClient(std::shared_ptr<CellClient> pClient);//å¢åŠ å®¢æˆ·ç«¯
+	void startCellServer();//å¯åŠ¨å·¥ä½œçº¿ç¨‹	
 	size_t getClientCount();
-	void addSendTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<netmsg_Header> header)
-	{
-		auto task = std::make_shared<SendMsgToClientTask>(pClient, header);
-
-		//Ö´ĞĞÈÎÎñ
-		_taskServer.addTask([pClient, header]() {
-			pClient->sendData(header);
-			});
-	}
-
+	void addSendTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<netmsg_Header> header);
+	
 private:
-	void closeServer();//¹Ø±Õ·şÎñÆ÷
-	void onRun();//select	
-	int recvData(std::shared_ptr<CellClient> pClient);//½ÓÊÕÏûÏ¢£¬´¦ÀíÕ³°ü¡¢ÉÙ°ü
-	virtual void onNetMsg(std::shared_ptr<CellClient>& pClient, netmsg_Header* header);//ÏìÓ¦ÍøÂçÊı¾İ
-	void readData(fd_set& fd_read);//´¦ÀíÊı¾İ
+	void closeServer();//å…³é—­æœåŠ¡å™¨
+	void onRunCellServer(CellThread* pThread);//select	
+	int recvData(std::shared_ptr<CellClient> pClient);//æ¥æ”¶æ¶ˆæ¯ï¼Œå¤„ç†ç²˜åŒ…ã€å°‘åŒ…
+	virtual void onNetMsg(std::shared_ptr<CellClient>& pClient, netmsg_Header* header);//å“åº”ç½‘ç»œæ•°æ®
+	void readData(fd_set& fd_read);//å¤„ç†æ•°æ®
 
-	void checkTime();//¼ì²âĞÄÌøÏûÏ¢£¬Íê³É¶¨Ê±·¢ËÍÊı¾İ 
+	void checkTime();//æ£€æµ‹å¿ƒè·³æ¶ˆæ¯ï¼Œå®Œæˆå®šæ—¶å‘é€æ•°æ® 
 	void clearClients();
 private:
-	//´óµÄÍùÇ°·Å£¬Ğ¡µÄÍùºó·Å£¬ÄÚ´æ¶ÔÆë
-	std::map<SOCKET, std::shared_ptr<CellClient>> _clients;//ÕıÊ½¿Í»§¶ÓÁĞ
-	std::vector<std::shared_ptr<CellClient>> _clientsBuf;//»º³å¿Í»§¶ÓÁĞ
-	std::mutex _mutex;//»º³å¶ÓÁĞµÄËø
-	std::thread _thread;
-	INetEvent* _pNetEvent;//ÍøÂçÊÂ¼ş¶ÔÏó
+	//å¤§çš„å¾€å‰æ”¾ï¼Œå°çš„å¾€åæ”¾ï¼Œå†…å­˜å¯¹é½
+	std::map<SOCKET, std::shared_ptr<CellClient>> _clients;//æ­£å¼å®¢æˆ·é˜Ÿåˆ—
+	std::vector<std::shared_ptr<CellClient>> _clientsBuf;//ç¼“å†²å®¢æˆ·é˜Ÿåˆ—
+
+	std::mutex _mutex;//ç¼“å†²é˜Ÿåˆ—çš„é”
+	INetEvent* _pNetEvent;//ç½‘ç»œäº‹ä»¶å¯¹è±¡
+
 	CellTaskServer _taskServer;
-	fd_set _fdReadBack;//¿Í»§ÁĞ±í±¸·İ
-	bool _clientsChange;//¿Í»§ÁĞ±íÊÇ·ñ¸Ä±ä
+	fd_set _fdReadBack;//å®¢æˆ·åˆ—è¡¨å¤‡ä»½
+	bool _clientsChange;//å®¢æˆ·åˆ—è¡¨æ˜¯å¦æ”¹å˜
 	SOCKET _maxSock;
-	time_t _oldTime = CellTime::getNowInMillSec();//¾ÉÊ±¼ä´Á
-	bool _isRun;//ÅĞ¶Ï·şÎñÆ÷ÊÇ·ñÔÚÔËĞĞ
+	time_t _oldTime = CellTime::getNowInMillSec();//æ—§æ—¶é—´æˆ³
+	
 	int _id;
-	CellSemaphore _sem;
+	CellThread _thread;
 };
 
 #endif // !CELL_SERVER_H_

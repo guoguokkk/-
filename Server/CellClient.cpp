@@ -5,14 +5,14 @@ CellClient::CellClient(SOCKET sockfd)
 	static int n = 1;
 	id = n++;
 	_sockfd = sockfd;
-	memset(_msgBuf, 0, RECV_BUF_SIZE);//³õÊ¼»¯ÏûÏ¢»º³åÇø
+	memset(_msgBuf, 0, RECV_BUF_SIZE);//åˆå§‹åŒ–æ¶ˆæ¯ç¼“å†²åŒº
 	_lastMsgPos = 0;
 
-	memset(_szSendBuf, 0, SEND_BUF_SIZE);//³õÊ¼»¯·¢ËÍ»º³åÇø
+	memset(_szSendBuf, 0, SEND_BUF_SIZE);//åˆå§‹åŒ–å‘é€ç¼“å†²åŒº
 	_lastSendPos = 0;
 
-	resetDTHeart();//ĞÄÌøËÀÍö¼ÆÊ±³õÊ¼»¯
-	resetDTSend();//ÖØÖÃÉÏ´Î·¢ËÍÏûÏ¢µÄÊ±¼ä
+	resetDTHeart();//å¿ƒè·³æ­»äº¡è®¡æ—¶åˆå§‹åŒ–
+	resetDTSend();//é‡ç½®ä¸Šæ¬¡å‘é€æ¶ˆæ¯çš„æ—¶é—´
 }
 
 CellClient::~CellClient()
@@ -30,30 +30,30 @@ CellClient::~CellClient()
 }
 
 /**
- * @brief	·şÎñÆ÷Ïò¸Ã¿Í»§¶Ë·¢ËÍÊı¾İ
- * @param	header	´ı·¢ËÍÊı¾İ
- * @return	ÊÇ·ñ³É¹¦
+ * @brief	æœåŠ¡å™¨å‘è¯¥å®¢æˆ·ç«¯å‘é€æ•°æ®
+ * @param	header	å¾…å‘é€æ•°æ®
+ * @return	æ˜¯å¦æˆåŠŸ
  */
 int CellClient::sendData(std::shared_ptr<netmsg_Header> header)
 {
 	int ret = SOCKET_ERROR;
-	int nSendLen = header->dataLength;//´ı·¢ËÍÊı¾İµÄ³¤¶È
-	const char* pSendData = (const char*)header.get();//´ı·¢ËÍÊı¾İ
+	int nSendLen = header->dataLength;//å¾…å‘é€æ•°æ®çš„é•¿åº¦
+	const char* pSendData = (const char*)header.get();//å¾…å‘é€æ•°æ®
 
 	while (true)
 	{
-		//·¢ËÍÊı¾İµÄÌõ¼ş£º·¢ËÍ»º³åÇøÂú
-		//ÅĞ¶Ï»º³åÇøÖĞÒÑÓĞÊı¾İºÍ´ı·¢ËÍÊı¾İ×Ü³¤¶È
+		//å‘é€æ•°æ®çš„æ¡ä»¶ï¼šå‘é€ç¼“å†²åŒºæ»¡
+		//åˆ¤æ–­ç¼“å†²åŒºä¸­å·²æœ‰æ•°æ®å’Œå¾…å‘é€æ•°æ®æ€»é•¿åº¦
 		if (_lastSendPos + nSendLen >= SEND_BUF_SIZE)
 		{
-			int nCopyLen = SEND_BUF_SIZE - _lastSendPos;//·¢ËÍ»º³åÇøÊ£Óà´óĞ¡
-			memcpy(_szSendBuf + _lastSendPos, pSendData, nCopyLen);//ÌîÂú»º³åÇø
-			pSendData = pSendData + nCopyLen;//Î´ÄÜ·ÅÈë·¢ËÍ»º³åÇøµÄÊı¾İ
-			nSendLen = nSendLen - nCopyLen;//¸üĞÂ³¤¶È
-			ret = send(_sockfd, _szSendBuf, SEND_BUF_SIZE, 0);
-
-			resetDTSend();//·¢ËÍ³É¹¦£¬ĞèÒªÖØÖÃÉÏ´Î·¢ËÍ³É¹¦µÄÊ±¼ä
+			int nCopyLen = SEND_BUF_SIZE - _lastSendPos;//å‘é€ç¼“å†²åŒºå‰©ä½™å¤§å°
+			memcpy(_szSendBuf + _lastSendPos, pSendData, nCopyLen);//å¡«æ»¡ç¼“å†²åŒº
+			pSendData = pSendData + nCopyLen;//æœªèƒ½æ”¾å…¥å‘é€ç¼“å†²åŒºçš„æ•°æ®
+			nSendLen = nSendLen - nCopyLen;//æ›´æ–°é•¿åº¦
+			ret = send(_sockfd, _szSendBuf, SEND_BUF_SIZE, 0);			
 			_lastSendPos = 0;
+			resetDTSend();//å‘é€æˆåŠŸï¼Œéœ€è¦é‡ç½®ä¸Šæ¬¡å‘é€æˆåŠŸçš„æ—¶é—´
+
 			if (ret == SOCKET_ERROR)
 			{
 				return ret;
@@ -61,8 +61,8 @@ int CellClient::sendData(std::shared_ptr<netmsg_Header> header)
 		}
 		else
 		{
-			memcpy(_szSendBuf + _lastSendPos, pSendData, nSendLen);//½«Êı¾İ·ÅÈë·¢ËÍ»º³åÇø
-			_lastSendPos = _lastSendPos + nSendLen;//¸üĞÂ·¢ËÍ»º³åÇøÎ²²¿Î»ÖÃ
+			memcpy(_szSendBuf + _lastSendPos, pSendData, nSendLen);//å°†æ•°æ®æ”¾å…¥å‘é€ç¼“å†²åŒº
+			_lastSendPos = _lastSendPos + nSendLen;//æ›´æ–°å‘é€ç¼“å†²åŒºå°¾éƒ¨ä½ç½®
 			break;
 		}
 	}
@@ -70,16 +70,16 @@ int CellClient::sendData(std::shared_ptr<netmsg_Header> header)
 	return ret;
 }
 
-//Á¢¼´½«»º³åÇøµÄÊı¾İ·¢ËÍ¸ø¿Í»§¶Ë
+//ç«‹å³å°†ç¼“å†²åŒºçš„æ•°æ®å‘é€ç»™å®¢æˆ·ç«¯
 int CellClient::sendDataDirect()
 {
 	int ret = SOCKET_ERROR;
-	//»º³åÇøÓĞÊı¾İ
+	//ç¼“å†²åŒºæœ‰æ•°æ®
 	if (_lastSendPos > 0 && _sockfd != SOCKET_ERROR)
 	{
-		ret = send(_sockfd, _szSendBuf, _lastSendPos, 0);//½«·¢ËÍ»º³åÇøµÄÊı¾İ·¢ËÍ³öÈ¥
-		_lastSendPos = 0;//·¢ËÍ»º³åÇøÎ²²¿ÇåÁã
-		resetDTSend();//ÖØÖÃ·¢ËÍÊ±¼ä
+		ret = send(_sockfd, _szSendBuf, _lastSendPos, 0);//å°†å‘é€ç¼“å†²åŒºçš„æ•°æ®å‘é€å‡ºå»
+		_lastSendPos = 0;//å‘é€ç¼“å†²åŒºå°¾éƒ¨æ¸…é›¶
+		resetDTSend();//é‡ç½®å‘é€æ—¶é—´
 	}
 	return ret;
 }
@@ -88,4 +88,31 @@ void CellClient::sendDataDirect(std::shared_ptr<netmsg_Header> header)
 {
 	sendData(header);
 	sendDataDirect();
+}
+
+bool CellClient::checkHeart(time_t dt)
+{
+	_dtHeart += dt;
+	if (_dtHeart >= CLIENT_HEART_DEAD_TIME)
+	{
+		printf("checkHeart dead:s=%d,time=%d\n", _sockfd, _dtHeart);
+		return true;
+	}
+	return false;
+}
+
+bool CellClient::checkSend(time_t dt)
+{
+	_dtSend += dt;
+	if (_dtSend >= CLIENT_SEND_BUF_TIME)
+	{
+		//printf("checkSend: _sockfd=%d, time=%d\n", (int)_sockfd, (int)_dtSend);
+		//æ—¶é—´åˆ°äº†ï¼Œç«‹å³å°†å‘é€ç¼“å†²åŒºçš„æ•°æ®å‘é€å‡ºå»
+		sendDataDirect();
+
+		//é‡ç½®å‘é€è®¡æ—¶
+		resetDTSend();
+		return true;
+	}
+	return false;
 }

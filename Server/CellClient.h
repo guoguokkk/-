@@ -5,69 +5,47 @@
 #include<memory>
 #include"ObjectPool.h"
 
-#define CLIENT_HEART_DEAD_TIME 60000//¿Í»§¶ËĞÄÌø¼ì²âËÀÍö¼ÆÊ±£¬60Ãë
-#define CLIENT_SEND_BUF_TIME 200//¶¨Ê±·¢ËÍÊı¾İµÄ×î´óÊ±¼ä¼ä¸ô£¬0.2Ãë
+#define CLIENT_HEART_DEAD_TIME 60000//å®¢æˆ·ç«¯å¿ƒè·³æ£€æµ‹æ­»äº¡è®¡æ—¶ï¼Œ60ç§’
+#define CLIENT_SEND_BUF_TIME 200//å®šæ—¶å‘é€æ•°æ®çš„æœ€å¤§æ—¶é—´é—´éš”ï¼Œ0.2ç§’
 
-//¿Í»§¶ËÊı¾İÀàĞÍ£¬ÊÊÓÃ¶ÔÏó³ØÔ­Òò£º¿Í»§¶ËÆµ·±µØÍË³öÁ¬½Ó
-class CellClient :public ObjectPoolBase<CellClient, 10000>
+//å®¢æˆ·ç«¯æ•°æ®ç±»å‹ï¼Œé€‚ç”¨å¯¹è±¡æ± åŸå› ï¼šå®¢æˆ·ç«¯é¢‘ç¹åœ°é€€å‡ºè¿æ¥
+class CellClient :public ObjectPoolBase<CellClient, 1000>
 {
 public:
 	CellClient(SOCKET clientSock = INVALID_SOCKET);
 	~CellClient();
 
-	int sendData(std::shared_ptr<netmsg_Header> header);//·¢ËÍÊı¾İ£¬¶¨Á¿·¢ËÍ
-	int sendDataDirect();//Á¢¼´½«»º³åÇøµÄÊı¾İ·¢ËÍ¸ø¿Í»§¶Ë
-	void sendDataDirect(std::shared_ptr<netmsg_Header> header);//Á¢¼´·¢ËÍ
+	int sendData(std::shared_ptr<netmsg_Header> header);//å‘é€æ•°æ®ï¼Œå®šé‡å‘é€
+	int sendDataDirect();//ç«‹å³å°†ç¼“å†²åŒºçš„æ•°æ®å‘é€ç»™å®¢æˆ·ç«¯
+	void sendDataDirect(std::shared_ptr<netmsg_Header> header);//ç«‹å³å‘é€
 
 	SOCKET getSockfd() { return _sockfd; }
 	char* getMsgBuf() { return _msgBuf; }
 	int getLastPos() { return _lastMsgPos; }
 	void setLastPos(int pos) { _lastMsgPos = pos; }
 
-	void resetDTHeart() { _dtHeart = 0; }//ÖØÖÃĞÄÌøËÀÍö¼ÆÊ±
-	void resetDTSend() { _dtSend = 0; }//ÖØÖÃÉÏ´Î·¢ËÍÏûÏ¢µÄÊ±¼ä
+	void resetDTHeart() { _dtHeart = 0; }//é‡ç½®å¿ƒè·³æ­»äº¡è®¡æ—¶
+	void resetDTSend() { _dtSend = 0; }//é‡ç½®ä¸Šæ¬¡å‘é€æ¶ˆæ¯çš„æ—¶é—´
 
-	//¼ì²âĞÄÌø
-	bool checkHeart(time_t dt)
-	{
-		_dtHeart += dt;
-		if (_dtHeart >= CLIENT_HEART_DEAD_TIME)
-		{
-			printf("checkHeart dead:s=%d,time=%d\n", _sockfd, _dtHeart);
-			return true;
-		}
-		return false;
-	}
+	//æ£€æµ‹å¿ƒè·³
+	bool checkHeart(time_t dt);
 
-	//¼ì²âÊı¾İ·¢ËÍµÄÊ±¼ä¼ä¸ô
-	bool checkSend(time_t dt)
-	{
-		_dtSend += dt;
-		if (_dtSend >= CLIENT_SEND_BUF_TIME)
-		{
-			//printf("checkSend: _sockfd=%d, time=%d\n", (int)_sockfd, (int)_dtSend);
-			//Ê±¼äµ½ÁË£¬Á¢¼´½«·¢ËÍ»º³åÇøµÄÊı¾İ·¢ËÍ³öÈ¥
-			sendDataDirect();
+	//æ£€æµ‹æ•°æ®å‘é€çš„æ—¶é—´é—´éš”
+	bool checkSend(time_t dt);
 
-			//ÖØÖÃ·¢ËÍ¼ÆÊ±
-			resetDTSend();
-			return true;
-		}
-		return false;
-	}
-public :
-	int id;
-	int serverId = -1;//ËùÊôserverµÄid
+public:
+	int id = -1;
+	int serverId = -1;//æ‰€å±serverçš„id
 private:
-	SOCKET _sockfd;//¿Í»§¶Ësocket
+	SOCKET _sockfd;//å®¢æˆ·ç«¯socket
 
-	char _msgBuf[RECV_BUF_SIZE];//ÏûÏ¢»º³åÇø
-	int _lastMsgPos;//ÏûÏ¢»º³åÇøÎ²²¿Î»ÖÃ
+	char _msgBuf[RECV_BUF_SIZE];//æ¶ˆæ¯ç¼“å†²åŒº
+	int _lastMsgPos;//æ¶ˆæ¯ç¼“å†²åŒºå°¾éƒ¨ä½ç½®
 
-	char _szSendBuf[SEND_BUF_SIZE];//·¢ËÍ»º³åÇø
-	int _lastSendPos;//·¢ËÍ»º³åÇøÎ²²¿Î»ÖÃ
+	char _szSendBuf[SEND_BUF_SIZE];//å‘é€ç¼“å†²åŒº
+	int _lastSendPos;//å‘é€ç¼“å†²åŒºå°¾éƒ¨ä½ç½®
 
-	time_t _dtHeart;//ĞÄÌøËÀÍö¼ÆÊ±
-	time_t _dtSend;//ÉÏ´Î·¢ËÍÏûÏ¢µÄÊ±¼ä(¶¨Ê±·¢ËÍÏûÏ¢)
+	time_t _dtHeart;//å¿ƒè·³æ­»äº¡è®¡æ—¶
+	time_t _dtSend;//ä¸Šæ¬¡å‘é€æ¶ˆæ¯çš„æ—¶é—´(å®šæ—¶å‘é€æ¶ˆæ¯)
 };
 #endif // !CELL_CLIENT_H_

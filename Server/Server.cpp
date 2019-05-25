@@ -109,6 +109,7 @@ SOCKET Server::Accept()
 	}
 	else
 	{
+		//向所有的客户端发送新加入的客户端
 		//netmsg_NewUserJoin new_user_join;
 		//SendToAll(&new_user_join);
 
@@ -134,7 +135,6 @@ void Server::addClientToCellServer(std::shared_ptr<CellClient> pClient)
 		}
 	}
 	pMinServer->addClient(pClient);//加入客户端数量最小的消息处理线程	
-	onNetJoin(pClient);
 }
 
 void Server::startServer(int n_cellServer)
@@ -147,11 +147,17 @@ void Server::startServer(int n_cellServer)
 		cell_server->setEventObj(this);//注册网络事件接受对象
 		cell_server->startCellServer();//启动消息处理线程
 	}
+
+	_thread.startThread(nullptr, 
+		[this](CellThread* pThread) {
+			onRun(pThread);
+		},
+		nullptr);
 }
 
 void Server::closeServer()
 {
-	printf("Server::closeServer()... 1\n");
+	printf("EasyTcpServer.Close begin\n");
 
 	//避免重复关闭！
 	if (_serverSock != INVALID_SOCKET)
@@ -170,45 +176,38 @@ void Server::closeServer()
 		_serverSock = INVALID_SOCKET;
 	}
 
-	printf("Server::closeServer()...2\n");
+	printf("EasyTcpServer.Close end\n");
 }
 
 //只负责连接新客户端，有其他线程负责消息处理
-bool Server::onRun()
+void Server::onRun(CellThread* pThread)
 {
-	if (!isRun())
+	while (pThread->isRun())
 	{
-		return false;
+		time4Msg();
+		fd_set fd_read;
+		FD_ZERO(&fd_read);
+		FD_SET(_serverSock, &fd_read);
+
+		timeval time;
+		time.tv_sec = 0;//秒
+		time.tv_usec = 10;
+		int ret = select(_serverSock + 1, &fd_read, nullptr, nullptr, &time);
+		if (ret < 0)
+		{
+			printf("<socket=%d> select error.\n", (int)_serverSock);
+			pThread->exitThread();
+			break;
+		}
+
+		if (FD_ISSET(_serverSock, &fd_read))
+		{
+			FD_CLR(_serverSock, &fd_read);
+			Accept();
+		}
 	}
 
-	time4Msg();
-	fd_set fd_read;
-	FD_ZERO(&fd_read);
-	FD_SET(_serverSock, &fd_read);
-
-	timeval time;
-	time.tv_sec = 0;//秒
-	time.tv_usec = 10;
-	int ret = select(_serverSock + 1, &fd_read, nullptr, nullptr, &time);
-	if (ret < 0)
-	{
-		printf("<socket=%d> select error.\n", (int)_serverSock);
-		closeServer();
-		return false;
-	}
-
-	if (FD_ISSET(_serverSock, &fd_read))
-	{
-		FD_CLR(_serverSock, &fd_read);
-		Accept();
-		return true;
-	}
-	return false;
-}
-
-bool Server::isRun()
-{
-	return _serverSock != INVALID_SOCKET;
+	
 }
 
 void Server::time4Msg()

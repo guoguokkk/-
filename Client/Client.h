@@ -9,16 +9,16 @@ public:
 	Client();
 	virtual ~Client();
 
-	int connectToServer(const char* ip, unsigned short port);//Á¬½Ó·şÎñÆ÷
-	void closeClient();//¹Ø±Õ¿Í»§¶Ë	
-	bool onRun();//´¦ÀíÍøÂçÏûÏ¢	
-	int recvData(SOCKET clientSock);//½ÓÊÕÏûÏ¢
-	virtual void onNetMsg(netmsg_Header* header);//´¦ÀíÏûÏ¢
-	int sendData(netmsg_Header* header, int nLen);//·¢ËÍÏûÏ¢
+	int connectToServer(const char* ip, unsigned short port);//è¿æ¥æœåŠ¡å™¨
+	void closeClient();//å…³é—­å®¢æˆ·ç«¯	
+	bool onRun();//å¤„ç†ç½‘ç»œæ¶ˆæ¯	
+	int recvData(SOCKET clientSock);//æ¥æ”¶æ¶ˆæ¯
+	virtual void onNetMsg(netmsg_Header* header);//å¤„ç†æ¶ˆæ¯
+	int sendData(netmsg_Header* header, int nLen);//å‘é€æ¶ˆæ¯
 
 private:
 	bool isRun();
-	void initClient();//³õÊ¼»¯¿Í»§¶Ë
+	void initClient();//åˆå§‹åŒ–å®¢æˆ·ç«¯
 
 private:
 	SOCKET _clientSock;

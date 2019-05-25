@@ -3,10 +3,10 @@
 
 MemoryPool::MemoryPool()
 {	
-	_pBuf = nullptr;//ÄÚ´æ³ØµÄÎ»ÖÃ
-	_pHeader = nullptr;//µÚÒ»¸ö¿ÕÏÐ¿éµÄÎ»ÖÃ
-	_nChunkSize = 0;//ÄÚ´æ¿é´óÐ¡
-	_nChunkNum = 0;//ÄÚ´æ¿éÊýÄ¿
+	_pBuf = nullptr;//å†…å­˜æ± çš„ä½ç½®
+	_pHeader = nullptr;//ç¬¬ä¸€ä¸ªç©ºé—²å—çš„ä½ç½®
+	_nChunkSize = 0;//å†…å­˜å—å¤§å°
+	_nChunkNum = 0;//å†…å­˜å—æ•°ç›®
 	xPrintf("MemoryPool...\n");
 }
 
@@ -18,23 +18,23 @@ MemoryPool::~MemoryPool()
 	}
 }
 
-//³õÊ¼»¯ÄÚ´æ³Ø
+//åˆå§‹åŒ–å†…å­˜æ± 
 void MemoryPool::initObjectPool()
 {
 	xPrintf("initPool: _nChunkSize=%d, _nChunkNum=%d\n", _nChunkSize, _nChunkNum);
 
-	//±ÜÃâÖØ¸´³õÊ¼»¯
-	assert(_pBuf == nullptr);//²»Âú×ãÌõ¼þ£¬¾ÍÅ×³ö´íÎó
+	//é¿å…é‡å¤åˆå§‹åŒ–
+	assert(_pBuf == nullptr);//ä¸æ»¡è¶³æ¡ä»¶ï¼Œå°±æŠ›å‡ºé”™è¯¯
 	if (_pBuf != nullptr)
 	{
 		return;
 	}
 
-	//ÏòÏµÍ³ÉêÇë³ØµÄÄÚ´æ
-	size_t realSize = _nChunkSize + sizeof(Chunk); //ÄÚ´æ¿éÃèÊöÐÅÏ¢ + Êý¾Ý
+	//å‘ç³»ç»Ÿç”³è¯·æ± çš„å†…å­˜
+	size_t realSize = _nChunkSize + sizeof(Chunk); //å†…å­˜å—æè¿°ä¿¡æ¯ + æ•°æ®
 	_pBuf = (char*)malloc(_nChunkNum * realSize);
 
-	//³õÊ¼»¯Ã¿¸ö¿é
+	//åˆå§‹åŒ–æ¯ä¸ªå—
 	_pHeader = (Chunk*)_pBuf;
 	_pHeader->_nID = 0;
 	_pHeader->_nRef = 0;
@@ -61,16 +61,16 @@ void MemoryPool::initObjectPool()
 void* MemoryPool::allocMemInPool(size_t size)
 {
 	std::lock_guard<std::mutex> lg(_mutex);
-	//±ÜÃâÖØ¸´³õÊ¼»¯
+	//é¿å…é‡å¤åˆå§‹åŒ–
 	if (_pBuf == nullptr)
 	{
 		initObjectPool();
 	}
 
-	//·ÖÅäÄÚ´æ
+	//åˆ†é…å†…å­˜
 	Chunk* pReturn = nullptr;
 	if (_pHeader == nullptr)
-	{//ÄÚ´æ³ØÃ»ÓÐ¿ÕÏÐ¿é£¬ÏòÏµÍ³ÉêÇëÄÚ´æ£¬ÄÚ´æ¿éÃèÊöÐÅÏ¢+Êý¾Ý
+	{//å†…å­˜æ± æ²¡æœ‰ç©ºé—²å—ï¼Œå‘ç³»ç»Ÿç”³è¯·å†…å­˜ï¼Œå†…å­˜å—æè¿°ä¿¡æ¯+æ•°æ®
 		pReturn = (Chunk*)malloc(sizeof(Chunk) + size);
 		pReturn->_nID = -1;
 		pReturn->_nRef = 1;
@@ -79,27 +79,27 @@ void* MemoryPool::allocMemInPool(size_t size)
 		pReturn->_pNext = nullptr;
 	}
 	else
-	{//½«¿ÕÏÐ¿éÁ´±íµÄµÚÒ»¸ö¿é·ÖÅä³öÈ¥
+	{//å°†ç©ºé—²å—é“¾è¡¨çš„ç¬¬ä¸€ä¸ªå—åˆ†é…å‡ºåŽ»
 		pReturn = _pHeader;
 		_pHeader = _pHeader->_pNext;
 		assert(0 == pReturn->_nRef);
-		pReturn->_nRef = 1;//¸üÐÂÒýÓÃµÄ´ÎÊý
+		pReturn->_nRef = 1;//æ›´æ–°å¼•ç”¨çš„æ¬¡æ•°
 	}
 	//xPrintf("allocMem: %p, id=%d, size=%d\n", pReturn, pReturn->_nID, size);
 
-	//ÄÚ´æ³Ø£ºÄÚ´æ¿éÃèÊöÐÅÏ¢+Êý¾Ý-->ÄÚ´æ¿éÃèÊöÐÅÏ¢+Êý¾Ý	
-	return ((char*)pReturn + sizeof(Chunk));//Êä³ö£ºÊý¾ÝµÄµØÖ·
+	//å†…å­˜æ± ï¼šå†…å­˜å—æè¿°ä¿¡æ¯+æ•°æ®-->å†…å­˜å—æè¿°ä¿¡æ¯+æ•°æ®	
+	return ((char*)pReturn + sizeof(Chunk));//è¾“å‡ºï¼šæ•°æ®çš„åœ°å€
 }
 
-//ÊäÈë£ºÊý¾ÝµÄµØÖ·
+//è¾“å…¥ï¼šæ•°æ®çš„åœ°å€
 void MemoryPool::freeMemInPool(void* pMem)
 {
-	//ÄÚ´æ³Ø£ºÄÚ´æ¿éÃèÊöÐÅÏ¢+Êý¾Ý-->ÄÚ´æ¿éÃèÊöÐÅÏ¢+Êý¾Ý
+	//å†…å­˜æ± ï¼šå†…å­˜å—æè¿°ä¿¡æ¯+æ•°æ®-->å†…å­˜å—æè¿°ä¿¡æ¯+æ•°æ®
 	Chunk* pTempChunk = (Chunk*)((char*)pMem - sizeof(Chunk));
 	assert(pTempChunk->_nRef == 1);
 
 	if (pTempChunk->_bPool == false)
-	{//²»ÔÚ³ØÖÐ
+	{//ä¸åœ¨æ± ä¸­
 		if (--pTempChunk->_nRef != 0)
 		{
 			return;
@@ -107,7 +107,7 @@ void MemoryPool::freeMemInPool(void* pMem)
 		free(pTempChunk);
 	}
 	else
-	{//ÔÚ³ØÖÐ
+	{//åœ¨æ± ä¸­
 		std::lock_guard<std::mutex> lg(_mutex);
 		if (--pTempChunk->_nRef != 0)
 		{
@@ -148,7 +148,7 @@ void* MemoryMgr::allocMem(size_t size)
 	Chunk* pReturn = nullptr;
 
 	if (size > MAX_MEMORY_SIZE)
-	{//´óÓÚ×î´óµÄÄÚ´æ³Ø£¬ÔÚÏµÍ³ÖÐ·ÖÅäÒ»¸ö¿é		
+	{//å¤§äºŽæœ€å¤§çš„å†…å­˜æ± ï¼Œåœ¨ç³»ç»Ÿä¸­åˆ†é…ä¸€ä¸ªå—		
 		pReturn = (Chunk*)malloc(sizeof(Chunk) + size);
 		pReturn->_nID = -1;
 		pReturn->_nRef = 1;
@@ -160,7 +160,7 @@ void* MemoryMgr::allocMem(size_t size)
 		return ((char*)pReturn + sizeof(Chunk));
 	}
 	else
-	{//Ð¡ÓÚµÈÓÚ×î´óµÄÄÚ´æ³Ø£¬ÔÚºÏÊÊµÄÄÚ´æ³ØÖÐ·ÖÅäÄÚ´æ
+	{//å°äºŽç­‰äºŽæœ€å¤§çš„å†…å­˜æ± ï¼Œåœ¨åˆé€‚çš„å†…å­˜æ± ä¸­åˆ†é…å†…å­˜
 		return _szAlloc[size]->allocMemInPool(size);
 	}
 }
@@ -171,14 +171,14 @@ void MemoryMgr::freeMem(void* pMem)
 	//xPrintf("freeMem: %p, id=%d\n", pTempChunk, pTempChunk->_nID);
 
 	if (pTempChunk->_bPool == false)
-	{//²»ÔÚ³ØÖÐ
+	{//ä¸åœ¨æ± ä¸­
 		if (--pTempChunk->_nRef == 0)
 		{
 			free(pTempChunk);
 		}
 	}
 	else
-	{//ÔÚ³ØÖÐ
+	{//åœ¨æ± ä¸­
 		pTempChunk->_pPool->freeMemInPool(pMem);
 	}
 }

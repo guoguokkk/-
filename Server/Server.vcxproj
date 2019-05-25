@@ -23,6 +23,7 @@
     <ClInclude Include="CellSemaphore.h" />
     <ClInclude Include="CellServer.h" />
     <ClInclude Include="CellTask.h" />
+    <ClInclude Include="CellThread.h" />
     <ClInclude Include="INetEvent.h" />
     <ClInclude Include="MemoryAlloc.h" />
     <ClInclude Include="MemoryPool.h" />

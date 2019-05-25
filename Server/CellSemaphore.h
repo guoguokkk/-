@@ -5,7 +5,7 @@
 #include<thread>
 #include<condition_variable>
 
-//ĞÅºÅÁ¿
+//ä¿¡å·é‡
 class CellSemaphore
 {
 public:
@@ -22,7 +22,7 @@ public:
 		{
 			_cv.wait(lock, [this]()->bool {
 				return _wakeup > 0;
-				});//×èÈûµÈ´ıOnRun()ÍË³ö
+				});//é˜»å¡ç­‰å¾…OnRun()é€€å‡º
 			--_wakeup;
 		}
 	}
@@ -35,17 +35,13 @@ public:
 			++_wakeup;
 			_cv.notify_one();
 		}
-		else
-		{
-			printf("CELLSemaphore wakeup error.");
-		}
 	}
 
 private:
 	std::mutex _mutex;
-	std::condition_variable _cv;//Ìõ¼ş±äÁ¿£º×èÈûµÈ´ı
-	int _wait;//µÈ´ı¼ÆÊı
-	int _wakeup;//»½ĞÑ¼ÆÊı
+	std::condition_variable _cv;//æ¡ä»¶å˜é‡ï¼šé˜»å¡ç­‰å¾…
+	int _wait;//ç­‰å¾…è®¡æ•°
+	int _wakeup;//å”¤é†’è®¡æ•°
 };
 
 #endif // !CELL_SEMAPHORE_H_

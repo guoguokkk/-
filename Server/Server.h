@@ -7,6 +7,7 @@
 #include"CellClient.h"
 #include"CellServer.h"
 #include<vector>
+#include"CellThread.h"
 
 class Server :public INetEvent
 {
@@ -20,18 +21,19 @@ public:
 	void addClientToCellServer(std::shared_ptr<CellClient> pClient);
 	void startServer(int n_cellServer);
 	void closeServer();//关闭服务器	   	 
-	bool onRun();//select
-	bool isRun();
+	
 	void time4Msg();//计算并输出每秒收到的网络消息
 	virtual void onNetJoin(std::shared_ptr<CellClient> pClient);//只会被一个线程触发，安全
 	virtual void onNetLeave(std::shared_ptr<CellClient> pClient);//有客户端离开事件
 	virtual void onNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient> pClient, netmsg_Header* header);
 	virtual void onNetRecv(std::shared_ptr<CellClient> pClient);
-
+private:
+	void onRun(CellThread* pThread);//select
 private:
 	SOCKET _serverSock;
 	std::vector<CellServer*> _cellServers;//消息处理对象，内部会创建线程	
 	CellTimeStamp _tTime;
+	CellThread _thread;
 protected:
 	std::atomic_int _recvCount;//收到消息计数
 	std::atomic_int _clientCount;//客户端计数

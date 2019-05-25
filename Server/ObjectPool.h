@@ -4,17 +4,17 @@
 #include<assert.h>
 #include<mutex>
 
-//ÀàµÄÀàĞÍºÍ¶ÔÏó³ØÖĞ¶ÔÏó½ÚµãµÄÊıÄ¿
+//ç±»çš„ç±»å‹å’Œå¯¹è±¡æ± ä¸­å¯¹è±¡èŠ‚ç‚¹çš„æ•°ç›®
 template<typename Type, size_t nNodeNum>
 class ObjectPool
 {
 private:
 	struct objectNode
 	{
-		int nID;//¶ÔÏó½ÚµãµÄ±àºÅ
-		char nRef;//¶ÔÏó½ÚµãµÄÒıÓÃ´ÎÊı
-		bool bPool;//ÊÇ·ñÔÚ¶ÔÏó³ØÖĞ
-		objectNode* pNext;//ÏÂÒ»¸ö½Úµã
+		int nID;//å¯¹è±¡èŠ‚ç‚¹çš„ç¼–å·
+		char nRef;//å¯¹è±¡èŠ‚ç‚¹çš„å¼•ç”¨æ¬¡æ•°
+		bool bPool;//æ˜¯å¦åœ¨å¯¹è±¡æ± ä¸­
+		objectNode* pNext;//ä¸‹ä¸€ä¸ªèŠ‚ç‚¹
 	};
 
 public:
@@ -38,7 +38,7 @@ public:
 		std::lock_guard<std::mutex> lg(_mutex);
 		objectNode* pReturn = nullptr;
 
-		//ÅĞ¶ÏÊÇ·ñÓĞ¿ÕÏĞ¶ÔÏó½Úµã
+		//åˆ¤æ–­æ˜¯å¦æœ‰ç©ºé—²å¯¹è±¡èŠ‚ç‚¹
 		if (_pHeader != nullptr)
 		{
 			pReturn = _pHeader;
@@ -48,7 +48,7 @@ public:
 		}
 		else
 		{
-			size_t nNodeSize = sizeof(Type) + sizeof(objectNode);//Ò»¸ö½ÚµãµÄ´óĞ¡£ºÊı¾İ+Í·²¿ÃèÊöĞÅÏ¢
+			size_t nNodeSize = sizeof(Type) + sizeof(objectNode);//ä¸€ä¸ªèŠ‚ç‚¹çš„å¤§å°ï¼šæ•°æ®+å¤´éƒ¨æè¿°ä¿¡æ¯
 			pReturn = (objectNode*)new char[nNodeSize];
 			pReturn->nID = -1;
 			pReturn->nRef = 1;
@@ -65,7 +65,7 @@ public:
 		objectNode* pNode = (objectNode*)((char*)p - sizeof(objectNode));
 		assert(pNode->nRef == 1);
 
-		//ÅĞ¶ÏÊÇ·ñÔÚ¶ÔÏó³ØÖĞ
+		//åˆ¤æ–­æ˜¯å¦åœ¨å¯¹è±¡æ± ä¸­
 		if (pNode->bPool == true)
 		{
 			std::lock_guard<std::mutex> lg(_mutex);
@@ -84,11 +84,11 @@ private:
 	void initObjectPool()
 	{
 		printf("initObjectPool...\n");
-		//±ÜÃâÖØ¸´³õÊ¼»¯
+		//é¿å…é‡å¤åˆå§‹åŒ–
 		assert(_pBuf == nullptr);
 		if (_pBuf != nullptr) { return; }
 
-		size_t nNodeSize = sizeof(Type) + sizeof(objectNode);//Ò»¸ö½ÚµãµÄ´óĞ¡£ºÊı¾İ+Í·²¿ÃèÊöĞÅÏ¢
+		size_t nNodeSize = sizeof(Type) + sizeof(objectNode);//ä¸€ä¸ªèŠ‚ç‚¹çš„å¤§å°ï¼šæ•°æ®+å¤´éƒ¨æè¿°ä¿¡æ¯
 		size_t n = nNodeSize * nNodeNum;
 		_pBuf = new char[n];
 		_pHeader = (objectNode*)_pBuf;
@@ -112,8 +112,8 @@ private:
 	}
 
 private:
-	char* _pBuf;//¶ÔÏó³ØµØÖ·
-	objectNode* _pHeader;//¿ÕÏĞ¶ÔÏó½ÚµãµÄÍ·²¿
+	char* _pBuf;//å¯¹è±¡æ± åœ°å€
+	objectNode* _pHeader;//ç©ºé—²å¯¹è±¡èŠ‚ç‚¹çš„å¤´éƒ¨
 	std::mutex _mutex;
 };
 
@@ -146,7 +146,7 @@ public:
 private:
 	static ObjectPool<Type, nNodeNum>& getObjectPool()
 	{
-		static ObjectPool <Type, nNodeNum> objectPool;//Ò»¶¨ÒªÊÇstatic£¬²»È»»á·ÃÎÊ³åÍ»
+		static ObjectPool <Type, nNodeNum> objectPool;//ä¸€å®šè¦æ˜¯staticï¼Œä¸ç„¶ä¼šè®¿é—®å†²çª
 		return objectPool;
 	}
 };

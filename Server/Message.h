@@ -3,7 +3,7 @@
 
 #ifdef _WIN32
 #define FD_SETSIZE 2056
-#define WIN32_LEAN_AND_MEAN//½â¾ö Windows.h ºÍ WinSock2.h ³åÍ»
+#define WIN32_LEAN_AND_MEAN//è§£å†³ Windows.h å’Œ WinSock2.h å†²çª
 #include<Windows.h>
 #include<WinSock2.h>
 #pragma comment(lib,"ws2_32.lib")
@@ -21,13 +21,13 @@
 #define IP "202.114.7.16"
 #define PORT 8080
 
-//»º³åÇø×îĞ¡µ¥Ôª´óĞ¡
+//ç¼“å†²åŒºæœ€å°å•å…ƒå¤§å°
 #ifndef RECV_BUF_SIZE
 #define RECV_BUF_SIZE 10240*5
 #define SEND_BUF_SIZE 10240*5
 #endif // !RECV_BUF_SIZE
 
-//ÃüÁî
+//å‘½ä»¤
 enum CMD
 {
 	CMD_LOGIN,
@@ -40,7 +40,7 @@ enum CMD
 	CMD_S2C_HEART
 };
 
-//ÏûÏ¢Í·
+//æ¶ˆæ¯å¤´
 struct netmsg_Header
 {
 	netmsg_Header() 
@@ -48,11 +48,11 @@ struct netmsg_Header
 		dataLength = sizeof(netmsg_Header);
 		cmd = CMD_ERROR;		
 	}
-	short dataLength;//ÏûÏ¢µÄ³¤¶È
-	short cmd;//ÃüÁî	
+	unsigned short dataLength;//æ¶ˆæ¯çš„é•¿åº¦
+	unsigned short cmd;//å‘½ä»¤	
 };
 
-//µÇÂ¼ÏûÏ¢
+//ç™»å½•æ¶ˆæ¯
 struct  netmsg_Login :public netmsg_Header
 {
 	netmsg_Login()
@@ -65,7 +65,7 @@ struct  netmsg_Login :public netmsg_Header
 	char data[32];
 };
 
-//µÇÂ¼½á¹ûÏûÏ¢
+//ç™»å½•ç»“æœæ¶ˆæ¯
 struct  netmsg_LoginResult :public netmsg_Header
 {
 	netmsg_LoginResult()
@@ -78,7 +78,7 @@ struct  netmsg_LoginResult :public netmsg_Header
 	char data[92];
 };
 
-//µÇ³öÏûÏ¢
+//ç™»å‡ºæ¶ˆæ¯
 struct  netmsg_Logout :public netmsg_Header
 {
 	netmsg_Logout()
@@ -89,7 +89,7 @@ struct  netmsg_Logout :public netmsg_Header
 	char userName[32];
 };
 
-//µÇ³ö½á¹ûÏûÏ¢
+//ç™»å‡ºç»“æœæ¶ˆæ¯
 struct  netmsg_LogoutResult :public netmsg_Header
 {
 	netmsg_LogoutResult()
@@ -101,7 +101,7 @@ struct  netmsg_LogoutResult :public netmsg_Header
 	int result;
 };
 
-//ĞÂÓÃ»§¼ÓÈë
+//æ–°ç”¨æˆ·åŠ å…¥
 struct  netmsg_NewUserJoin :public netmsg_Header
 {
 	netmsg_NewUserJoin()
@@ -113,7 +113,7 @@ struct  netmsg_NewUserJoin :public netmsg_Header
 	int sock;
 };
 
-//ĞÄÌøÏûÏ¢£¬¿Í»§¶Ë·¢ËÍ¸ø·şÎñÆ÷
+//å¿ƒè·³æ¶ˆæ¯ï¼Œå®¢æˆ·ç«¯å‘é€ç»™æœåŠ¡å™¨
 struct  netmsg_c2s_Heart :public netmsg_Header
 {
 	netmsg_c2s_Heart()
@@ -123,7 +123,7 @@ struct  netmsg_c2s_Heart :public netmsg_Header
 	}
 };
 
-//ĞÄÌøÏûÏ¢£¬·şÎñÆ÷·¢ËÍ¸ø¿Í»§¶Ë
+//å¿ƒè·³æ¶ˆæ¯ï¼ŒæœåŠ¡å™¨å‘é€ç»™å®¢æˆ·ç«¯
 struct  netmsg_s2c_Heart :public netmsg_Header
 {
 	netmsg_s2c_Heart()

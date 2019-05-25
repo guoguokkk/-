@@ -4,44 +4,58 @@
 #include<iostream>
 #include<thread>
 
-bool g_bRun = true;
-void cmdThread()
-{
-	while (true)
-	{
-		char cmd_buf[256];
-		std::cin >> cmd_buf;
-		if (strcmp(cmd_buf, "exit") == 0)
-		{
-			g_bRun = false;
-			std::cout << "Server exit" << std::endl;
-			break;
-		}
-		else
-		{
-			std::cout << "Invalid input, please re-enter." << std::endl;
-		}
-	}
-}
+
+#define THREAD_COUNT 4//线程数量
+
+//bool g_bRun = true;
+//void cmdThread()
+//{
+//	while (true)
+//	{
+//		char cmd_buf[256];
+//		std::cin >> cmd_buf;
+//		if (strcmp(cmd_buf, "exit") == 0)
+//		{
+//			g_bRun = false;
+//			std::cout << "Server exit" << std::endl;
+//			break;
+//		}
+//		else
+//		{
+//			std::cout << "Invalid input, please re-enter." << std::endl;
+//		}
+//	}
+//}
+
 int main()
 {
 	MyServer server;
 	server.initServer();
 	server.Bind(nullptr, PORT);
-	server.Listen(5);
-	server.startServer(4);
-
-	//����UI�߳�
-	std::thread cmd_t(cmdThread);
-	cmd_t.detach();
+	server.Listen(64);
+	server.startServer(THREAD_COUNT);//启动服务器，输入服务器的数量
 		
-	while (g_bRun)
+	//在主线程中等待用户输入命令
+	while (true)
 	{
-		server.onRun();
+		char cmdBuf[256] = {};
+		scanf("%s", cmdBuf);
+		if (0 == strcmp(cmdBuf, "exit"))
+		{
+			server.closeServer();
+			break;
+		}
+		else 
+		{
+			printf("undefine cmd\n");
+		}
 	}
-	server.closeServer();
+
 	std::cout << "EXIT...." << std::endl;
+
+#ifdef _WIN32
 	while (true)
 		Sleep(1);
+#endif // _WIN32	
 	return 0;
 }

@@ -6,14 +6,14 @@ using namespace std::chrono;
 class CellTime
 {
 public:
-	//»ñÈ¡µ±Ç°Ê±¼ä´Á£¬ºÁÃë
+	//è·å–å½“å‰æ—¶é—´æˆ³ï¼Œæ¯«ç§’
 	static time_t getNowInMillSec()
 	{
 		return duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count();
 	}
 };
 
-//¸ß¾«¶È¼ÆÊ±Æ÷
+//é«˜ç²¾åº¦è®¡æ—¶å™¨
 class CellTimeStamp
 {
 public:
@@ -23,24 +23,24 @@ public:
 	}
 	~CellTimeStamp() = default;
 
-	//¸üĞÂÊ±¼ä
+	//æ›´æ–°æ—¶é—´
 	void update()
 	{
 		_begin = high_resolution_clock::now();
 	}
 
-	//»ñÈ¡Ãë
+	//è·å–ç§’
 	double getElapsedSecond()
 	{
 		return getElapsedTimeInMicroSec()* 0.000001;
 	}
 
-	//»ñÈ¡ºÁÃë
+	//è·å–æ¯«ç§’
 	double getElapsedTimeInMillSec()
 	{
 		return getElapsedTimeInMicroSec()* 0.001;
 	}
-	//»ñÈ¡Î¢Ãë
+	//è·å–å¾®ç§’
 	long long getElapsedTimeInMicroSec()
 	{
 		return duration_cast<microseconds>(high_resolution_clock::now() - _begin).count();

@@ -7,13 +7,13 @@
 class MyServer :public Server
 {
 public:
-	virtual void onNetJoin(std::shared_ptr<CellClient>& pClient)//Ö»»á±»Ò»¸öÏß³Ì´¥·¢£¬°²È«
+	virtual void onNetJoin(std::shared_ptr<CellClient>& pClient)//åªä¼šè¢«ä¸€ä¸ªçº¿ç¨‹è§¦å‘ï¼Œå®‰å…¨
 	{
 		Server::onNetJoin(pClient);
 		//printf("Client<%d> join\n", (int)pClient->GetSock());
 	}
 
-	virtual void onNetLeave(std::shared_ptr<CellClient>& pClient)//ÓĞ¿Í»§¶ËÀë¿ªÊÂ¼ş
+	virtual void onNetLeave(std::shared_ptr<CellClient>& pClient)//æœ‰å®¢æˆ·ç«¯ç¦»å¼€äº‹ä»¶
 	{
 		Server::onNetLeave(pClient);
 		//printf("Client<%d> leave\n", (int)pClient->GetSock());
@@ -26,15 +26,15 @@ public:
 		{
 		case CMD_S2C_HEART:
 		{
-			//¶¨ÒåÁËĞÄÌøÏûÏ¢£¬µ«ÊÇ¿Í»§¶ËÃ»ÓĞ·¢ËÍ¶ÔÓ¦µÄĞÄÌøÏûÏ¢
-			pClient->resetDTHeart();//ÖØÖÃĞÄÌø
+			//å®šä¹‰äº†å¿ƒè·³æ¶ˆæ¯ï¼Œä½†æ˜¯å®¢æˆ·ç«¯æ²¡æœ‰å‘é€å¯¹åº”çš„å¿ƒè·³æ¶ˆæ¯
+			pClient->resetDTHeart();//é‡ç½®å¿ƒè·³
 			std::shared_ptr<netmsg_s2c_Heart> netmsg_s2c_heart = std::make_shared<netmsg_s2c_Heart>();
 			pCellServer->addSendTask(pClient, (std::shared_ptr<netmsg_s2c_Heart>)netmsg_s2c_heart);
 		}
 		case CMD_LOGIN:
 		{
-			//ÓÃµÇÂ¼ÏûÏ¢´úÌæĞÄÌøÏûÏ¢£¬ÊÕµ½¿Í»§¶ËµÄµÇÂ¼ÏûÏ¢Ïàµ±ÓÚÊÕµ½ĞÄÌøÏûÏ¢
-			pClient->resetDTHeart();//ÖØÖÃĞÄÌø
+			//ç”¨ç™»å½•æ¶ˆæ¯ä»£æ›¿å¿ƒè·³æ¶ˆæ¯ï¼Œæ”¶åˆ°å®¢æˆ·ç«¯çš„ç™»å½•æ¶ˆæ¯ç›¸å½“äºæ”¶åˆ°å¿ƒè·³æ¶ˆæ¯
+			pClient->resetDTHeart();//é‡ç½®å¿ƒè·³
 			netmsg_Login* login = (netmsg_Login*)header;
 			/*printf("netmsg_Login : socket = %d , user name = %s , password= %s\n",
 				(int)pClient->getSockfd(), login->userName, login->passWord);*/

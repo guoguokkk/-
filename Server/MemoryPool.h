@@ -3,7 +3,7 @@
 #include<stdlib.h>
 #include<assert.h>
 #include<mutex>
-#define MAX_MEMORY_SIZE 256//×î´óÄÚ´æµ¥ÔªµÄ³ß´ç
+#define MAX_MEMORY_SIZE 256//æœ€å¤§å†…å­˜å•å…ƒçš„å°ºå¯¸
 
 #ifdef _DEBUG
 #include<stdio.h>
@@ -12,38 +12,38 @@
 #define xPrintf(...) 
 #endif // _DEBUG
 
-class Chunk;//ÄÚ´æ¿é
-class MemoryPool;//ÄÚ´æ³Ø
-class MemoryMgr;//ÄÚ´æ³Ø¹ÜÀíÀà
+class Chunk;//å†…å­˜å—
+class MemoryPool;//å†…å­˜æ± 
+class MemoryMgr;//å†…å­˜æ± ç®¡ç†ç±»
 
-//ÄÚ´æ¿é£¬Á´±í´æ´¢¿ÕÏĞÄÚ´æ¿é
+//å†…å­˜å—ï¼Œé“¾è¡¨å­˜å‚¨ç©ºé—²å†…å­˜å—
 class Chunk
 {
 public:
 	int _nID;//id
-	int _nRef;//ÒıÓÃ´ÎÊı
-	bool _bPool;//ÊÇ·ñÔÚÄÚ´æ³ØÖĞ
-	MemoryPool* _pPool;//ËùÊôÄÚ´æ³Ø
-	Chunk* _pNext;//ÏÂÒ»¸ö¿é
+	int _nRef;//å¼•ç”¨æ¬¡æ•°
+	bool _bPool;//æ˜¯å¦åœ¨å†…å­˜æ± ä¸­
+	MemoryPool* _pPool;//æ‰€å±å†…å­˜æ± 
+	Chunk* _pNext;//ä¸‹ä¸€ä¸ªå—
 };
 
 //int size = sizeof(Chunk);
 
-//ÄÚ´æ³Ø£ºÄÚ´æ¿éÃèÊöĞÅÏ¢+Êı¾İ-->ÄÚ´æ¿éÃèÊöĞÅÏ¢+Êı¾İ
+//å†…å­˜æ± ï¼šå†…å­˜å—æè¿°ä¿¡æ¯+æ•°æ®-->å†…å­˜å—æè¿°ä¿¡æ¯+æ•°æ®
 class MemoryPool
 {
 public:
 	MemoryPool();
 	~MemoryPool();
-	void initObjectPool();//³õÊ¼»¯ÄÚ´æ³Ø
-	void* allocMemInPool(size_t size);//ÉêÇëÄÚ´æ³ØÖĞÄÚ´æ
-	void freeMemInPool(void* pMem);//ÊÍ·ÅÄÚ´æ³ØÖĞÄÚ´æ
+	void initObjectPool();//åˆå§‹åŒ–å†…å­˜æ± 
+	void* allocMemInPool(size_t size);//ç”³è¯·å†…å­˜æ± ä¸­å†…å­˜
+	void freeMemInPool(void* pMem);//é‡Šæ”¾å†…å­˜æ± ä¸­å†…å­˜
 
 protected:
-	char* _pBuf;//ÄÚ´æ³ØµÄÎ»ÖÃ
-	Chunk* _pHeader;//µÚÒ»¸ö¿ÕÏĞ¿éµÄÎ»ÖÃ
-	size_t _nChunkSize;//ÄÚ´æ¿éÊı¾İ´óĞ¡
-	size_t _nChunkNum;//ÄÚ´æ¿éÊıÄ¿
+	char* _pBuf;//å†…å­˜æ± çš„ä½ç½®
+	Chunk* _pHeader;//ç¬¬ä¸€ä¸ªç©ºé—²å—çš„ä½ç½®
+	size_t _nChunkSize;//å†…å­˜å—æ•°æ®å¤§å°
+	size_t _nChunkNum;//å†…å­˜å—æ•°ç›®
 	std::mutex _mutex;
 };
 
@@ -54,30 +54,30 @@ public:
 	MyMemoryPool()
 	{
 		const int n = sizeof(void*);
-		_nChunkSize = (nChunkSize / n) * n + (nChunkSize % n == 0 ? 0 : n);//°´Ö¸Õë´óĞ¡¶ÔÆë
+		_nChunkSize = (nChunkSize / n) * n + (nChunkSize % n == 0 ? 0 : n);//æŒ‰æŒ‡é’ˆå¤§å°å¯¹é½
 		_nChunkNum = nChunkNum;
 	}
 };
 
-//ÄÚ´æ³Ø¹ÜÀíÀà£¬µ¥ÀıÄ£Ê½£¬Ö»ĞèÒªÉú³ÉÒ»¸ö¶ÔÏóÈ¥¹ÜÀí£¬²»ĞèÒªÉú³ÉºÜ¶à¹ÜÀíÀà
+//å†…å­˜æ± ç®¡ç†ç±»ï¼Œå•ä¾‹æ¨¡å¼ï¼Œåªéœ€è¦ç”Ÿæˆä¸€ä¸ªå¯¹è±¡å»ç®¡ç†ï¼Œä¸éœ€è¦ç”Ÿæˆå¾ˆå¤šç®¡ç†ç±»
 class MemoryMgr
 {
 public:
-	static MemoryMgr& instance();//»ñÈ¡¸ÃÀàµÄ¶ÔÏó£¬µ¥ÀıÄ£Ê½
-	void* allocMem(size_t size);//ÉêÇëÄÚ´æ£¬Ìá¹©¸øÍâ²¿µÄ½Ó¿Ú
-	void freeMem(void* pMem);//ÊÍ·ÅÄÚ´æ£¬Ìá¹©¸øÍâ²¿µÄ½Ó¿Ú	
+	static MemoryMgr& instance();//è·å–è¯¥ç±»çš„å¯¹è±¡ï¼Œå•ä¾‹æ¨¡å¼
+	void* allocMem(size_t size);//ç”³è¯·å†…å­˜ï¼Œæä¾›ç»™å¤–éƒ¨çš„æ¥å£
+	void freeMem(void* pMem);//é‡Šæ”¾å†…å­˜ï¼Œæä¾›ç»™å¤–éƒ¨çš„æ¥å£	
 	void addRef(void* pMem);
 
 private:
 	MemoryMgr();
 	~MemoryMgr();
-	void init_szAlloc(int nBegin, int nEnd, MemoryPool* pPool);//³õÊ¼»¯ÄÚ´æ³ØÓ³ÉäÊı×é
+	void init_szAlloc(int nBegin, int nEnd, MemoryPool* pPool);//åˆå§‹åŒ–å†…å­˜æ± æ˜ å°„æ•°ç»„
 
 private:
 	MyMemoryPool<60, 1000000> _mem64;
 	MyMemoryPool<128, 1000000> _mem128;
 	MyMemoryPool<256, 1000000> _mem256;
-	MemoryPool* _szAlloc[MAX_MEMORY_SIZE + 1];//ÄÚ´æ³ØÓ³ÉäÊı×é£¬¸ù¾İÓÃ»§ÊäÈëµÄ´óĞ¡Ö±½Ó¶¨Î»µ½ÄÚ´æ³Ø
+	MemoryPool* _szAlloc[MAX_MEMORY_SIZE + 1];//å†…å­˜æ± æ˜ å°„æ•°ç»„ï¼Œæ ¹æ®ç”¨æˆ·è¾“å…¥çš„å¤§å°ç›´æ¥å®šä½åˆ°å†…å­˜æ± 
 };
 
 #endif // !MEMORYPOOL_H_

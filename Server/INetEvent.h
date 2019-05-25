@@ -5,14 +5,14 @@
 #include"CellServer.h"
 #include<memory>
 
-//ÍøÂçÊÂ¼ş½Ó¿Ú
+//ç½‘ç»œäº‹ä»¶æ¥å£
 class CellServer;
 class INetEvent
 {
 public:	
-	virtual void onNetJoin(std::shared_ptr<CellClient>& pClient) = 0;//¿Í»§¶Ë¼ÓÈëÊÂ¼ş
-	virtual void onNetLeave(std::shared_ptr<CellClient>& pClient) = 0;//¿Í»§¶ËÀë¿ªÊÂ¼ş
-	virtual void onNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient>& pClient,netmsg_Header* header) = 0;//¿Í»§¶ËÏûÏ¢ÊÂ¼ş
-	virtual void onNetRecv(std::shared_ptr<CellClient>& pClient) = 0;//½ÓÊÕ´ÎÊıÊÂ¼ş
+	virtual void onNetJoin(std::shared_ptr<CellClient>& pClient) = 0;//å®¢æˆ·ç«¯åŠ å…¥äº‹ä»¶
+	virtual void onNetLeave(std::shared_ptr<CellClient>& pClient) = 0;//å®¢æˆ·ç«¯ç¦»å¼€äº‹ä»¶
+	virtual void onNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient>& pClient,netmsg_Header* header) = 0;//å®¢æˆ·ç«¯æ¶ˆæ¯äº‹ä»¶
+	virtual void onNetRecv(std::shared_ptr<CellClient>& pClient) = 0;//æ¥æ”¶æ¬¡æ•°äº‹ä»¶
 };
 #endif // !INETEVENT_H_
