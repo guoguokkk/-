@@ -8,7 +8,12 @@
 //日志：单例模式
 class CellLog
 {
-public:
+private:
+	CellLog()
+	{
+		_taskSever.startTask();
+	}
+
 	~CellLog()
 	{
 		_taskSever.closeTask();
@@ -20,6 +25,7 @@ public:
 		}
 	}
 
+public:
 	static CellLog& Instance()
 	{
 		static CellLog sLog;
@@ -89,11 +95,6 @@ public:
 			});
 
 
-	}
-private:
-	CellLog()
-	{
-		_taskSever.startTask();
 	}
 
 private:
