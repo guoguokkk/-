@@ -164,7 +164,7 @@ void CellServer::writeData(fd_set& fd_write)
 		auto iter = _clients.find(fd_write.fd_array[i]);
 		if (iter != _clients.end())
 		{
-			
+
 			int ret = iter->second->sendDataReal();
 			if (ret == -1)
 			{
@@ -241,11 +241,7 @@ void CellServer::onClientLeave(std::shared_ptr<CellClient> pClient)
 //接收消息，处理粘包、少包
 int CellServer::recvData(std::shared_ptr<CellClient> pClient)
 {
-	//接收客户端消息，直接使用每个客户端的消息缓冲区接收数据
-	char* recvBuf = pClient->getMsgBuf() + pClient->getLastPos();
-
-	int nLen = (int)recv(pClient->getSockfd(), recvBuf, RECV_BUF_SIZE - pClient->getLastPos(), 0);
-	_pNetEvent->onNetRecv(pClient);//计数
+	int nLen = pClient->recvData();//接收客户端消息，直接使用每个客户端的消息缓冲区接收数据	
 	//判断客户端是否退出
 	if (nLen <= 0)
 	{
@@ -253,24 +249,13 @@ int CellServer::recvData(std::shared_ptr<CellClient> pClient)
 		return -1;
 	}
 
-	pClient->setLastPos(pClient->getLastPos() + nLen);
+	_pNetEvent->onNetRecv(pClient);//接收计数
 
 	//处理粘包、少包问题
-	while (pClient->getLastPos() >= sizeof(netmsg_Header))
+	while (pClient->hasMsg())
 	{
-		netmsg_Header* header = (netmsg_Header*)pClient->getMsgBuf();
-		if (pClient->getLastPos() >= header->dataLength)
-		{
-			//更新消息缓冲区
-			int temp_pos = pClient->getLastPos() - header->dataLength;
-			onNetMsg(pClient, header);
-			memcpy(pClient->getMsgBuf(), pClient->getMsgBuf() + header->dataLength, temp_pos);
-			pClient->setLastPos(temp_pos);
-		}
-		else
-		{
-			break;//消息缓冲区剩余数据不够一条完整消息
-		}
+		onNetMsg(pClient, pClient->front_msg());//处理第一条消息		
+		pClient->pop_front_msg();//移除第一条消息
 	}
 	return 0;
 }

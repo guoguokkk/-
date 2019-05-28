@@ -13,6 +13,7 @@
 #include"TimeStamp.h"
 #include"CellSemaphore.h"
 #include"CellThread.h"
+#include"CellBuffer.h"
 
 //网络消息发送队列
 class SendMsgToClientTask

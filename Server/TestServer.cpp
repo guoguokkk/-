@@ -33,6 +33,6 @@ int main()
 
 	std::cout << "EXIT...." << std::endl;
 
-
+	Sleep(1);
 	return 0;
 }

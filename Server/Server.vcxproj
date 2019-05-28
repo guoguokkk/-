@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CellBuffer.h" />
     <ClInclude Include="CellClient.h" />
     <ClInclude Include="CellSemaphore.h" />
     <ClInclude Include="CellServer.h" />

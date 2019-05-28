@@ -1,15 +1,10 @@
 #include "CellClient.h"
 
-CellClient::CellClient(SOCKET sockfd)
+CellClient::CellClient(SOCKET sockfd) :_SendBuf(SEND_BUF_SIZE), _recvBuf(RECV_BUF_SIZE)
 {
 	static int n = 1;
 	id = n++;
 	_sockfd = sockfd;
-	memset(_msgBuf, 0, RECV_BUF_SIZE);//初始化消息缓冲区
-	_lastMsgPos = 0;
-
-	memset(_szSendBuf, 0, SEND_BUF_SIZE);//初始化发送缓冲区
-	_lastSendPos = 0;
 
 	resetDTHeart();//心跳死亡计时初始化
 	resetDTSend();//重置上次发送消息的时间
@@ -39,61 +34,9 @@ int CellClient::sendDataAsynchronous(std::shared_ptr<netmsg_Header> header)
 	//发送数据的条件：发送缓冲区满
 	//判断缓冲区中已有数据和待发送数据总长度
 	//先判断是不是满
-	if (_lastSendPos + nSendLen <= SEND_BUF_SIZE)
+	if (_SendBuf.push(pSendData, nSendLen))
 	{
-		//没有满的情况下才可以放入，否则返回错误
-		memcpy(_szSendBuf + _lastSendPos, pSendData, nSendLen);//将数据放入发送缓冲区
-		_lastSendPos = _lastSendPos + nSendLen;//更新发送缓冲区尾部位置
-
-		if (_lastSendPos == SEND_BUF_SIZE)
-		{
-			++_sendBufFullCount;
-		}
 		return nSendLen;
-	}
-	else
-	{
-		++_sendBufFullCount;//缓冲区满了
-	}
-	return ret;
-}
-
-/**
- * @brief	服务器向该客户端发送数据
- * @param	header	待发送数据
- * @return	是否成功
- */
-int CellClient::sendData(std::shared_ptr<netmsg_Header> header)
-{
-	int ret = SOCKET_ERROR;
-	int nSendLen = header->dataLength;//待发送数据的长度
-	const char* pSendData = (const char*)header.get();//待发送数据
-
-	while (true)
-	{
-		//发送数据的条件：发送缓冲区满
-		//判断缓冲区中已有数据和待发送数据总长度
-		if (_lastSendPos + nSendLen >= SEND_BUF_SIZE)
-		{
-			int nCopyLen = SEND_BUF_SIZE - _lastSendPos;//发送缓冲区剩余大小
-			memcpy(_szSendBuf + _lastSendPos, pSendData, nCopyLen);//填满缓冲区
-			pSendData = pSendData + nCopyLen;//未能放入发送缓冲区的数据
-			nSendLen = nSendLen - nCopyLen;//更新长度
-			ret = send(_sockfd, _szSendBuf, SEND_BUF_SIZE, 0);
-			_lastSendPos = 0;
-			resetDTSend();//发送成功，需要重置上次发送成功的时间
-
-			if (ret == SOCKET_ERROR)
-			{
-				return ret;
-			}
-		}
-		else
-		{
-			memcpy(_szSendBuf + _lastSendPos, pSendData, nSendLen);//将数据放入发送缓冲区
-			_lastSendPos = _lastSendPos + nSendLen;//更新发送缓冲区尾部位置
-			break;
-		}
 	}
 	return ret;
 }
@@ -101,16 +44,8 @@ int CellClient::sendData(std::shared_ptr<netmsg_Header> header)
 //立即将缓冲区的数据发送给客户端
 int CellClient::sendDataReal()
 {
-	int ret = 0;
-	//缓冲区有数据
-	if (_lastSendPos > 0 && _sockfd != INVALID_SOCKET)
-	{
-		ret = send(_sockfd, _szSendBuf, _lastSendPos, 0);//将发送缓冲区的数据发送出去
-		_lastSendPos = 0;//发送缓冲区尾部清零
-		_sendBufFullCount = 0;
-		resetDTSend();//重置发送时间
-	}
-	return ret;
+	resetDTSend();//重置发送时间
+	return _SendBuf.write2socket(_sockfd);
 }
 
 bool CellClient::checkHeart(time_t dt)

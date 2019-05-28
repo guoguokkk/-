@@ -4,6 +4,7 @@
 #include"Message.h"
 #include<memory>
 #include"ObjectPool.h"
+#include"CellBuffer.h"
 
 #define CLIENT_HEART_DEAD_TIME 60000//客户端心跳检测死亡计时，60秒
 #define CLIENT_SEND_BUF_TIME 200//定时发送数据的最大时间间隔，0.2秒
@@ -23,11 +24,17 @@ public:
 	bool checkSend(time_t dt);//检测数据发送的时间间隔
 
 	SOCKET getSockfd() { return _sockfd; }
-	char* getMsgBuf() { return _msgBuf; }
-	int getLastPos() { return _lastMsgPos; }
-	void setLastPos(int pos) { _lastMsgPos = pos; }
 	void resetDTHeart() { _dtHeart = 0; }//重置心跳死亡计时
 	void resetDTSend() { _dtSend = 0; }//重置上次发送消息的时间
+
+	bool hasMsg() { return _recvBuf.hasMsg(); }
+	int recvData() { return _recvBuf.read4socket(_sockfd); }
+	netmsg_Header* front_msg() { return (netmsg_Header*)_recvBuf.data(); }
+	void pop_front_msg()
+	{
+		if (hasMsg())
+			_recvBuf.pop(front_msg()->dataLength);
+	}
 
 public:
 	int id = -1;
@@ -35,11 +42,8 @@ public:
 private:
 	SOCKET _sockfd;//客户端socket
 
-	char _msgBuf[RECV_BUF_SIZE];//消息缓冲区
-	int _lastMsgPos;//消息缓冲区尾部位置
-
-	char _szSendBuf[SEND_BUF_SIZE];//发送缓冲区
-	int _lastSendPos;//发送缓冲区尾部位置
+	CellBuffer _recvBuf;//消息缓冲区
+	CellBuffer _SendBuf;//发送缓冲区
 
 	time_t _dtHeart;//心跳死亡计时
 	time_t _dtSend;//上次发送消息的时间(定时发送消息)
