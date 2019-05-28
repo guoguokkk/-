@@ -15,23 +15,19 @@ public:
 	CellClient(SOCKET clientSock = INVALID_SOCKET);
 	~CellClient();
 
+	int sendDataAsynchronous(std::shared_ptr<netmsg_Header> header);//异步发送数据
 	int sendData(std::shared_ptr<netmsg_Header> header);//发送数据，定量发送
-	int sendDataDirect();//立即将缓冲区的数据发送给客户端
-	void sendDataDirect(std::shared_ptr<netmsg_Header> header);//立即发送
+	int sendDataReal();//立即将缓冲区的数据发送给客户端
+
+	bool checkHeart(time_t dt);//检测心跳	
+	bool checkSend(time_t dt);//检测数据发送的时间间隔
 
 	SOCKET getSockfd() { return _sockfd; }
 	char* getMsgBuf() { return _msgBuf; }
 	int getLastPos() { return _lastMsgPos; }
 	void setLastPos(int pos) { _lastMsgPos = pos; }
-
 	void resetDTHeart() { _dtHeart = 0; }//重置心跳死亡计时
 	void resetDTSend() { _dtSend = 0; }//重置上次发送消息的时间
-
-	//检测心跳
-	bool checkHeart(time_t dt);
-
-	//检测数据发送的时间间隔
-	bool checkSend(time_t dt);
 
 public:
 	int id = -1;
@@ -47,5 +43,7 @@ private:
 
 	time_t _dtHeart;//心跳死亡计时
 	time_t _dtSend;//上次发送消息的时间(定时发送消息)
+
+	int _sendBufFullCount = 0;//发送缓冲区写满的次数
 };
 #endif // !CELL_CLIENT_H_

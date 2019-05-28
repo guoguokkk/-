@@ -1,31 +1,11 @@
 #include"MemoryAlloc.h"
+#include"ObjectPool.h"
 #include"Server.h"
 #include"MyServer.h"
 #include<iostream>
 #include<thread>
 
-
-#define THREAD_COUNT 4//线程数量
-
-//bool g_bRun = true;
-//void cmdThread()
-//{
-//	while (true)
-//	{
-//		char cmd_buf[256];
-//		std::cin >> cmd_buf;
-//		if (strcmp(cmd_buf, "exit") == 0)
-//		{
-//			g_bRun = false;
-//			std::cout << "Server exit" << std::endl;
-//			break;
-//		}
-//		else
-//		{
-//			std::cout << "Invalid input, please re-enter." << std::endl;
-//		}
-//	}
-//}
+#define THREAD_COUNT 1//线程数量
 
 int main()
 {

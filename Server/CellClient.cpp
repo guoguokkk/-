@@ -29,6 +29,35 @@ CellClient::~CellClient()
 	_sockfd = INVALID_SOCKET;
 }
 
+//缓冲区的控制根据业务需求的差异而调整，异步发送数据
+int CellClient::sendDataAsynchronous(std::shared_ptr<netmsg_Header> header)
+{
+	int ret = SOCKET_ERROR;//缓冲区不足
+	int nSendLen = header->dataLength;//待发送数据的长度
+	const char* pSendData = (const char*)header.get();//待发送数据
+
+	//发送数据的条件：发送缓冲区满
+	//判断缓冲区中已有数据和待发送数据总长度
+	//先判断是不是满
+	if (_lastSendPos + nSendLen <= SEND_BUF_SIZE)
+	{
+		//没有满的情况下才可以放入，否则返回错误
+		memcpy(_szSendBuf + _lastSendPos, pSendData, nSendLen);//将数据放入发送缓冲区
+		_lastSendPos = _lastSendPos + nSendLen;//更新发送缓冲区尾部位置
+
+		if (_lastSendPos == SEND_BUF_SIZE)
+		{
+			++_sendBufFullCount;
+		}
+		return nSendLen;
+	}
+	else
+	{
+		++_sendBufFullCount;//缓冲区满了
+	}
+	return ret;
+}
+
 /**
  * @brief	服务器向该客户端发送数据
  * @param	header	待发送数据
@@ -50,7 +79,7 @@ int CellClient::sendData(std::shared_ptr<netmsg_Header> header)
 			memcpy(_szSendBuf + _lastSendPos, pSendData, nCopyLen);//填满缓冲区
 			pSendData = pSendData + nCopyLen;//未能放入发送缓冲区的数据
 			nSendLen = nSendLen - nCopyLen;//更新长度
-			ret = send(_sockfd, _szSendBuf, SEND_BUF_SIZE, 0);			
+			ret = send(_sockfd, _szSendBuf, SEND_BUF_SIZE, 0);
 			_lastSendPos = 0;
 			resetDTSend();//发送成功，需要重置上次发送成功的时间
 
@@ -66,28 +95,22 @@ int CellClient::sendData(std::shared_ptr<netmsg_Header> header)
 			break;
 		}
 	}
-
 	return ret;
 }
 
 //立即将缓冲区的数据发送给客户端
-int CellClient::sendDataDirect()
+int CellClient::sendDataReal()
 {
-	int ret = SOCKET_ERROR;
+	int ret = 0;
 	//缓冲区有数据
-	if (_lastSendPos > 0 && _sockfd != SOCKET_ERROR)
+	if (_lastSendPos > 0 && _sockfd != INVALID_SOCKET)
 	{
 		ret = send(_sockfd, _szSendBuf, _lastSendPos, 0);//将发送缓冲区的数据发送出去
 		_lastSendPos = 0;//发送缓冲区尾部清零
+		_sendBufFullCount = 0;
 		resetDTSend();//重置发送时间
 	}
 	return ret;
-}
-
-void CellClient::sendDataDirect(std::shared_ptr<netmsg_Header> header)
-{
-	sendData(header);
-	sendDataDirect();
 }
 
 bool CellClient::checkHeart(time_t dt)
@@ -108,7 +131,7 @@ bool CellClient::checkSend(time_t dt)
 	{
 		//printf("checkSend: _sockfd=%d, time=%d\n", (int)_sockfd, (int)_dtSend);
 		//时间到了，立即将发送缓冲区的数据发送出去
-		sendDataDirect();
+		sendDataReal();
 
 		//重置发送计时
 		resetDTSend();

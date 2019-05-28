@@ -48,10 +48,15 @@ private:
 	void onRunCellServer(CellThread* pThread);//select	
 	int recvData(std::shared_ptr<CellClient> pClient);//接收消息，处理粘包、少包
 	virtual void onNetMsg(std::shared_ptr<CellClient>& pClient, netmsg_Header* header);//响应网络数据
+
 	void readData(fd_set& fd_read);//处理数据
+	void writeData(fd_set& fd_write);
 
 	void checkTime();//检测心跳消息，完成定时发送数据 
 	void clearClients();
+
+	void onClientLeave(std::shared_ptr<CellClient> pClient);
+
 private:
 	//大的往前放，小的往后放，内存对齐
 	std::map<SOCKET, std::shared_ptr<CellClient>> _clients;//正式客户队列

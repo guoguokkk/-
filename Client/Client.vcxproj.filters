@@ -26,10 +26,10 @@
     <ClInclude Include="Client.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Message.h">
+    <ClInclude Include="TimeStamp.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TimeStamp.h">
+    <ClInclude Include="Message.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

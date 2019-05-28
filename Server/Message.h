@@ -2,7 +2,7 @@
 #define MESSAGE_H_
 
 #ifdef _WIN32
-#define FD_SETSIZE 2056
+#define FD_SETSIZE 10056
 #define WIN32_LEAN_AND_MEAN//解决 Windows.h 和 WinSock2.h 冲突
 #include<Windows.h>
 #include<WinSock2.h>
@@ -23,8 +23,8 @@
 
 //缓冲区最小单元大小
 #ifndef RECV_BUF_SIZE
-#define RECV_BUF_SIZE 10240*5
-#define SEND_BUF_SIZE 10240*5
+#define RECV_BUF_SIZE 10240
+#define SEND_BUF_SIZE 1024000
 #endif // !RECV_BUF_SIZE
 
 //命令
@@ -43,10 +43,10 @@ enum CMD
 //消息头
 struct netmsg_Header
 {
-	netmsg_Header() 
+	netmsg_Header()
 	{
 		dataLength = sizeof(netmsg_Header);
-		cmd = CMD_ERROR;		
+		cmd = CMD_ERROR;
 	}
 	unsigned short dataLength;//消息的长度
 	unsigned short cmd;//命令	
@@ -58,7 +58,7 @@ struct  netmsg_Login :public netmsg_Header
 	netmsg_Login()
 	{
 		dataLength = sizeof(netmsg_Login);
-		cmd = CMD_LOGIN;		
+		cmd = CMD_LOGIN;
 	}
 	char userName[32];
 	char passWord[32];
@@ -71,7 +71,7 @@ struct  netmsg_LoginResult :public netmsg_Header
 	netmsg_LoginResult()
 	{
 		dataLength = sizeof(netmsg_LoginResult);
-		cmd = CMD_LOGIN_RESULT;		
+		cmd = CMD_LOGIN_RESULT;
 		result = 0;
 	}
 	int result;
@@ -82,7 +82,7 @@ struct  netmsg_LoginResult :public netmsg_Header
 struct  netmsg_Logout :public netmsg_Header
 {
 	netmsg_Logout()
-	{		
+	{
 		dataLength = sizeof(netmsg_Logout);
 		cmd = CMD_LOGOUT;
 	}
@@ -93,7 +93,7 @@ struct  netmsg_Logout :public netmsg_Header
 struct  netmsg_LogoutResult :public netmsg_Header
 {
 	netmsg_LogoutResult()
-	{		
+	{
 		dataLength = sizeof(netmsg_LogoutResult);
 		cmd = CMD_LOGOUT_RESULT;
 		result = 0;
@@ -107,7 +107,7 @@ struct  netmsg_NewUserJoin :public netmsg_Header
 	netmsg_NewUserJoin()
 	{
 		dataLength = sizeof(netmsg_NewUserJoin);
-		cmd = CMD_NEW_USER_JOIN;		
+		cmd = CMD_NEW_USER_JOIN;
 		sock = 0;
 	}
 	int sock;

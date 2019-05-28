@@ -29,6 +29,7 @@ public:
 	virtual void onNetRecv(std::shared_ptr<CellClient> pClient);
 private:
 	void onRun(CellThread* pThread);//select
+
 private:
 	SOCKET _serverSock;
 	std::vector<CellServer*> _cellServers;//消息处理对象，内部会创建线程	

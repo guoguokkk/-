@@ -83,13 +83,14 @@ public:
 private:
 	void initObjectPool()
 	{
-		printf("initObjectPool...\n");
+		printf("initObjectPool... :sizeof(objectNode)=%d, nNodeNum=%d, malloc %d\n", sizeof(objectNode), nNodeNum);
 		//避免重复初始化
 		assert(_pBuf == nullptr);
 		if (_pBuf != nullptr) { return; }
 
 		size_t nNodeSize = sizeof(Type) + sizeof(objectNode);//一个节点的大小：数据+头部描述信息
 		size_t n = nNodeSize * nNodeNum;
+		printf("malloc %d...\n", n);
 		_pBuf = new char[n];
 		_pHeader = (objectNode*)_pBuf;
 		_pHeader->nID = 0;

@@ -2,7 +2,7 @@
 #define MESSAGE_H_
 
 #ifdef _WIN32
-#define FD_SETSIZE 2056
+#define FD_SETSIZE 10056
 #define WIN32_LEAN_AND_MEAN//解决 Windows.h 和 WinSock2.h 冲突
 #include<Windows.h>
 #include<WinSock2.h>
@@ -23,8 +23,8 @@
 
 //缓冲区最小单元大小
 #ifndef RECV_BUF_SIZE
-#define RECV_BUF_SIZE 10240*5
-#define SEND_BUF_SIZE 10240*5
+#define RECV_BUF_SIZE 10240
+#define SEND_BUF_SIZE 1024000
 #endif // !RECV_BUF_SIZE
 
 //命令

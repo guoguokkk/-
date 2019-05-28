@@ -148,8 +148,8 @@ void Server::startServer(int n_cellServer)
 		cell_server->startCellServer();//启动消息处理线程
 	}
 
-	_thread.startThread(nullptr, 
-		[this](CellThread* pThread) {
+	_thread.startThread(nullptr,
+		[this](CellThread * pThread) {
 			onRun(pThread);
 		},
 		nullptr);
@@ -180,7 +180,7 @@ void Server::closeServer()
 }
 
 //只负责连接新客户端，有其他线程负责消息处理
-void Server::onRun(CellThread* pThread)
+void Server::onRun(CellThread * pThread)
 {
 	while (pThread->isRun())
 	{
@@ -207,7 +207,7 @@ void Server::onRun(CellThread* pThread)
 		}
 	}
 
-	
+
 }
 
 void Server::time4Msg()
@@ -215,9 +215,9 @@ void Server::time4Msg()
 	auto t1 = _tTime.getElapsedSecond();
 	if (t1 >= 1.0)
 	{
-		printf("thread<%d>,time<%lf>,socket<%d>,clients<%d>,msgCount<%d>,recvCount<%d>\n",
+		printf("thread<%d>,time<%lf>,socket<%d>,clients<%d>,recvCount<%d>,msgCount<%d>\n",
 			(int)_cellServers.size(), (double)t1, (int)_serverSock,
-			(int)(_clientCount), (int)_msgCount, (int)(_recvCount));
+			(int)(_clientCount), (int)(_recvCount), (int)_msgCount);
 		_recvCount = 0;
 		_msgCount = 0;
 		_tTime.update();

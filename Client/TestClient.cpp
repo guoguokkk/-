@@ -6,8 +6,8 @@
 #include<atomic>
 #include"TimeStamp.h"
 
-#define CLIENT_COUNT 1//客户端数量
-#define THREAD_COUNT 1//线程数量
+#define CLIENT_COUNT 1000//客户端数量
+#define THREAD_COUNT 4//线程数量
 
 bool g_bRun = true;
 void cmdThread()
@@ -37,11 +37,14 @@ std::atomic_int readyCount(0);
 
 void recvThread(int begin, int end)//1-4，四个线程
 {
+	//CellTimeStamp t;
 	while (g_bRun)
 	{
 		for (int i = begin; i < end; ++i)
 		{
-			client[i]->onRun();
+			/*if (t.getElapsedSecond() > 3.0 && i == begin)
+				continue;*/
+			client[i]->onRun(); 
 		}
 	}
 }
@@ -81,8 +84,6 @@ void sendThread(int id)//1-4，四个线程
 		strcpy(login[i].userName, "kzj");
 		strcpy(login[i].passWord, "12345");
 	}
-
-
 	const int nLen = sizeof(login);
 	while (g_bRun)
 	{
@@ -93,6 +94,9 @@ void sendThread(int id)//1-4，四个线程
 				++sendCount;//发送的数量
 			}
 		}
+
+		std::chrono::milliseconds t(100);
+		std::this_thread::sleep_for(t);
 	}
 
 	for (int i = begin; i < end; ++i)
