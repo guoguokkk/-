@@ -12,7 +12,7 @@ CellClient::CellClient(SOCKET sockfd) :_SendBuf(SEND_BUF_SIZE), _recvBuf(RECV_BU
 
 CellClient::~CellClient()
 {
-	printf("s=%d CellClient%d.~CellClient\n", serverId, id);
+	CellLog::Info("s=%d CellClient%d.~CellClient\n", serverId, id);
 	if (_sockfd != INVALID_SOCKET)
 	{
 #ifdef _WIN32
@@ -53,7 +53,7 @@ bool CellClient::checkHeart(time_t dt)
 	_dtHeart += dt;
 	if (_dtHeart >= CLIENT_HEART_DEAD_TIME)
 	{
-		printf("checkHeart dead:s=%d,time=%ld\n", _sockfd, _dtHeart);
+		CellLog::Info("checkHeart dead:s=%d,time=%ld\n", _sockfd, _dtHeart);
 		return true;
 	}
 	return false;
@@ -64,7 +64,7 @@ bool CellClient::checkSend(time_t dt)
 	_dtSend += dt;
 	if (_dtSend >= CLIENT_SEND_BUF_TIME)
 	{
-		//printf("checkSend: _sockfd=%d, time=%d\n", (int)_sockfd, (int)_dtSend);
+		//CellLog::Info("checkSend: _sockfd=%d, time=%d\n", (int)_sockfd, (int)_dtSend);
 		//时间到了，立即将发送缓冲区的数据发送出去
 		sendDataReal();
 

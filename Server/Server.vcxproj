@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="CellBuffer.h" />
     <ClInclude Include="CellClient.h" />
+    <ClInclude Include="CellLog.h" />
     <ClInclude Include="CellSemaphore.h" />
     <ClInclude Include="CellServer.h" />
     <ClInclude Include="CellTask.h" />

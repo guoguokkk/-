@@ -2,6 +2,7 @@
 #define CELL_BUFFER_H_
 #include"MemoryAlloc.h"
 #include<memory>
+#include"CellLog.h"
 
 class CellBuffer
 {
@@ -10,6 +11,7 @@ public:
 	{
 		_pBuf = new char[_nSize];
 		_nLast = 0;
+		_bufFullCount = 0;
 	}
 
 	~CellBuffer()
@@ -75,7 +77,7 @@ public:
 			//判断客户端是否退出
 			if (nLen <= 0)
 			{
-				printf("Client %d exit.\n", sockfd);
+				CellLog::Info("Client %d exit.\n", sockfd);
 				return -1;
 			}
 			_nLast += nLen;

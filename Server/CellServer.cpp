@@ -14,9 +14,9 @@ CellServer::CellServer(int id)
 
 CellServer::~CellServer()
 {
-	printf("CellServer%d.~CellServer exit begin\n", _id);
+	CellLog::Info("CellServer%d.~CellServer exit begin\n", _id);
 	closeServer();
-	printf("CellServer%d.~CellServer exit end\n", _id);
+	CellLog::Info("CellServer%d.~CellServer exit end\n", _id);
 }
 
 void CellServer::setEventObj(INetEvent* event)
@@ -26,10 +26,10 @@ void CellServer::setEventObj(INetEvent* event)
 
 void CellServer::closeServer()
 {
-	printf("CellServer%d.Close begin\n", _id);
+	CellLog::Info("CellServer%d.Close begin\n", _id);
 	_taskServer.closeTask();
 	_thread.closeThread();
-	printf("CellServer%d.Close end\n", _id);
+	CellLog::Info("CellServer%d.Close end\n", _id);
 }
 
 void CellServer::onRunCellServer(CellThread* pThread)
@@ -98,7 +98,7 @@ void CellServer::onRunCellServer(CellThread* pThread)
 		int ret = select(_maxSock + 1, &fdRead, &fdWrite, &fdExc, &time);//阻塞
 		if (ret < 0)
 		{
-			printf("select task end\n");
+			CellLog::Info("select task end\n");
 			pThread->exitThread();
 			break;
 		}
@@ -107,15 +107,15 @@ void CellServer::onRunCellServer(CellThread* pThread)
 		writeData(fdWrite);
 		writeData(fdExc);
 
-		/*printf("###CellServer::onRunCellServer: _id=%d, fdRead=%d, fdWrite=%d\n", _id, fdRead.fd_count, fdWrite.fd_count);
+		/*CellLog::Info("###CellServer::onRunCellServer: _id=%d, fdRead=%d, fdWrite=%d\n", _id, fdRead.fd_count, fdWrite.fd_count);
 		if (fdExc.fd_count > 0)
 		{
-			printf("###CellServer::onRunCellServer: fdExc=%d\n", fdExc.fd_count);
+			CellLog::Info("###CellServer::onRunCellServer: fdExc=%d\n", fdExc.fd_count);
 		}*/
 
 		checkTime();//检测心跳
 	}
-	printf("CellServer%d.OnRun exit\n", _id);
+	CellLog::Info("CellServer%d.OnRun exit\n", _id);
 }
 
 void CellServer::readData(fd_set& fd_read)
@@ -135,7 +135,7 @@ void CellServer::readData(fd_set& fd_read)
 		}
 		else
 		{
-			printf("error. if (iter != _clients.end())\n");
+			CellLog::Info("error. if (iter != _clients.end())\n");
 		}
 	}
 
@@ -174,7 +174,7 @@ void CellServer::writeData(fd_set& fd_write)
 		}
 		else
 		{
-			printf("error. if (iter != _clients.end())\n");
+			CellLog::Info("error. if (iter != _clients.end())\n");
 		}
 	}
 
@@ -245,7 +245,7 @@ int CellServer::recvData(std::shared_ptr<CellClient> pClient)
 	//判断客户端是否退出
 	if (nLen <= 0)
 	{
-		printf("Client %d exit.\n", (int)pClient->getSockfd());
+		CellLog::Info("Client %d exit.\n", (int)pClient->getSockfd());
 		return -1;
 	}
 
@@ -304,6 +304,6 @@ void CellServer::addSendTask(std::shared_ptr<CellClient> pClient, std::shared_pt
 	_taskServer.addTask([pClient, header]() {
 		//数据发送失败，比如短时间发送大量数据
 		if (pClient->sendDataAsynchronous(header) == 0)
-			printf("Message buffer is full and data cannot be sent...\n");
+			CellLog::Info("Message buffer is full and data cannot be sent...\n");
 		});
 }

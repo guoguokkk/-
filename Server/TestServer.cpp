@@ -9,12 +9,13 @@
 
 int main()
 {
+	CellLog::Instance().setLogPath("../../serverLog.txt", "w");
 	MyServer server;
 	server.initServer();
 	server.Bind(nullptr, PORT);
 	server.Listen(64);
 	server.startServer(THREAD_COUNT);//启动服务器，输入服务器的数量
-		
+
 	//在主线程中等待用户输入命令
 	while (true)
 	{
@@ -25,9 +26,9 @@ int main()
 			server.closeServer();
 			break;
 		}
-		else 
+		else
 		{
-			printf("undefine cmd\n");
+			CellLog::Info("undefine cmd\n");
 		}
 	}
 
