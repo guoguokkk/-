@@ -33,9 +33,6 @@ int main()
 
 	std::cout << "EXIT...." << std::endl;
 
-#ifdef _WIN32
-	while (true)
-		Sleep(1);
-#endif // _WIN32	
+
 	return 0;
 }

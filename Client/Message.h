@@ -19,7 +19,8 @@
 #endif // _WIN32
 
 #define IP "202.114.7.16"
-#define PORT 8080
+//#define IP "192.168.153.129"//ubuntu
+#define PORT 8099
 
 //缓冲区最小单元大小
 #ifndef RECV_BUF_SIZE

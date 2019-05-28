@@ -12,12 +12,12 @@ void* operator new[](size_t size)
 	return MemoryMgr::instance().allocMem(size);
 }
 
-void operator delete(void* p)
+void operator delete(void* p)  noexcept
 {
 	return MemoryMgr::instance().freeMem(p);
 }
 
-void operator delete[](void* p)
+void operator delete[](void* p) noexcept
 {
 	return MemoryMgr::instance().freeMem(p);
 }

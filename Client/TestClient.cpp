@@ -6,7 +6,7 @@
 #include<atomic>
 #include"TimeStamp.h"
 
-#define CLIENT_COUNT 1000//客户端数量
+#define CLIENT_COUNT 8//客户端数量
 #define THREAD_COUNT 4//线程数量
 
 bool g_bRun = true;

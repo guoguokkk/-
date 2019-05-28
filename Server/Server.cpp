@@ -22,6 +22,14 @@ SOCKET Server::initServer()
 	WSAStartup(version, &data);
 #endif // _WIN32
 
+	//
+#ifndef _WIN32
+	//if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+	//	return (1);
+	//忽略异常信号，默认情况会导致进程终止
+	signal(SIGPIPE, SIG_IGN);
+#endif // !_WIN32
+
 	//建立 socket
 	if (_serverSock != INVALID_SOCKET)
 	{
@@ -206,8 +214,6 @@ void Server::onRun(CellThread * pThread)
 			Accept();
 		}
 	}
-
-
 }
 
 void Server::time4Msg()

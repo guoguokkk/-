@@ -8,6 +8,7 @@
 #include"CellServer.h"
 #include<vector>
 #include"CellThread.h"
+#include<signal.h>
 
 class Server :public INetEvent
 {
