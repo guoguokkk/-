@@ -2,7 +2,7 @@
 #define CELL_LOG_H_
 #include<stdio.h>
 #include"CellTask.h"
-#include"TimeStamp.h"
+#include"CellTimeStamp.h"
 #include<ctime>
 
 //日志：单例模式

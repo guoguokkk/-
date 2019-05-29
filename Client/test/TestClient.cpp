@@ -1,10 +1,12 @@
 #include<iostream>
-#include"Client.h"
+#include"../client/Client.h"
 #include<thread>
 #include<chrono>
 #include<stdio.h>
 #include<atomic>
-#include"TimeStamp.h"
+#include"../tool/CellTimeStamp.h"
+#include"MyClient.h"
+#include"../tool/CellLog.h"
 
 #define CLIENT_COUNT 8//客户端数量
 #define THREAD_COUNT 4//线程数量
@@ -19,12 +21,12 @@ void cmdThread()
 		if (strcmp(cmdBuf, "exit") == 0)
 		{
 			g_bRun = false;
-			printf("Client exit.\n");
+			CellLog::Info("Client exit.\n");
 			break;
 		}
 		else
 		{
-			printf("Invalid input, please re-enter.\n");
+			CellLog::Info("Invalid input, please re-enter.\n");
 		}
 	}
 }
@@ -51,13 +53,13 @@ void recvThread(int begin, int end)//1-4，四个线程
 
 void sendThread(int id)//1-4，四个线程
 {
-	printf("thread<%d>,start\n", id);
+	CellLog::Info("thread<%d>,start\n", id);
 	int c = client_count / thread_count;
 	int begin = (id - 1) * c;
 	int end = id * c;
 	for (int i = begin; i < end; ++i)
 	{
-		client[i] = new Client();
+		client[i] = new MyClient();
 	}
 
 	for (int i = begin; i < end; ++i)
@@ -65,7 +67,7 @@ void sendThread(int id)//1-4，四个线程
 		client[i]->connectToServer(IP, PORT);
 	}
 
-	printf("thread<%d>,Connect<begin=%d, end=%d>\n", id, begin, end);
+	CellLog::Info("thread<%d>,Connect<begin=%d, end=%d>\n", id, begin, end);
 
 	//等待其他线程准备好发送
 	++readyCount;
@@ -105,11 +107,13 @@ void sendThread(int id)//1-4，四个线程
 		delete client[i];
 	}
 
-	printf("thread<%d>,exit\n", id);
+	CellLog::Info("thread<%d>,exit\n", id);
 }
 
 int main()
 {
+	CellLog::Instance().setLogPath("../../clientLog.txt", "w");
+
 	//输入线程
 	std::thread cmd_t(cmdThread);
 	cmd_t.detach();
@@ -130,10 +134,10 @@ int main()
 		{
 			//!"std::atomic<int>::atomic(const std::atomic<int>&)": 尝试引用已删除的函数
 			//!将类 "std::atomic<int>" 作为可变参数函数的参数的非标准用法
-			/*printf("thread<%d>,clients<%d>,time<%lf>,send<%d>\n",
+			/*CellLog::Info("thread<%d>,clients<%d>,time<%lf>,send<%d>\n",
 				thread_count, client_count, t, sendCount);*/
 
-			printf("thread<%d>,clients<%d>,time<%lf>,send<%d>\n",
+			CellLog::Info("thread<%d>,clients<%d>,time<%lf>,send<%d>\n",
 				thread_count, client_count, t, (int)(sendCount.load() / t));
 
 			sendCount = 0;

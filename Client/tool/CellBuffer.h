@@ -1,8 +1,8 @@
 #ifndef CELL_BUFFER_H_
 #define CELL_BUFFER_H_
-#include"MemoryAlloc.h"
+#include"../memory/MemoryAlloc.h"
 #include<memory>
-#include"CellLog.h"
+#include"../tool/CellLog.h"
 
 class CellBuffer
 {
@@ -92,12 +92,20 @@ public:
 		if (_nLast >= sizeof(netmsg_Header))
 		{
 			netmsg_Header* header = (netmsg_Header*)_pBuf;
-			if (_nLast >= header->dataLength)
-			{
-				return true;
-			}
+			return _nLast >= header->dataLength;
 		}
 		return false;
+	}
+
+	//ÊÇ·ñÐèÒªÐ´
+	bool needWrite()
+	{
+		if (_nLast >= sizeof(netmsg_Header))
+		{
+			netmsg_Header* header = (netmsg_Header*)_pBuf;
+			return _nLast >= header->dataLength;
+		}
+		return _nLast>0;
 	}
 
 	char* data() { return _pBuf; }

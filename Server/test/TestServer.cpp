@@ -1,6 +1,8 @@
-#include"MemoryAlloc.h"
-#include"ObjectPool.h"
-#include"Server.h"
+#include"../memory/MemoryAlloc.h"
+#include"../memory/ObjectPool.h"
+#include"../server/Server.h"
+#include"../tool/CellLog.h"
+#include"../tool/Message.h"
 #include"MyServer.h"
 #include<iostream>
 #include<thread>

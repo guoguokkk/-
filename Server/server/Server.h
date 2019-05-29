@@ -1,20 +1,19 @@
 #ifndef SERVER_H_
 #define SERVER_H_
-
-#include"Message.h"
-#include"TimeStamp.h"
+#include"../tool/Message.h"
+#include"../tool/CellTimeStamp.h"
 #include"INetEvent.h"
-#include"CellClient.h"
-#include"CellServer.h"
-#include<vector>
-#include"CellThread.h"
+#include"../tool/CellClient.h"
+#include"../tool/CellServer.h"
+#include"../tool/CellThread.h"
+#include"../tool/CellNetWork.h"
 #include<signal.h>
-#include"CellNetWork.h"
+#include<vector>
 
 class Server :public INetEvent
 {
 public:
-	Server();	
+	Server();
 	~Server();
 	SOCKET initServer();//初始化服务器
 	int Bind(const char* ip, unsigned short port);//绑定ip地址和端口
@@ -23,7 +22,7 @@ public:
 	void addClientToCellServer(std::shared_ptr<CellClient> pClient);
 	void startServer(int n_cellServer);
 	void closeServer();//关闭服务器	   	 
-	
+
 	void time4Msg();//计算并输出每秒收到的网络消息
 	virtual void onNetJoin(std::shared_ptr<CellClient> pClient);//只会被一个线程触发，安全
 	virtual void onNetLeave(std::shared_ptr<CellClient> pClient);//有客户端离开事件

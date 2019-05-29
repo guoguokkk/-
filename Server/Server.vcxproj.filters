@@ -13,75 +13,84 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="源文件\memory">
+      <UniqueIdentifier>{e7440e6a-2827-4c17-8c85-be12565c9bc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\tool">
+      <UniqueIdentifier>{f9047bb4-a468-499b-a1ae-1cbeed8f12a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\test">
+      <UniqueIdentifier>{a04fc64c-b3e0-4991-8abe-a530003fa5bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\server">
+      <UniqueIdentifier>{610caa57-ff97-4644-addf-52c2bf52f8be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CellServer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="INetEvent.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="MyServer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Server.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryAlloc.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryPool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectPool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Message.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TimeStamp.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CellClient.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CellTask.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CellSemaphore.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CellThread.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CellBuffer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CellLog.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CellNetWork.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
+    <ClCompile Include="memory\MemoryAlloc.cpp">
+      <Filter>源文件\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\MemoryPool.cpp">
+      <Filter>源文件\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="server\Server.cpp">
+      <Filter>源文件\server</Filter>
+    </ClCompile>
+    <ClCompile Include="test\TestServer.cpp">
+      <Filter>源文件\test</Filter>
+    </ClCompile>
+    <ClCompile Include="tool\CellServer.cpp">
+      <Filter>源文件\server</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Server.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TestServer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="CellServer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryAlloc.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryPool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="CellClient.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
+    <ClInclude Include="memory\MemoryAlloc.h">
+      <Filter>源文件\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\MemoryPool.h">
+      <Filter>源文件\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\ObjectPool.h">
+      <Filter>源文件\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellBuffer.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellClient.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellLog.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellNetWork.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellSemaphore.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellTask.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellThread.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellTimeStamp.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\Message.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="server\INetEvent.h">
+      <Filter>源文件\server</Filter>
+    </ClInclude>
+    <ClInclude Include="server\Server.h">
+      <Filter>源文件\server</Filter>
+    </ClInclude>
+    <ClInclude Include="test\MyServer.h">
+      <Filter>源文件\test</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellServer.h">
+      <Filter>源文件\server</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

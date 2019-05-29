@@ -1,8 +1,8 @@
 #ifndef INETEVENT_H_
 #define INETEVENT_H_
 
-#include"CellClient.h"
-#include"CellServer.h"
+#include"../tool/CellClient.h"
+#include"../tool/CellServer.h"
 #include<memory>
 
 //网络事件接口

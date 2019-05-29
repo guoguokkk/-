@@ -291,7 +291,7 @@ size_t CellServer::getClientCount()
 	return size_t(_clients.size() + _clientsBuf.size());
 }
 
-void CellServer::addSendTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<netmsg_Header> header)
+void CellServer::addSendTask(std::shared_ptr<CellClient> pClient, netmsg_Header* header)
 {
 	auto task = std::make_shared<SendMsgToClientTask>(pClient, header);
 

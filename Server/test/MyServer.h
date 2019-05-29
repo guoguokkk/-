@@ -1,9 +1,9 @@
 #ifndef MY_SERVER_H_
 #define MY_SERVER_H_
-
+#include"../server/Server.h"
 #include<iostream>
-#include"Server.h"
 #include<stdio.h>
+
 class MyServer :public Server
 {
 public:
@@ -28,8 +28,8 @@ public:
 		{
 			//定义了心跳消息，但是客户端没有发送对应的心跳消息
 			pClient->resetDTHeart();//重置心跳
-			std::shared_ptr<netmsg_s2c_Heart> netmsg_s2c_heart = std::make_shared<netmsg_s2c_Heart>();
-			pCellServer->addSendTask(pClient, (std::shared_ptr<netmsg_s2c_Heart>)netmsg_s2c_heart);
+			netmsg_s2c_Heart* netmsg_s2c_heart = new netmsg_s2c_Heart();
+			pCellServer->addSendTask(pClient, (netmsg_s2c_Heart*)netmsg_s2c_heart);
 		}
 		case CMD_LOGIN:
 		{
@@ -39,8 +39,8 @@ public:
 			/*CellLog::Info("netmsg_Login : socket = %d , user name = %s , password= %s\n",
 				(int)pClient->getSockfd(), login->userName, login->passWord);*/
 
-			std::shared_ptr<netmsg_LoginResult> login_result = std::make_shared<netmsg_LoginResult>();
-			pCellServer->addSendTask(pClient, (std::shared_ptr<netmsg_Header>)login_result);
+			netmsg_LoginResult* login_result = new netmsg_LoginResult();
+			pCellServer->addSendTask(pClient, (netmsg_Header*)login_result);
 			break;
 		}
 

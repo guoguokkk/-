@@ -19,30 +19,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CellBuffer.h" />
-    <ClInclude Include="CellClient.h" />
-    <ClInclude Include="CellLog.h" />
-    <ClInclude Include="CellNetWork.h" />
-    <ClInclude Include="CellSemaphore.h" />
-    <ClInclude Include="CellServer.h" />
-    <ClInclude Include="CellTask.h" />
-    <ClInclude Include="CellThread.h" />
-    <ClInclude Include="INetEvent.h" />
-    <ClInclude Include="MemoryAlloc.h" />
-    <ClInclude Include="MemoryPool.h" />
-    <ClInclude Include="Message.h" />
-    <ClInclude Include="MyServer.h" />
-    <ClInclude Include="ObjectPool.h" />
-    <ClInclude Include="Server.h" />
-    <ClInclude Include="TimeStamp.h" />
+    <ClCompile Include="memory\MemoryAlloc.cpp" />
+    <ClCompile Include="memory\MemoryPool.cpp" />
+    <ClCompile Include="server\Server.cpp" />
+    <ClCompile Include="test\TestServer.cpp" />
+    <ClCompile Include="tool\CellServer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CellClient.cpp" />
-    <ClCompile Include="CellServer.cpp" />
-    <ClCompile Include="MemoryAlloc.cpp" />
-    <ClCompile Include="MemoryPool.cpp" />
-    <ClCompile Include="Server.cpp" />
-    <ClCompile Include="TestServer.cpp" />
+    <ClInclude Include="memory\MemoryAlloc.h" />
+    <ClInclude Include="memory\MemoryPool.h" />
+    <ClInclude Include="memory\ObjectPool.h" />
+    <ClInclude Include="server\INetEvent.h" />
+    <ClInclude Include="server\Server.h" />
+    <ClInclude Include="test\MyServer.h" />
+    <ClInclude Include="tool\CellBuffer.h" />
+    <ClInclude Include="tool\CellClient.h" />
+    <ClInclude Include="tool\CellLog.h" />
+    <ClInclude Include="tool\CellNetWork.h" />
+    <ClInclude Include="tool\CellSemaphore.h" />
+    <ClInclude Include="tool\CellServer.h" />
+    <ClInclude Include="tool\CellTask.h" />
+    <ClInclude Include="tool\CellThread.h" />
+    <ClInclude Include="tool\CellTimeStamp.h" />
+    <ClInclude Include="tool\Message.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

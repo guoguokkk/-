@@ -9,8 +9,8 @@
 #include<vector>
 #include"Message.h"
 #include"CellClient.h"
-#include"INetEvent.h"
-#include"TimeStamp.h"
+#include"../server/INetEvent.h"
+#include"CellTimeStamp.h"
 #include"CellSemaphore.h"
 #include"CellThread.h"
 #include"CellBuffer.h"
@@ -19,14 +19,14 @@
 class SendMsgToClientTask
 {
 public:
-	SendMsgToClientTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<netmsg_Header> header)
+	SendMsgToClientTask(std::shared_ptr<CellClient> pClient, netmsg_Header* header)
 	{
 		_pClient = pClient;
 		_pHeader = header;
 	}
 private:
 	std::shared_ptr<CellClient> _pClient;//目标客户端
-	std::shared_ptr<netmsg_Header> _pHeader;//要发送的数据
+	netmsg_Header* _pHeader;//要发送的数据
 };
 
 
@@ -42,7 +42,7 @@ public:
 	void addClient(std::shared_ptr<CellClient> pClient);//增加客户端
 	void startCellServer();//启动工作线程	
 	size_t getClientCount();
-	void addSendTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<netmsg_Header> header);
+	void addSendTask(std::shared_ptr<CellClient> pClient, netmsg_Header* header);
 	
 private:
 	void closeServer();//关闭服务器

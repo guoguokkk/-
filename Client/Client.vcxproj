@@ -19,13 +19,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Client.cpp" />
-    <ClCompile Include="TestClient.cpp" />
+    <ClCompile Include="client\Client.cpp" />
+    <ClCompile Include="memory\MemoryAlloc.cpp" />
+    <ClCompile Include="memory\MemoryPool.cpp" />
+    <ClCompile Include="test\TestClient.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Client.h" />
-    <ClInclude Include="Message.h" />
-    <ClInclude Include="TimeStamp.h" />
+    <ClInclude Include="..\Server\tool\CellBuffer.h" />
+    <ClInclude Include="..\Server\tool\CellClient.h" />
+    <ClInclude Include="..\Server\tool\CellLog.h" />
+    <ClInclude Include="..\Server\tool\CellNetWork.h" />
+    <ClInclude Include="..\Server\tool\CellSemaphore.h" />
+    <ClInclude Include="..\Server\tool\CellTask.h" />
+    <ClInclude Include="..\Server\tool\CellThread.h" />
+    <ClInclude Include="..\Server\tool\CellTimeStamp.h" />
+    <ClInclude Include="..\Server\tool\Message.h" />
+    <ClInclude Include="client\Client.h" />
+    <ClInclude Include="memory\MemoryAlloc.h" />
+    <ClInclude Include="memory\MemoryPool.h" />
+    <ClInclude Include="memory\ObjectPool.h" />
+    <ClInclude Include="test\MyClient.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
