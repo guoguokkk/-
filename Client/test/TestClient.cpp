@@ -7,6 +7,9 @@
 #include"../tool/CellTimeStamp.h"
 #include"MyClient.h"
 #include"../tool/CellLog.h"
+#include"../tool/CellThread.h"
+#include"../tool/CellStream.h"
+#include"../tool/CellMsgStream.h"
 
 #define CLIENT_COUNT 8//客户端数量
 #define THREAD_COUNT 4//线程数量
@@ -46,7 +49,7 @@ void recvThread(int begin, int end)//1-4，四个线程
 		{
 			/*if (t.getElapsedSecond() > 3.0 && i == begin)
 				continue;*/
-			client[i]->onRun(); 
+			client[i]->onRun();
 		}
 	}
 }
@@ -73,8 +76,7 @@ void sendThread(int id)//1-4，四个线程
 	++readyCount;
 	while (readyCount < thread_count)
 	{
-		std::chrono::milliseconds t(100);
-		std::this_thread::sleep_for(t);
+		CellThread::sleepInThread(10);
 	}
 
 	std::thread t1(recvThread, begin, end);
@@ -91,7 +93,7 @@ void sendThread(int id)//1-4，四个线程
 	{
 		for (int i = begin; i < end; ++i)
 		{
-			if (client[i]->sendData(login, nLen) != SOCKET_ERROR)
+			if (client[i]->sendData(login) != SOCKET_ERROR)
 			{
 				++sendCount;//发送的数量
 			}
@@ -113,6 +115,26 @@ void sendThread(int id)//1-4，四个线程
 int main()
 {
 	CellLog::Instance().setLogPath("../../clientLog.txt", "w");
+
+	CellSendStream s;
+	s.setNetCmd(CMD_LOGOUT);
+	s.writeInt8(1);
+	s.writeInt16(2);
+	s.writeInt32(3);
+	s.writeFloat(4.5f);
+	s.writeDouble(6.7);
+	s.writeString("client");
+	s.finish();
+
+	MyClient client;
+	client.connectToServer(IP, PORT);
+
+	while (client.isRun())
+	{
+		client.onRun();
+		client.sendData(s.getData(), s.getWritePos());
+		CellThread::sleepInThread(1000);
+	}
 
 	//输入线程
 	std::thread cmd_t(cmdThread);

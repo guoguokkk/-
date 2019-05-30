@@ -53,6 +53,18 @@
     <ClInclude Include="memory\ObjectPool.h">
       <Filter>源文件\memory</Filter>
     </ClInclude>
+    <ClInclude Include="server\INetEvent.h">
+      <Filter>源文件\server</Filter>
+    </ClInclude>
+    <ClInclude Include="server\Server.h">
+      <Filter>源文件\server</Filter>
+    </ClInclude>
+    <ClInclude Include="test\MyServer.h">
+      <Filter>源文件\test</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellServer.h">
+      <Filter>源文件\server</Filter>
+    </ClInclude>
     <ClInclude Include="tool\CellBuffer.h">
       <Filter>源文件\tool</Filter>
     </ClInclude>
@@ -62,10 +74,16 @@
     <ClInclude Include="tool\CellLog.h">
       <Filter>源文件\tool</Filter>
     </ClInclude>
+    <ClInclude Include="tool\CellMsgStream.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
     <ClInclude Include="tool\CellNetWork.h">
       <Filter>源文件\tool</Filter>
     </ClInclude>
     <ClInclude Include="tool\CellSemaphore.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellStream.h">
       <Filter>源文件\tool</Filter>
     </ClInclude>
     <ClInclude Include="tool\CellTask.h">
@@ -79,18 +97,6 @@
     </ClInclude>
     <ClInclude Include="tool\Message.h">
       <Filter>源文件\tool</Filter>
-    </ClInclude>
-    <ClInclude Include="server\INetEvent.h">
-      <Filter>源文件\server</Filter>
-    </ClInclude>
-    <ClInclude Include="server\Server.h">
-      <Filter>源文件\server</Filter>
-    </ClInclude>
-    <ClInclude Include="test\MyServer.h">
-      <Filter>源文件\test</Filter>
-    </ClInclude>
-    <ClInclude Include="tool\CellServer.h">
-      <Filter>源文件\server</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

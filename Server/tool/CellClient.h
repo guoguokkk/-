@@ -37,19 +37,19 @@ public:
 	}
 
 	//缓冲区的控制根据业务需求的差异而调整，异步发送数据
-	int sendDataAsynchronous(netmsg_Header* header)
-	{
-		int ret = SOCKET_ERROR;//缓冲区不足
-		int nSendLen = header->dataLength;//待发送数据的长度
-		const char* pSendData = (const char*)header;//待发送数据
+	int sendData(netmsg_Header* header)
+	{		
+		return sendData((const char*)header, header->dataLength);
+	}
 
-		//发送数据的条件：发送缓冲区满
-		//判断缓冲区中已有数据和待发送数据总长度
-		if (_SendBuf.push(pSendData, nSendLen))
+	int sendData(const char* pData, int len)
+	{
+		//添加数据，参数为数据和数据的长度
+		if (_SendBuf.push(pData, len))
 		{
-			return nSendLen;
+			return len;
 		}
-		return ret;
+		return SOCKET_ERROR;
 	}
 
 	//立即将缓冲区的数据发送给客户端
@@ -58,7 +58,7 @@ public:
 		resetDTSend();//重置发送时间
 		return _SendBuf.write2socket(_sockfd);
 	}
-
+	
 	//检测心跳	
 	bool checkHeart(time_t dt)
 	{

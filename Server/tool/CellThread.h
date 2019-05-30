@@ -11,6 +11,12 @@ class CellThread
 private:
 	typedef std::function<void(CellThread*)> EventCall;
 public:
+	static void sleepInThread(time_t dt)
+	{
+		std::chrono::milliseconds t(dt);
+		std::this_thread::sleep_for(t);
+	}
+
 	//启动线程
 	void startThread(EventCall onCreate = nullptr,
 		EventCall onRun = nullptr,

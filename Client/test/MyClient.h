@@ -1,8 +1,9 @@
 #ifndef MYCLIENT_H_
 #define MYCLIENT_H_
 #include"../client/Client.h"
-
-class MyClient:public Client
+#include"../tool/CellStream.h"
+#include"../tool/CellMsgStream.h"
+class MyClient :public Client
 {
 public:
 	MyClient() {}

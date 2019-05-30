@@ -61,7 +61,7 @@ public:
 				//写文件
 				auto t = system_clock::now();
 				auto tNow = system_clock::to_time_t(t);
-				//fprintf(pLog->_logFile, "%s", ctime(&tNow));
+				//fprintf(pLog->_logFile, "%r", ctime(&tNow));
 				std::tm* now = std::gmtime(&tNow);
 				fprintf(pLog->_logFile, "%s", "Info ");
 				fprintf(pLog->_logFile, "[%d-%d-%d %d:%d:%d]",
@@ -83,7 +83,7 @@ public:
 				//写文件
 				auto t = system_clock::now();
 				auto tNow = system_clock::to_time_t(t);
-				//fprintf(pLog->_logFile, "%s", ctime(&tNow));
+				//fprintf(pLog->_logFile, "%r", ctime(&tNow));
 				std::tm* now = std::gmtime(&tNow);
 				fprintf(pLog->_logFile, "%s", "Info ");
 				fprintf(pLog->_logFile, "[%d-%d-%d %d:%d:%d] ",

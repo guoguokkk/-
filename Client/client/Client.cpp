@@ -82,17 +82,17 @@ bool Client::onRun()
 	{
 		SOCKET clientSock = _pClient->getSockfd();
 
-		fd_set fdRead;		
+		fd_set fdRead;
 		FD_ZERO(&fdRead);
 		FD_SET(clientSock, &fdRead);
 
 		fd_set fdWrite;
 		FD_ZERO(&fdWrite);
-		
+
 		timeval time = { 0,1 };
 		int ret = 0;
 		if (_pClient->needWrite())
-		{			
+		{
 			FD_SET(clientSock, &fdWrite);
 			ret = select(clientSock + 1, &fdRead, &fdWrite, 0, &time);//linux 需要+1
 		}
@@ -141,22 +141,38 @@ bool Client::isRun()
 //接受服务器端数据
 int Client::recvData(SOCKET clientSock)
 {
-	int nLen = _pClient->recvData();
-	if (nLen > 0)
+	if (isRun())
 	{
-		//判断是否有消息需要处理
-		if (_pClient->hasMsg())
+		int nLen = _pClient->recvData();
+		if (nLen > 0)
 		{
-			onNetMsg(_pClient->front_msg());//处理第一个消息
-			_pClient->pop_front_msg();//移除第一个数据
+			//判断是否有消息需要处理
+			if (_pClient->hasMsg())
+			{
+				onNetMsg(_pClient->front_msg());//处理第一个消息
+				_pClient->pop_front_msg();//移除第一个数据
+			}
 		}
+		return nLen;
 	}
-	return nLen;
+	return 0;
 }
 
-//参数：接收对象，要发送的内容
-int Client::sendData(netmsg_Header* header, int nLen)
+int Client::sendData(netmsg_Header* header)
 {
-	return _pClient->sendDataAsynchronous(header);
+	if (isRun())
+	{
+		return _pClient->sendData(header);
+	}
+	return 0;
+}
+
+int Client::sendData(const char* pData, int len)
+{
+	if (isRun())
+	{
+		return _pClient->sendData(pData, len);
+	}
+	return 0;
 }
 

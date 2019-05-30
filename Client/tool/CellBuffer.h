@@ -11,7 +11,7 @@ public:
 	{
 		_pBuf = new char[_nSize];
 		_nLast = 0;
-		_bufFullCount = 0;
+		_fullCount = 0;
 	}
 
 	~CellBuffer()
@@ -31,7 +31,7 @@ public:
 
 			if (_nLast == _nSize)
 			{
-				++_bufFullCount;
+				++_fullCount;
 			}
 			return true;
 		}
@@ -48,7 +48,7 @@ public:
 			//delete[] _pBuf;
 			//_pBuf = buff;
 
-			++_bufFullCount;
+			++_fullCount;
 			return false;
 		}
 	}
@@ -62,7 +62,7 @@ public:
 		{
 			ret = send(sockfd, _pBuf, _nLast, 0);//将发送缓冲区的数据发送出去
 			_nLast = 0;//发送缓冲区尾部清零
-			_bufFullCount = 0;
+			_fullCount = 0;
 		}
 		return ret;
 	}
@@ -118,15 +118,15 @@ public:
 			memcpy(_pBuf, _pBuf + nLen, n);
 		}
 		_nLast = n;
-		if (_bufFullCount > 0)
-			--_bufFullCount;
+		if (_fullCount > 0)
+			--_fullCount;
 	}
 
 private:
 	char* _pBuf = nullptr;//缓冲区
 	int _nLast;//缓冲区尾部位置，已有数据长度
 	int _nSize;//缓冲区总长度
-	int _bufFullCount;//缓冲区写满的次数
+	int _fullCount;//缓冲区写满的次数
 };
 
 #endif // !CELL_BUFFER_H_

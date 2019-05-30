@@ -15,10 +15,11 @@ public:
 	bool onRun();//处理网络消息	
 	int recvData(SOCKET clientSock);//接收消息
 	virtual void onNetMsg(netmsg_Header* header) = 0;//处理消息
-	int sendData(netmsg_Header* header, int nLen);//发送消息
-
-private:
+	int sendData(netmsg_Header* header);//发送消息
+	int sendData(const char* pData,int len);//发送消息
 	bool isRun();
+
+private:	
 	void initClient();//初始化客户端
 
 private:

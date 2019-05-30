@@ -303,7 +303,7 @@ void CellServer::addSendTask(std::shared_ptr<CellClient> pClient, netmsg_Header*
 	//异步执行任务
 	_taskServer.addTask([pClient, header]() {
 		//数据发送失败，比如短时间发送大量数据
-		if (pClient->sendDataAsynchronous(header) == 0)
+		if (pClient->sendData(header) == 0)
 			CellLog::Info("Message buffer is full and data cannot be sent...\n");
 		});
 }

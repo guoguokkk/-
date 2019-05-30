@@ -35,9 +35,11 @@
     <ClInclude Include="tool\CellBuffer.h" />
     <ClInclude Include="tool\CellClient.h" />
     <ClInclude Include="tool\CellLog.h" />
+    <ClInclude Include="tool\CellMsgStream.h" />
     <ClInclude Include="tool\CellNetWork.h" />
     <ClInclude Include="tool\CellSemaphore.h" />
     <ClInclude Include="tool\CellServer.h" />
+    <ClInclude Include="tool\CellStream.h" />
     <ClInclude Include="tool\CellTask.h" />
     <ClInclude Include="tool\CellThread.h" />
     <ClInclude Include="tool\CellTimeStamp.h" />

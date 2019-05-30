@@ -53,35 +53,41 @@
     <ClInclude Include="client\Client.h">
       <Filter>源文件\client</Filter>
     </ClInclude>
-    <ClInclude Include="..\Server\tool\CellBuffer.h">
-      <Filter>源文件\tool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Server\tool\CellClient.h">
-      <Filter>源文件\tool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Server\tool\CellLog.h">
-      <Filter>源文件\tool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Server\tool\CellNetWork.h">
-      <Filter>源文件\tool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Server\tool\CellSemaphore.h">
-      <Filter>源文件\tool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Server\tool\CellTask.h">
-      <Filter>源文件\tool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Server\tool\CellThread.h">
-      <Filter>源文件\tool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Server\tool\CellTimeStamp.h">
-      <Filter>源文件\tool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Server\tool\Message.h">
-      <Filter>源文件\tool</Filter>
-    </ClInclude>
     <ClInclude Include="test\MyClient.h">
       <Filter>源文件\test</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellBuffer.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellClient.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellLog.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellNetWork.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellSemaphore.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellTask.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellThread.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellTimeStamp.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\Message.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellStream.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellMsgStream.h">
+      <Filter>源文件\tool</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@
 #include"../server/Server.h"
 #include<iostream>
 #include<stdio.h>
+#include"../tool/CellMsgStream.h"
 
 class MyServer :public Server
 {
@@ -36,7 +37,7 @@ public:
 			//用登录消息代替心跳消息，收到客户端的登录消息相当于收到心跳消息
 			pClient->resetDTHeart();//重置心跳
 			netmsg_Login* login = (netmsg_Login*)header;
-			/*CellLog::Info("netmsg_Login : socket = %d , user name = %s , password= %s\n",
+			/*CellLog::Info("netmsg_Login : socket = %d , user name = %r , password= %r\n",
 				(int)pClient->getSockfd(), login->userName, login->passWord);*/
 
 			netmsg_LoginResult* login_result = new netmsg_LoginResult();
@@ -46,9 +47,25 @@ public:
 
 		case CMD_LOGOUT:
 		{
-			netmsg_Logout* logout = (netmsg_Logout*)header;
-			/*CellLog::Info("netmsg_Logout : socket = %d , user name = %s ",
-				(int)pClient->GetSock(), logout->userName);*/
+			CellRecvStream r(header);
+			int8_t n1;
+			r.readInt8(n1);
+			int16_t n2;
+			r.readInt16(n2);
+			int32_t n3;
+			r.readInt32(n3);
+			float n4;
+			r.readFloat(n4);
+			double n5;
+			r.readDouble(n5);
+			char name[20] = {};
+			int n = r.readArray(name, 20);//返回的是数组元素个数
+
+			printf("name= %s\n", name);
+
+			/*	netmsg_Logout* logout = (netmsg_Logout*)header;
+				CellLog::Info("netmsg_Logout : socket = %d , user name = %s \n",
+					(int)pClient->getSockfd(), logout->userName);*/
 			break;
 		}
 

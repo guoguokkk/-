@@ -15,25 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Test.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryAlloc.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryPool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="MemoryAlloc.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryPool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectPool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

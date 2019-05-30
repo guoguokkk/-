@@ -150,7 +150,7 @@ void* MemoryMgr::allocMem(size_t size)
 	if (size > MAX_MEMORY_SIZE)
 	{//大于最大的内存池，在系统中分配一个块		
 		pReturn = (Chunk*)malloc(sizeof(Chunk) + size);
-		int s = sizeof(Chunk) + size;
+		int r = sizeof(Chunk) + size;
 		pReturn->_nID = -1;
 		pReturn->_nRef = 1;
 		pReturn->_bPool = false;
