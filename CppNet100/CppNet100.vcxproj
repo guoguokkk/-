@@ -90,9 +90,11 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;CPPNET100_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;CPPNET100_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -106,7 +108,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;CPPNET100_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
@@ -120,7 +122,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;CPPNET100_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
@@ -136,7 +138,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;CPPNET100_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
@@ -149,7 +151,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="client\Client.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="memory\MemoryAlloc.cpp" />
+    <ClCompile Include="memory\MemoryPool.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="client\Client.h" />
+    <ClInclude Include="memory\MemoryAlloc.h" />
+    <ClInclude Include="memory\MemoryPool.h" />
+    <ClInclude Include="memory\ObjectPool.h" />
+    <ClInclude Include="tool\CellBuffer.h" />
+    <ClInclude Include="tool\CellClient.h" />
+    <ClInclude Include="tool\CellLog.h" />
+    <ClInclude Include="tool\CellMsgStream.h" />
+    <ClInclude Include="tool\CellNetWork.h" />
+    <ClInclude Include="tool\CellSemaphore.h" />
+    <ClInclude Include="tool\CellStream.h" />
+    <ClInclude Include="tool\CellTask.h" />
+    <ClInclude Include="tool\CellThread.h" />
+    <ClInclude Include="tool\CellTimeStamp.h" />
+    <ClInclude Include="tool\Message.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

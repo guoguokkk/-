@@ -4,6 +4,7 @@
 #include<iostream>
 #include<stdio.h>
 #include"../tool/CellMsgStream.h"
+#include<stdint.h>
 
 class MyServer :public Server
 {
@@ -58,15 +59,32 @@ public:
 			r.readFloat(n4);
 			double n5;
 			r.readDouble(n5);
+			char s[20] = {};
+			int a = r.readArray(s, 20);//返回的是数组元素个数
 			char name[20] = {};
-			int n = r.readArray(name, 20);//返回的是数组元素个数
+			int b = r.readArray(name, 20);//返回的是数组元素个数
+			int password[20] = {};
+			int c = r.readArray(password, 20);//返回的是数组元素个数
 
-			printf("name= %s\n", name);
+			CellSendStream ss(128);
+			ss.setNetCmd(CMD_LOGOUT_RESULT);
+			ss.writeInt8(n1);
+			ss.writeInt16(n2);
+			ss.writeInt32(n3);
+			ss.writeFloat(n4);
+			ss.writeDouble(n5);
+			ss.writeArray(s,a);
+			ss.writeArray(name,b);
+			ss.writeArray(password,c);
+			ss.finish();
+			//pCellServer->addSendTask(pClient, (netmsg_Header*)ss.getData());
+			pClient->sendData(ss.getData(),ss.getWritePos());
 
-			/*	netmsg_Logout* logout = (netmsg_Logout*)header;
-				CellLog::Info("netmsg_Logout : socket = %d , user name = %s \n",
-					(int)pClient->getSockfd(), logout->userName);*/
-			break;
+
+				/*	netmsg_Logout* logout = (netmsg_Logout*)header;
+					CellLog::Info("netmsg_Logout : socket = %d , user name = %s \n",
+						(int)pClient->getSockfd(), logout->userName);*/
+				break;
 		}
 
 		case CMD_ERROR:

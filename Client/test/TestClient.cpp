@@ -124,6 +124,9 @@ int main()
 	s.writeFloat(4.5f);
 	s.writeDouble(6.7);
 	s.writeString("client");
+	s.writeString("kzj");
+	int arr[] = { 1,2,3,4,5,6, };
+	s.writeArray(arr, 6);
 	s.finish();
 
 	MyClient client;
