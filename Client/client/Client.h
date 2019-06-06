@@ -18,9 +18,7 @@ public:
 	int sendData(netmsg_Header* header);//发送消息
 	int sendData(const char* pData,int len);//发送消息
 	bool isRun();
-
-private:	
-	void initClient();//初始化客户端
+	void initClient(int sendSize = SEND_BUF_SIZE, int recvSize = RECV_BUF_SIZE);//初始化客户端
 
 private:
 	bool _isConnect;

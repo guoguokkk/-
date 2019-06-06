@@ -22,16 +22,19 @@
     <Filter Include="源文件\client">
       <UniqueIdentifier>{6f0c5b30-3ef6-4766-bb7a-4f570e68bd6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\test">
+      <UniqueIdentifier>{6a105a35-42fd-4c29-8928-ae977259f491}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="memory\MemoryAlloc.cpp">
       <Filter>源文件\memory</Filter>
     </ClCompile>
     <ClCompile Include="memory\MemoryPool.cpp">
       <Filter>源文件\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="test\main.cpp">
+      <Filter>源文件\test</Filter>
     </ClCompile>
     <ClCompile Include="client\Client.cpp">
       <Filter>源文件\client</Filter>
@@ -80,8 +83,16 @@
     <ClInclude Include="memory\ObjectPool.h">
       <Filter>源文件\memory</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="client\Client.h">
       <Filter>源文件\client</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CppNet100.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

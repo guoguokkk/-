@@ -14,7 +14,7 @@ Client::~Client()
 	closeClient();
 }
 
-void Client::initClient()
+void Client::initClient(int sendSize, int recvSize)
 {
 	CellNetwork::Init();
 
@@ -32,7 +32,7 @@ void Client::initClient()
 	else
 	{
 		//CellLog::Info("<socket=%d> build socket success.\n", _client_sock);
-		_pClient = new CellClient(clientSock);
+		_pClient = new CellClient(clientSock, sendSize, recvSize);
 	}
 }
 

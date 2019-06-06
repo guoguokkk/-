@@ -5,42 +5,47 @@
 #include<string>
 
 //接收消息数据字节流
-class CellRecvStream :public CellStream
+class CellReadStream :public CellStream
 {
 public:
-	CellRecvStream(netmsg_Header* header) :
-		CellStream((char*)header, header->dataLength, false)
+	CellReadStream(char* pData, int nSize = 1024, bool bDelete = false) :
+		CellStream(pData, nSize, false)
 	{
-		push(header->dataLength);//写入消息长度个字节
+		push(nSize);//写入消息长度个字节
 		uint16_t n;
 		read<uint16_t>(n);//读取消息的长度
 		getNetCmd();
 	}
 
+	CellReadStream(netmsg_Header* header) :
+		CellReadStream((char*)header, header->dataLength, false)
+	{
+	}
+
 	uint16_t getNetCmd()
-	{ 
+	{
 		uint16_t cmd = CMD_ERROR;
-		read<uint16_t>(cmd); 
+		read<uint16_t>(cmd);
 		return cmd;
 	}
 };
 
 //发送消息数据字节流
-class CellSendStream :public CellStream
+class CellWriteStream :public CellStream
 {
 public:
-	CellSendStream(char* pData, int nSize = 1024, bool bDelete = false) :
+	CellWriteStream(char* pData, int nSize = 1024, bool bDelete = false) :
 		CellStream(pData, nSize, bDelete)
 	{
 		write<int16_t>(0);//short
 	}
 
-	CellSendStream(int nSize = 1024) :
+	CellWriteStream(int nSize = 1024) :
 		CellStream(nSize)
 	{
 		write<uint16_t>(0);//预先占有消息长度所需要的空间
 	}
-		
+
 	void setNetCmd(uint16_t cmd) { write<uint16_t>(cmd); }
 
 	bool writeString(const char* str, int len)

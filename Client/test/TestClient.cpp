@@ -116,7 +116,7 @@ int main()
 {
 	CellLog::Instance().setLogPath("../../clientLog.txt", "w");
 
-	CellSendStream s;
+	CellWriteStream s;
 	s.setNetCmd(CMD_LOGOUT);
 	s.writeInt8(1);
 	s.writeInt16(2);

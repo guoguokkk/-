@@ -23,7 +23,7 @@ public:
 		break;
 		case CMD_LOGOUT_RESULT:
 		{
-			CellRecvStream r(header);
+			CellReadStream r(header);
 			int8_t n1;
 			r.readInt8(n1);
 			int16_t n2;

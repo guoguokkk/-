@@ -21,14 +21,15 @@
   <ItemGroup>
     <ClCompile Include="memory\MemoryAlloc.cpp" />
     <ClCompile Include="memory\MemoryPool.cpp" />
+    <ClCompile Include="server\CellServer.cpp" />
     <ClCompile Include="server\Server.cpp" />
     <ClCompile Include="test\TestServer.cpp" />
-    <ClCompile Include="tool\CellServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="memory\MemoryAlloc.h" />
     <ClInclude Include="memory\MemoryPool.h" />
     <ClInclude Include="memory\ObjectPool.h" />
+    <ClInclude Include="server\CellServer.h" />
     <ClInclude Include="server\INetEvent.h" />
     <ClInclude Include="server\Server.h" />
     <ClInclude Include="test\MyServer.h" />
@@ -38,7 +39,6 @@
     <ClInclude Include="tool\CellMsgStream.h" />
     <ClInclude Include="tool\CellNetWork.h" />
     <ClInclude Include="tool\CellSemaphore.h" />
-    <ClInclude Include="tool\CellServer.h" />
     <ClInclude Include="tool\CellStream.h" />
     <ClInclude Include="tool\CellTask.h" />
     <ClInclude Include="tool\CellThread.h" />

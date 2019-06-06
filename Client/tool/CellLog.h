@@ -4,6 +4,7 @@
 #include"CellTask.h"
 #include"CellTimeStamp.h"
 #include<ctime>
+
 //日志：单例模式
 class CellLog
 {

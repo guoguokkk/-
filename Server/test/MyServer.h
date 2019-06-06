@@ -48,7 +48,7 @@ public:
 
 		case CMD_LOGOUT:
 		{
-			CellRecvStream r(header);
+			CellReadStream r(header);
 			int8_t n1;
 			r.readInt8(n1);
 			int16_t n2;
@@ -66,7 +66,7 @@ public:
 			int password[20] = {};
 			int c = r.readArray(password, 20);//返回的是数组元素个数
 
-			CellSendStream ss(128);
+			CellWriteStream ss(128);
 			ss.setNetCmd(CMD_LOGOUT_RESULT);
 			ss.writeInt8(n1);
 			ss.writeInt16(n2);

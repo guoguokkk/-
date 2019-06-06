@@ -12,7 +12,8 @@
 class CellClient :public ObjectPoolBase<CellClient, 1000>
 {
 public:
-	CellClient(SOCKET sockfd = INVALID_SOCKET) :_SendBuf(SEND_BUF_SIZE), _recvBuf(RECV_BUF_SIZE)
+	CellClient(SOCKET sockfd = INVALID_SOCKET, int sendSize = SEND_BUF_SIZE, int recvSize = RECV_BUF_SIZE) :
+		_SendBuf(sendSize), _recvBuf(recvSize)
 	{
 		static int n = 1;
 		id = n++;
@@ -38,7 +39,7 @@ public:
 
 	//缓冲区的控制根据业务需求的差异而调整，异步发送数据
 	int sendData(netmsg_Header* header)
-	{		
+	{
 		return sendData((const char*)header, header->dataLength);
 	}
 
@@ -58,7 +59,7 @@ public:
 		resetDTSend();//重置发送时间
 		return _SendBuf.write2socket(_sockfd);
 	}
-	
+
 	//检测心跳	
 	bool checkHeart(time_t dt)
 	{

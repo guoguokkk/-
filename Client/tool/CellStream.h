@@ -62,13 +62,19 @@ public:
 	template<typename T>
 	bool onlyRead(T& n)
 	{
-		return Read(n, false);
+		return read(n, false);
 	}
-
-
+	
 	bool readInt8(int8_t& n) { return read<int8_t>(n); }//typedef signed char int8_t;	
 	bool readInt16(int16_t& n) { return read<int16_t>(n); }//typedef short int16_t;	
 	bool readInt32(int32_t& n) { return read<int32_t>(n); }//typedef int int32_t;
+	bool readInt64(int64_t& n) { return read<int64_t>(n); }//typedef long long int64_t;
+
+	bool readUInt8(uint8_t& n) { return read<uint8_t>(n); }//typedef unsigned char uint8_t;	
+	bool readUInt16(uint16_t& n) { return read<uint16_t>(n); }//typedef unsigned short uint16_t;
+	bool readUInt32(uint32_t& n) { return read<uint32_t>(n); }//typedef unsigned int uint32_t;	
+	bool readUInt64(uint64_t& n) { return read<uint64_t>(n); }//typedef unsigned long long uint64_t;
+
 	bool readFloat(float& n) { return read<float>(n); }
 	bool readDouble(double& n) { return read<double>(n); }
 
@@ -115,9 +121,16 @@ public:
 		return false;
 	}
 
-	bool writeInt8(int8_t n) { return write<int8_t>(n); }//typedef signed char int8_t;
-	bool writeInt16(int16_t n) { return write<int16_t>(n); }//typedef short int16_t;
-	bool writeInt32(int32_t n) { return write<int32_t>(n); }//typedef int int32_t;
+	bool writeInt8(int8_t n) { return write<int8_t>(n); }
+	bool writeInt16(int16_t n) { return write<int16_t>(n); }
+	bool writeInt32(int32_t n) { return write<int32_t>(n); }
+	bool writeInt64(int64_t n) { return write<int64_t>(n); }
+
+	bool writeUInt8(uint8_t n) { return write<uint8_t>(n); }
+	bool writeUInt16(uint16_t n) { return write<uint16_t>(n); }
+	bool writeUInt32(uint32_t n) { return write<uint32_t>(n); }
+	bool writeUInt64(uint64_t n) { return write<uint64_t>(n); }
+
 	bool writeFloat(float n) { return write<float>(n); }
 	bool writeDouble(double n) { return write<double>(n); }
 
@@ -153,5 +166,6 @@ private:
 	int _fullCount = 0;//缓冲区写满次数
 	bool _bDelete = false;//_pBuf是外部数据块，是否应该释放
 };
+
 #endif // !CELL_STREAM_H_
 

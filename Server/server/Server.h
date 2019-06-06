@@ -2,9 +2,9 @@
 #define SERVER_H_
 #include"../tool/Message.h"
 #include"../tool/CellTimeStamp.h"
-#include"INetEvent.h"
+#include"../server/INetEvent.h"
 #include"../tool/CellClient.h"
-#include"../tool/CellServer.h"
+#include"../server/CellServer.h"
 #include"../tool/CellThread.h"
 #include"../tool/CellNetWork.h"
 #include<signal.h>

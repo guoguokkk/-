@@ -39,7 +39,7 @@
     <ClCompile Include="test\TestServer.cpp">
       <Filter>源文件\test</Filter>
     </ClCompile>
-    <ClCompile Include="tool\CellServer.cpp">
+    <ClCompile Include="server\CellServer.cpp">
       <Filter>源文件\server</Filter>
     </ClCompile>
   </ItemGroup>
@@ -61,9 +61,6 @@
     </ClInclude>
     <ClInclude Include="test\MyServer.h">
       <Filter>源文件\test</Filter>
-    </ClInclude>
-    <ClInclude Include="tool\CellServer.h">
-      <Filter>源文件\server</Filter>
     </ClInclude>
     <ClInclude Include="tool\CellBuffer.h">
       <Filter>源文件\tool</Filter>
@@ -97,6 +94,9 @@
     </ClInclude>
     <ClInclude Include="tool\Message.h">
       <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="server\CellServer.h">
+      <Filter>源文件\server</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

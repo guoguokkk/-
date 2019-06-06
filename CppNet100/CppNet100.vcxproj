@@ -77,12 +77,18 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)../bin/$(Platform)/$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)../temp/$(Platform)/$(Configuration)/$(ProjectName)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)../bin/$(Platform)/$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)../temp/$(Platform)/$(Configuration)/$(ProjectName)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)../bin/$(Platform)/$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)../temp/$(Platform)/$(Configuration)/$(ProjectName)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -152,15 +158,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="client\Client.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="memory\MemoryAlloc.cpp" />
     <ClCompile Include="memory\MemoryPool.cpp" />
+    <ClCompile Include="test\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client\Client.h" />
     <ClInclude Include="memory\MemoryAlloc.h" />
     <ClInclude Include="memory\MemoryPool.h" />
     <ClInclude Include="memory\ObjectPool.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="tool\CellBuffer.h" />
     <ClInclude Include="tool\CellClient.h" />
     <ClInclude Include="tool\CellLog.h" />
@@ -172,6 +179,9 @@
     <ClInclude Include="tool\CellThread.h" />
     <ClInclude Include="tool\CellTimeStamp.h" />
     <ClInclude Include="tool\Message.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CppNet100.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
