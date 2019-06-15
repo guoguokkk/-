@@ -25,7 +25,7 @@ public:
 
 	~CellClient()
 	{
-		CellLog::Info("s=%d CellClient%d.~CellClient\n", serverId, id);
+		CELLLOG_DEBUG("s=%d CellClient%d.~CellClient\n", serverId, id);
 		if (_sockfd != INVALID_SOCKET)
 		{
 #ifdef _WIN32
@@ -66,7 +66,7 @@ public:
 		_dtHeart += dt;
 		if (_dtHeart >= CLIENT_HEART_DEAD_TIME)
 		{
-			CellLog::Info("checkHeart dead:s=%d,time=%ld\n", _sockfd, _dtHeart);
+			CELLLOG_INFO("checkHeart dead:s=%d,time=%ld\n", _sockfd, _dtHeart);
 			return true;
 		}
 		return false;
@@ -78,7 +78,7 @@ public:
 		_dtSend += dt;
 		if (_dtSend >= CLIENT_SEND_BUF_TIME)
 		{
-			//CellLog::Info("checkSend: _sockfd=%d, time=%d\n", (int)_sockfd, (int)_dtSend);
+			//CELLLOG_INFO("checkSend: _sockfd=%d, time=%d\n", (int)_sockfd, (int)_dtSend);
 			//时间到了，立即将发送缓冲区的数据发送出去
 			sendDataReal();
 

@@ -11,7 +11,7 @@ public:
 	CellReadStream(char* pData, int nSize = 1024, bool bDelete = false) :
 		CellStream(pData, nSize, false)
 	{
-		push(nSize);//写入消息长度个字节
+		//push(nSize);//写入消息长度个字节，我感觉不需要写，而且也能正确运行
 		uint16_t n;
 		read<uint16_t>(n);//读取消息的长度
 		getNetCmd();

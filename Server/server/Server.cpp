@@ -19,17 +19,17 @@ SOCKET Server::initServer()
 	//建立 socket
 	if (_serverSock != INVALID_SOCKET)
 	{
-		CellLog::Info("<socket=%d> close old connections.\n", (int)_serverSock);
+		CELLLOG_INFO("<socket=%d> close old connections.\n", (int)_serverSock);
 		closeServer();
 	}
 	_serverSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (_serverSock == INVALID_SOCKET)
 	{
-		CellLog::Info("<socket=%d> socket error.\n", (int)_serverSock);
+		CELLLOG_INFO("<socket=%d> socket error.\n", (int)_serverSock);
 	}
 	else
 	{
-		//CellLog::Info("<socket=%d> socket success.\n",(int)_server_sock);
+		//CELLLOG_INFO("<socket=%d> socket success.\n",(int)_server_sock);
 	}
 	return _serverSock;
 }
@@ -63,11 +63,11 @@ int Server::Bind(const char* ip, unsigned short port)
 	int ret = bind(_serverSock, (sockaddr*)& server_addr, sizeof(server_addr));
 	if (ret == SOCKET_ERROR)
 	{
-		CellLog::Info("<socket=%d> bind error.\n", (int)_serverSock);
+		CELLLOG_INFO("<socket=%d> bind error.\n", (int)_serverSock);
 	}
 	else
 	{
-		//CellLog::Info("<socket=%d> bind success.\n", (int)_server_sock);
+		//CELLLOG_INFO("<socket=%d> bind success.\n", (int)_server_sock);
 	}
 	return ret;
 }
@@ -77,11 +77,11 @@ int Server::Listen(int n)
 	int ret = listen(_serverSock, n);
 	if (ret == SOCKET_ERROR)
 	{
-		CellLog::Info("<socket=%d> listen error.\n", (int)_serverSock);
+		CELLLOG_INFO("<socket=%d> listen error.\n", (int)_serverSock);
 	}
 	else
 	{
-		//CellLog::Info("<socket=%d> listen success.\n", (int)_server_sock);
+		//CELLLOG_INFO("<socket=%d> listen success.\n", (int)_server_sock);
 	}
 	return ret;
 }
@@ -99,7 +99,7 @@ SOCKET Server::Accept()
 
 	if (client_sock == INVALID_SOCKET)
 	{
-		CellLog::Info("<socket=%d> accept error.\n", (int)_serverSock);
+		CELLLOG_INFO("<socket=%d> accept error.\n", (int)_serverSock);
 	}
 	else
 	{
@@ -112,7 +112,7 @@ SOCKET Server::Accept()
 		std::shared_ptr<CellClient> c(new CellClient(client_sock));
 		addClientToCellServer(c);
 
-		//CellLog::Info("New client %d join.\n", (int)client_sock);
+		//CELLLOG_INFO("New client %d join.\n", (int)client_sock);
 	}
 	return client_sock;
 }
@@ -151,7 +151,7 @@ void Server::startServer(int n_cellServer)
 
 void Server::closeServer()
 {
-	CellLog::Info("EasyTcpServer.Close begin\n");
+	CELLLOG_INFO("EasyTcpServer.Close begin\n");
 
 	//避免重复关闭！
 	if (_serverSock != INVALID_SOCKET)
@@ -169,7 +169,7 @@ void Server::closeServer()
 		_serverSock = INVALID_SOCKET;
 	}
 
-	CellLog::Info("EasyTcpServer.Close end\n");
+	CELLLOG_INFO("EasyTcpServer.Close end\n");
 }
 
 //只负责连接新客户端，有其他线程负责消息处理
@@ -188,7 +188,7 @@ void Server::onRun(CellThread * pThread)
 		int ret = select(_serverSock + 1, &fd_read, nullptr, nullptr, &time);
 		if (ret < 0)
 		{
-			CellLog::Info("<socket=%d> select error.\n", (int)_serverSock);
+			CELLLOG_ERROR("<socket=%d> select error.\n", (int)_serverSock);
 			pThread->exitThread();
 			break;
 		}
@@ -206,7 +206,7 @@ void Server::time4Msg()
 	auto t1 = _tTime.getElapsedSecond();
 	if (t1 >= 1.0)
 	{
-		CellLog::Info("thread<%d>,time<%lf>,socket<%d>,clients<%d>,recvCount<%d>,msgCount<%d>\n",
+		CELLLOG_INFO("thread<%d>,time<%lf>,socket<%d>,clients<%d>,recvCount<%d>,msgCount<%d>\n",
 			(int)_cellServers.size(), (double)t1, (int)_serverSock,
 			(int)(_clientCount), (int)(_recvCount), (int)_msgCount);
 		_recvCount = 0;

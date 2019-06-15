@@ -13,26 +13,20 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="源文件\memory">
-      <UniqueIdentifier>{e7440e6a-2827-4c17-8c85-be12565c9bc3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\tool">
-      <UniqueIdentifier>{f9047bb4-a468-499b-a1ae-1cbeed8f12a3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\test">
       <UniqueIdentifier>{a04fc64c-b3e0-4991-8abe-a530003fa5bb}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\server">
       <UniqueIdentifier>{610caa57-ff97-4644-addf-52c2bf52f8be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\tool">
+      <UniqueIdentifier>{8e16235b-6837-4bc8-b2b4-bdaf2db6dd46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\memory">
+      <UniqueIdentifier>{7542e5bd-d2a0-4330-b563-c0b903576fdf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="memory\MemoryAlloc.cpp">
-      <Filter>源文件\memory</Filter>
-    </ClCompile>
-    <ClCompile Include="memory\MemoryPool.cpp">
-      <Filter>源文件\memory</Filter>
-    </ClCompile>
     <ClCompile Include="server\Server.cpp">
       <Filter>源文件\server</Filter>
     </ClCompile>
@@ -42,17 +36,14 @@
     <ClCompile Include="server\CellServer.cpp">
       <Filter>源文件\server</Filter>
     </ClCompile>
+    <ClCompile Include="memory\MemoryAlloc.cpp">
+      <Filter>源文件\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\MemoryPool.cpp">
+      <Filter>源文件\memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="memory\MemoryAlloc.h">
-      <Filter>源文件\memory</Filter>
-    </ClInclude>
-    <ClInclude Include="memory\MemoryPool.h">
-      <Filter>源文件\memory</Filter>
-    </ClInclude>
-    <ClInclude Include="memory\ObjectPool.h">
-      <Filter>源文件\memory</Filter>
-    </ClInclude>
     <ClInclude Include="server\INetEvent.h">
       <Filter>源文件\server</Filter>
     </ClInclude>
@@ -61,6 +52,18 @@
     </ClInclude>
     <ClInclude Include="test\MyServer.h">
       <Filter>源文件\test</Filter>
+    </ClInclude>
+    <ClInclude Include="server\CellServer.h">
+      <Filter>源文件\server</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\MemoryAlloc.h">
+      <Filter>源文件\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\MemoryPool.h">
+      <Filter>源文件\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\ObjectPool.h">
+      <Filter>源文件\memory</Filter>
     </ClInclude>
     <ClInclude Include="tool\CellBuffer.h">
       <Filter>源文件\tool</Filter>
@@ -95,8 +98,10 @@
     <ClInclude Include="tool\Message.h">
       <Filter>源文件\tool</Filter>
     </ClInclude>
-    <ClInclude Include="server\CellServer.h">
-      <Filter>源文件\server</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
   </ItemGroup>
 </Project>

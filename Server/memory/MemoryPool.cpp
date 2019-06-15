@@ -2,7 +2,7 @@
 #include<assert.h>
 
 MemoryPool::MemoryPool()
-{	
+{
 	_pBuf = nullptr;//内存池的位置
 	_pHeader = nullptr;//第一个空闲块的位置
 	_nChunkSize = 0;//内存块大小
@@ -129,7 +129,7 @@ MemoryMgr::~MemoryMgr()
 {
 }
 
-void MemoryMgr::init_szAlloc(int nBegin, int nEnd, MemoryPool * pPool)
+void MemoryMgr::init_szAlloc(int nBegin, int nEnd, MemoryPool* pPool)
 {
 	for (int i = nBegin; i <= nEnd; ++i)
 	{

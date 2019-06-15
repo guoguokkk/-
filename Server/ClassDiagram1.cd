@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MyServer" Collapsed="true">
+    <Position X="5.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAFAA=</HashCode>
+      <FileName>test\MyServer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SendMsgToClientTask" Collapsed="true">
+    <Position X="17" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAEAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>server\CellServer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellServer" Collapsed="true">
+    <Position X="17" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QICgAAEAAAIBgAAAAEBDKCAAEiIAEIAAAAAAAAgAEgQ=</HashCode>
+      <FileName>server\CellServer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="INetEvent" Collapsed="true">
+    <Position X="5.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAFAA=</HashCode>
+      <FileName>server\INetEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Server" Collapsed="true">
+    <Position X="5.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QoAAgCIAQAAAAUBAAAADIAQEAgAAAAABAAEAAgAAFAA=</HashCode>
+      <FileName>server\Server.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellBuffer" Collapsed="true">
+    <Position X="17" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgACAAAQQAAAEgAIAAAgAAAAAAAEAYAAAgQAA=</HashCode>
+      <FileName>tool\CellBuffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellClient" Collapsed="true">
+    <Position X="0.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgABgAAjAAAAgAQAAGEgAAACIAgAAAAAAAIAAABAAwM=</HashCode>
+      <FileName>tool\CellClient.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellLog" Collapsed="true">
+    <Position X="18.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIEAAAAAAAAACAAAAAAAAAAAAAgAAQAEAAEAAAAA=</HashCode>
+      <FileName>tool\CellLog.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellReadStream" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>tool\CellMsgStream.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellWriteStream" Collapsed="true">
+    <Position X="2.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAACAAAAAAAAAAAAAAAAAAAKAAAAAA=</HashCode>
+      <FileName>tool\CellMsgStream.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellNetwork" Collapsed="true">
+    <Position X="20.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAY=</HashCode>
+      <FileName>tool\CellNetWork.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellSemaphore" Collapsed="true">
+    <Position X="22.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAAAAAAAAAACAAAAAgAAAAAEABAAAAABAAg=</HashCode>
+      <FileName>tool\CellSemaphore.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellStream" Collapsed="true">
+    <Position X="1.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAISAAAAAAFQAQCABmERMNAgAiAAAAKgB0gJAABAIMA=</HashCode>
+      <FileName>tool\CellStream.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellTaskServer" Collapsed="true">
+    <Position X="18.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IIgACAAAAAAAAQQAAAADAAAAAAAAAAABAAAAAAAACAA=</HashCode>
+      <FileName>tool\CellTask.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellThread" Collapsed="true">
+    <Position X="20.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAgAEAAAAAACQAwgAAAAEABAAAAAAACAABA=</HashCode>
+      <FileName>tool\CellThread.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellTime" Collapsed="true">
+    <Position X="22.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>tool\CellTimeStamp.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CellTimeStamp" Collapsed="true">
+    <Position X="17" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAACAgECAAAAAAACAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>tool\CellTimeStamp.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chunk">
+    <Position X="18.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACABAAAAAAoAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>memory\MemoryPool.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MemoryPool" Collapsed="true">
+    <Position X="3.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABQAAAAAAAAAAAAACAAAAEACAAAAACEAAAAAEIBA=</HashCode>
+      <FileName>memory\MemoryPool.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyMemoryPool&lt;nChunkSize, nChunkNum&gt;" Collapsed="true">
+    <Position X="3.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>memory\MemoryPool.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MemoryMgr" Collapsed="true">
+    <Position X="20.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAACEAAAAEAAgAAAAAAAgAABAAAAAAIADAAAACAA=</HashCode>
+      <FileName>memory\MemoryPool.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ObjectPool&lt;Type, nNodeNum&gt;" Collapsed="true">
+    <Position X="22.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABQAAAAAAAQAAAAACAAAAAAAAAAAAAEBAAACCAAA=</HashCode>
+      <FileName>memory\ObjectPool.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ObjectPoolBase&lt;Type, nNodeNum&gt;" Collapsed="true">
+    <Position X="0.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAEAAAAAgAAAAAAAQAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>memory\ObjectPool.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="netmsg_Header" Collapsed="true">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAIAAAAAAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>tool\Message.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="netmsg_Login" Collapsed="true">
+    <Position X="3.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAQAAEAEAA=</HashCode>
+      <FileName>tool\Message.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="netmsg_LoginResult" Collapsed="true">
+    <Position X="7.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>tool\Message.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="netmsg_Logout" Collapsed="true">
+    <Position X="10" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>tool\Message.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="netmsg_LogoutResult" Collapsed="true">
+    <Position X="12.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>tool\Message.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="netmsg_NewUserJoin" Collapsed="true">
+    <Position X="14.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAACAAAAAAAAAA=</HashCode>
+      <FileName>tool\Message.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="netmsg_c2s_Heart" Collapsed="true">
+    <Position X="1" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>tool\Message.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="netmsg_s2c_Heart" Collapsed="true">
+    <Position X="5.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>tool\Message.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="CMD" Collapsed="true">
+    <Position X="17" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAABAAAACAAAAAAAIAABAAAABAAAAAAAgIAAA=</HashCode>
+      <FileName>tool\Message.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

@@ -11,7 +11,7 @@
 
 int main()
 {
-	CellLog::Instance().setLogPath("../../serverLog.txt", "w");
+	CellLog::Instance().setLogPath("../../serverLog", "w");
 	MyServer server;
 	server.initServer();
 	server.Bind(nullptr, PORT);
@@ -31,7 +31,7 @@ int main()
 		}
 		else
 		{
-			CellLog::Info("undefine cmd\n");
+			CELLLOG_INFO("undefine cmd\n");
 		}
 	}
 

@@ -20,18 +20,18 @@ void Client::initClient(int sendSize, int recvSize)
 
 	if (_pClient)
 	{
-		CellLog::Info("<socket=%d> close old connections.\n", _pClient->getSockfd());// cout语句不是原子操作
+		CELLLOG_INFO("<socket=%d> close old connections.\n", _pClient->getSockfd());// cout语句不是原子操作
 		closeClient();
 	}
 
 	SOCKET clientSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (clientSock == INVALID_SOCKET)
 	{
-		CellLog::Info("<socket=%d> build socket error.\n", (int)clientSock);
+		CELLLOG_INFO("<socket=%d> build socket error.\n", (int)clientSock);
 	}
 	else
 	{
-		//CellLog::Info("<socket=%d> build socket success.\n", _client_sock);
+		//CELLLOG_INFO("<socket=%d> build socket success.\n", _client_sock);
 		_pClient = new CellClient(clientSock, sendSize, recvSize);
 	}
 }
@@ -55,12 +55,12 @@ int Client::connectToServer(const char* ip, unsigned short port)
 	int ret = connect(_pClient->getSockfd(), (sockaddr*)& server_addr, sizeof(server_addr));
 	if (ret == SOCKET_ERROR)
 	{
-		CellLog::Info("<socket=%d> connect error.\n", (int)_pClient->getSockfd());
+		CELLLOG_INFO("<socket=%d> connect error.\n", (int)_pClient->getSockfd());
 	}
 	else
 	{
 		_isConnect = true;
-		//CellLog::Info("<socket=%d> connect success.\n", _pClient->getSockfd());
+		//CELLLOG_INFO("<socket=%d> connect success.\n", _pClient->getSockfd());
 	}
 	return ret;
 }
@@ -103,7 +103,7 @@ bool Client::onRun()
 
 		if (ret < 0)
 		{
-			CellLog::Info("<socket=%d> select error 1.\n", (int)clientSock);
+			CELLLOG_INFO("<socket=%d> select error 1.\n", (int)clientSock);
 			closeClient();
 			return false;
 		}
@@ -113,7 +113,7 @@ bool Client::onRun()
 			int ret = recvData(clientSock);//处理收到的消息
 			if (ret == -1)
 			{
-				CellLog::Info("<socket=%d> select error 2.\n", (int)clientSock);
+				CELLLOG_INFO("<socket=%d> select error 2.\n", (int)clientSock);
 				closeClient();
 				return false;
 			}
@@ -124,7 +124,7 @@ bool Client::onRun()
 			int ret = _pClient->sendDataReal();//处理收到的消息
 			if (ret == -1)
 			{
-				CellLog::Info("<socket=%d> select error 2.\n", (int)clientSock);
+				CELLLOG_INFO("<socket=%d> select error 2.\n", (int)clientSock);
 				closeClient();
 				return false;
 			}
