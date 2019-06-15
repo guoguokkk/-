@@ -47,7 +47,7 @@ protected:
 			//清空任务
 			_tasks.clear();
 		}
-		//printf("CellTaskServer%d.OnRun exit\n", serverId);		
+		//printf("CellTaskServer%d.OnRun exit", serverId);		
 		//_sem.wakeup();
 	}
 public:
@@ -63,9 +63,9 @@ public:
 	//关闭工作线程
 	virtual void closeTask()
 	{
-		//printf("CellTaskServer%d.Close begin\n", serverId);
+		//printf("CellTaskServer%d.Close begin", serverId);
 		_thread.closeThread();
-		//printf("CellTaskServer%d.Close end\n", serverId);
+		//printf("CellTaskServer%d.Close end", serverId);
 	}
 
 	//将任务添加到任务队列

@@ -37,7 +37,7 @@ private:
 		_taskSever.closeTask();
 		if (_logFile)
 		{
-			Info("CellLog::fclose()\n");
+			Info("CellLog::fclose");
 			fclose(_logFile);
 			_logFile = nullptr;
 		}
@@ -54,7 +54,7 @@ public:
 	{
 		if (_logFile)
 		{
-			Info("CellLog::fclose()\n");
+			Info("CellLog::fclose");
 			fclose(_logFile);
 			_logFile = nullptr;
 		}
@@ -73,11 +73,11 @@ public:
 		_logFile = fopen(logPath, mode);
 		if (_logFile)
 		{
-			Echo("CellLog::setLogPath() success, <%s, %s>\n", logPath, mode);
+			CELLLOG_INFO("CellLog::setLogPath success, <%s, %s>", logPath, mode);
 		}
 		else
 		{
-			Echo("CellLog::setLogPath() failed, <%s, %s>\n", logPath, mode);
+			CELLLOG_INFO("CellLog::setLogPath failed, <%s, %s>", logPath, mode);
 		}
 	}
 
@@ -90,7 +90,7 @@ public:
 	template<typename ...Args>
 	static void Info(const char* pformat, Args... args)
 	{
-		Echo("Info", pformat, args...);
+		Echo("Info, ", pformat, args...);
 	}
 
 	//Error
@@ -102,7 +102,7 @@ public:
 	template<typename ...Args>
 	static void Error(const char* pformat, Args... args)
 	{
-		Echo("Error", pformat, args...);
+		Echo("Error, ", pformat, args...);
 	}
 
 	//Debug
@@ -114,7 +114,7 @@ public:
 	template<typename ...Args>
 	static void Debug(const char* pformat, Args... args)
 	{
-		Echo("Debug", pformat, args...);
+		Echo("Debug, ", pformat, args...);
 	}
 
 	//Warring
@@ -126,7 +126,7 @@ public:
 	template<typename ...Args>
 	static void Warring(const char* pformat, Args... args)
 	{
-		Echo("Warring", pformat, args...);
+		Echo("Warring, ", pformat, args...);
 	}
 
 	template<typename ...Args>
@@ -145,9 +145,12 @@ public:
 				fprintf(pLog->_logFile, "[%d-%d-%d %d:%d:%d] ",
 					now->tm_year + 1900, now->tm_mon + 1, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
 				fprintf(pLog->_logFile, pformat, args...);
+				fprintf(pLog->_logFile, "%s", "\n");
 				fflush(pLog->_logFile);
 			}
+			printf("%s", type);
 			printf(pformat, args...);
+			printf("%s", "\n");
 			});
 	}
 

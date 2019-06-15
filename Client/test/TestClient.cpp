@@ -24,12 +24,12 @@ void cmdThread()
 		if (strcmp(cmdBuf, "exit") == 0)
 		{
 			g_bRun = false;
-			CELLLOG_INFO("Client exit.\n");
+			CELLLOG_INFO("Client exit.");
 			break;
 		}
 		else
 		{
-			CELLLOG_INFO("Invalid input, please re-enter.\n");
+			CELLLOG_INFO("Invalid input, please re-enter.");
 		}
 	}
 }
@@ -56,7 +56,7 @@ void recvThread(int begin, int end)//1-4，四个线程
 
 void sendThread(int id)//1-4，四个线程
 {
-	CELLLOG_INFO("thread<%d>,start\n", id);
+	CELLLOG_INFO("thread<%d>,start", id);
 	int c = client_count / thread_count;
 	int begin = (id - 1) * c;
 	int end = id * c;
@@ -70,7 +70,7 @@ void sendThread(int id)//1-4，四个线程
 		client[i]->connectToServer(IP, PORT);
 	}
 
-	CELLLOG_INFO("thread<%d>,Connect<begin=%d, end=%d>\n", id, begin, end);
+	CELLLOG_INFO("thread<%d>,Connect<begin=%d, end=%d>", id, begin, end);
 
 	//等待其他线程准备好发送
 	++readyCount;
@@ -109,7 +109,7 @@ void sendThread(int id)//1-4，四个线程
 		delete client[i];
 	}
 
-	CELLLOG_INFO("thread<%d>,exit\n", id);
+	CELLLOG_INFO("thread<%d>,exit", id);
 }
 
 int main()
@@ -159,10 +159,10 @@ int main()
 		{
 			//!"std::atomic<int>::atomic(const std::atomic<int>&)": 尝试引用已删除的函数
 			//!将类 "std::atomic<int>" 作为可变参数函数的参数的非标准用法
-			/*CELLLOG_INFO("thread<%d>,clients<%d>,time<%lf>,send<%d>\n",
+			/*CELLLOG_INFO("thread<%d>,clients<%d>,time<%lf>,send<%d>",
 				thread_count, client_count, t, sendCount);*/
 
-			CELLLOG_INFO("thread<%d>,clients<%d>,time<%lf>,send<%d>\n",
+			CELLLOG_INFO("thread<%d>,clients<%d>,time<%lf>,send<%d>",
 				thread_count, client_count, t, (int)(sendCount.load() / t));
 
 			sendCount = 0;

@@ -17,7 +17,7 @@ public:
 		case CMD_LOGIN_RESULT:
 		{
 			netmsg_LoginResult* login_result = (netmsg_LoginResult*)header;
-			/*CELLLOG_INFO("netmsg_Login result : socket = %d , data length= %d , result= %d\n",
+			/*CELLLOG_INFO("netmsg_Login result : socket = %d , data length= %d , result= %d",
 				(int)_clientSock, login_result->dataLength, login_result->result);*/
 		}
 		break;
@@ -42,26 +42,26 @@ public:
 			int c = r.readArray(password, 20);//返回的是数组元素个数
 
 			netmsg_LogoutResult* logout_result = (netmsg_LogoutResult*)header;
-			/*CELLLOG_INFO("netmsg_Logout result : socket = %d , data length= %d , result= %d\n",
+			/*CELLLOG_INFO("netmsg_Logout result : socket = %d , data length= %d , result= %d",
 				(int)_client_sock, logout_result->dataLength, logout_result->result);*/
 		}
 		break;
 		case CMD_NEW_USER_JOIN:
 		{
 			netmsg_NewUserJoin* new_user_join = (netmsg_NewUserJoin*)header;
-			/*CELLLOG_INFO("New user join : socket = %d , data length = %d, sock= %d\n",
+			/*CELLLOG_INFO("New user join : socket = %d , data length = %d, sock= %d",
 				(int)_client_sock, new_user_join->dataLength, new_user_join->sock);*/
 		}
 		break;
 		case CMD_ERROR:
 		{
-			CELLLOG_INFO("error : socket = %d , data length= %d\n",
+			CELLLOG_INFO("error : socket = %d , data length= %d",
 				(int)_pClient->getSockfd(), header->dataLength);
 		}
 		break;
 		default:
 		{
-			CELLLOG_INFO("Undefined data : socket = %d , data length=  %d\n",
+			CELLLOG_INFO("Undefined data : socket = %d , data length=  %d",
 				(int)_pClient->getSockfd(), header->dataLength);
 		}
 		break;

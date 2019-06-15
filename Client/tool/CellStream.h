@@ -55,7 +55,7 @@ public:
 		}
 
 		//错误日志
-		CELLLOG_ERROR(" CellStream: read failed\n");
+		CELLLOG_ERROR("CellStream: read failed");
 		return 0;
 	}
 
@@ -98,7 +98,7 @@ public:
 		}
 
 		//错误日志
-		CELLLOG_ERROR(" CellStream: read failed\n");
+		CELLLOG_ERROR("CellStream: read failed");
 		return 0;
 	}
 
@@ -117,7 +117,7 @@ public:
 		}
 
 		//错误日志
-		CELLLOG_ERROR(" CellStream: write failed\n");
+		CELLLOG_ERROR("CellStream: write failed");
 		return false;
 	}
 
@@ -150,7 +150,7 @@ public:
 		}
 
 		//错误日志
-		CELLLOG_ERROR(" CellStream: write failed\n");
+		CELLLOG_ERROR("CellStream: write failed");
 		return false;
 	}
 

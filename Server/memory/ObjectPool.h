@@ -56,7 +56,7 @@ public:
 			pReturn->pNext = nullptr;
 		}
 
-		//CELLLOG_INFO("pReturn=%p, pReturn->nID=%d, nNodeNum=%d\n", pReturn, pReturn->nID, nNodeNum);
+		//CELLLOG_INFO("pReturn=%p, pReturn->nID=%d, nNodeNum=%d", pReturn, pReturn->nID, nNodeNum);
 		return ((char*)pReturn + sizeof(objectNode));
 	}
 
@@ -90,7 +90,7 @@ private:
 
 		size_t nNodeSize = sizeof(Type) + sizeof(objectNode);//一个节点的大小：数据+头部描述信息
 		size_t n = nNodeSize * nNodeNum;
-		CELLLOG_INFO("malloc %lu...\n", n);
+		CELLLOG_INFO("malloc %lu...", n);
 		_pBuf = new char[n];
 		_pHeader = (objectNode*)_pBuf;
 		_pHeader->nID = 0;

@@ -12,13 +12,13 @@ public:
 	virtual void onNetJoin(std::shared_ptr<CellClient>& pClient)//只会被一个线程触发，安全
 	{
 		Server::onNetJoin(pClient);
-		//CELLLOG_INFO("Client<%d> join\n", (int)pClient->GetSock());
+		//CELLLOG_INFO("Client<%d> join", (int)pClient->GetSock());
 	}
 
 	virtual void onNetLeave(std::shared_ptr<CellClient>& pClient)//有客户端离开事件
 	{
 		Server::onNetLeave(pClient);
-		//CELLLOG_INFO("Client<%d> leave\n", (int)pClient->GetSock());
+		//CELLLOG_INFO("Client<%d> leave", (int)pClient->GetSock());
 	}
 
 	virtual void onNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient>& pClient, netmsg_Header* header)
@@ -38,7 +38,7 @@ public:
 			//用登录消息代替心跳消息，收到客户端的登录消息相当于收到心跳消息
 			pClient->resetDTHeart();//重置心跳
 			netmsg_Login* login = (netmsg_Login*)header;
-			/*CELLLOG_INFO("netmsg_Login : socket = %d , user name = %r , password= %r\n",
+			/*CELLLOG_INFO("netmsg_Login : socket = %d , user name = %r , password= %r",
 				(int)pClient->getSockfd(), login->userName, login->passWord);*/
 
 			netmsg_LoginResult* login_result = new netmsg_LoginResult();
@@ -82,21 +82,21 @@ public:
 
 
 				/*	netmsg_Logout* logout = (netmsg_Logout*)header;
-					CELLLOG_INFO("netmsg_Logout : socket = %d , user name = %s \n",
+					CELLLOG_INFO("netmsg_Logout : socket = %d , user name = %s ",
 						(int)pClient->getSockfd(), logout->userName);*/
 				break;
 		}
 
 		case CMD_ERROR:
 		{
-			CELLLOG_INFO("error : socket = %d , data length= %d\n",
+			CELLLOG_INFO("error : socket = %d , data length= %d",
 				(int)pClient->getSockfd(), header->dataLength);
 			break;
 		}
 
 		default:
 		{
-			CELLLOG_INFO("Undefined data : socket = %d , data length=  %d\n",
+			CELLLOG_INFO("Undefined data : socket = %d , data length=  %d",
 				(int)pClient->getSockfd(), header->dataLength);
 			break;
 		}

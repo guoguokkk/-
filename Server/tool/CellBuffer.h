@@ -89,7 +89,7 @@ public:
 			//判断客户端是否退出
 			if (nLen <= 0)
 			{
-				CELLLOG_INFO("read4socket, nLen_%d\n", nLen);
+				CELLLOG_INFO("read4socket, nLen_%d", nLen);
 				return -1;
 			}
 			_nLast += nLen;
