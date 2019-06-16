@@ -209,8 +209,8 @@ void CellServer::writeData(fd_set& fd_write)
 			{
 				onClientLeave(iter->second);
 				auto iterOld = iter;
-				++iter
-					_clients.erase(iter);
+				++iter;
+				_clients.erase(iter);
 				continue;
 			}
 		}

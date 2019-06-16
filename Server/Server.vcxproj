@@ -35,6 +35,7 @@
     <ClInclude Include="test\MyServer.h" />
     <ClInclude Include="tool\CellBuffer.h" />
     <ClInclude Include="tool\CellClient.h" />
+    <ClInclude Include="tool\CellConfig.h" />
     <ClInclude Include="tool\CellLog.h" />
     <ClInclude Include="tool\CellMsgStream.h" />
     <ClInclude Include="tool\CellNetWork.h" />

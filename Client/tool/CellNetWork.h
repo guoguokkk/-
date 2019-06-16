@@ -1,6 +1,7 @@
 #ifndef CELL_NETWORK_H_
 #define CELL_NETWORK_H_
 #include"Message.h"
+#include<signal.h>
 
 //分离网络启动与关闭，避免多个服务器对象启动关闭时出现异常
 class CellNetwork

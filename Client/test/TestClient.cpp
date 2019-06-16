@@ -8,7 +8,7 @@
 #include"MyClient.h"
 #include"../tool/CellLog.h"
 #include"../tool/CellThread.h"
-#include"../tool/CellStream.h"
+#include"../tool/CellStream.h".
 #include"../tool/CellMsgStream.h"
 
 #define CLIENT_COUNT 1000//客户端数量
@@ -114,7 +114,7 @@ void sendThread(int id)//1-4，四个线程
 
 int main()
 {
-	CellLog::Instance().setLogPath("../../clientLog", "w");
+	CellLog::Instance().setLogPath("../../log/clientLog", "w");
 
 	/*CellWriteStream s;
 	s.setNetCmd(CMD_LOGOUT);
