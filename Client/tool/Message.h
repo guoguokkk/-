@@ -1,60 +1,33 @@
 #ifndef MESSAGE_H_
 #define MESSAGE_H_
 
-#ifdef _WIN32
-#define FD_SETSIZE 10056
-#define WIN32_LEAN_AND_MEAN//解决 Windows.h 和 WinSock2.h 冲突
-#include<Windows.h>
-#include<WinSock2.h>
-#pragma comment(lib,"ws2_32.lib")
-
-#else
-#include<arpa/inet.h>
-#include<sys/socket.h>
-#include<unistd.h>
-#include<string.h>
-#define SOCKET int
-#define INVALID_SOCKET (SOCKET)(~0)
-#define SOCKET_ERROR -1
-#endif // _WIN32
-
-#define IP "202.114.7.16"
-//#define IP "192.168.153.129"//ubuntu
-#define PORT 8099
-
-//缓冲区最小单元大小
-#ifndef RECV_BUF_SIZE
-#define RECV_BUF_SIZE 10240
-#define SEND_BUF_SIZE 1024000
-#endif // !RECV_BUF_SIZE
-
-//命令
+//命令类型
 enum CMD
 {
-	CMD_LOGIN,
+	CMD_LOGIN,//登入
 	CMD_LOGIN_RESULT,
-	CMD_LOGOUT,
+	CMD_LOGOUT,//登出
 	CMD_LOGOUT_RESULT,
-	CMD_ERROR,
-	CMD_NEW_USER_JOIN,
-	CMD_C2S_HEART,
-	CMD_S2C_HEART
+	CMD_ERROR,//错误
+	CMD_NEW_USER_JOIN,//新用户加入
+	CMD_C2S_HEART,//客户端发给服务器端的心跳消息
+	CMD_S2C_HEART//服务器端发给客户端的心跳消息
 };
 
-//消息头
-struct netmsg_Header
+//消息头(消息总长度、命令类型)
+struct netmsg_DataHeader
 {
-	netmsg_Header()
+	netmsg_DataHeader()
 	{
-		dataLength = sizeof(netmsg_Header);
+		dataLength = sizeof(netmsg_DataHeader);
 		cmd = CMD_ERROR;
 	}
-	unsigned short dataLength;//消息的长度
-	unsigned short cmd;//命令	
+	unsigned short dataLength;//消息总长度
+	unsigned short cmd;//命令类型	
 };
 
-//登录消息
-struct  netmsg_Login :public netmsg_Header
+//登录消息-100字节：消息头(消息总长度、命令类型)、用户名、密码、数据、消息ID
+struct netmsg_Login :public netmsg_DataHeader
 {
 	netmsg_Login()
 	{
@@ -63,11 +36,12 @@ struct  netmsg_Login :public netmsg_Header
 	}
 	char userName[32];
 	char passWord[32];
-	char data[32];
+	char getData[28];
+	int msgID;
 };
 
-//登录结果消息
-struct  netmsg_LoginResult :public netmsg_Header
+//登录结果消息-100字节：消息头(消息总长度、命令类型)、登录结果、数据、消息ID
+struct netmsg_LoginResult :public netmsg_DataHeader
 {
 	netmsg_LoginResult()
 	{
@@ -76,11 +50,12 @@ struct  netmsg_LoginResult :public netmsg_Header
 		result = 0;
 	}
 	int result;
-	char data[92];
+	char getData[88];
+	int msgID;
 };
 
-//登出消息
-struct  netmsg_Logout :public netmsg_Header
+//登出消息-40字节：消息头(消息总长度、命令类型)、用户名
+struct netmsg_Logout :public netmsg_DataHeader
 {
 	netmsg_Logout()
 	{
@@ -88,10 +63,11 @@ struct  netmsg_Logout :public netmsg_Header
 		cmd = CMD_LOGOUT;
 	}
 	char userName[32];
+	int msgID;
 };
 
-//登出结果消息
-struct  netmsg_LogoutResult :public netmsg_Header
+//登出结果消息-8字节：消息头(消息总长度、命令类型)、结果
+struct  netmsg_LogoutResult :public netmsg_DataHeader
 {
 	netmsg_LogoutResult()
 	{
@@ -102,8 +78,8 @@ struct  netmsg_LogoutResult :public netmsg_Header
 	int result;
 };
 
-//新用户加入
-struct  netmsg_NewUserJoin :public netmsg_Header
+//新用户加入消息-8字节：消息头(消息总长度、命令类型)、新加入用户的描述符
+struct  netmsg_NewUserJoin :public netmsg_DataHeader
 {
 	netmsg_NewUserJoin()
 	{
@@ -114,8 +90,8 @@ struct  netmsg_NewUserJoin :public netmsg_Header
 	int sock;
 };
 
-//心跳消息，客户端发送给服务器
-struct  netmsg_c2s_Heart :public netmsg_Header
+//客户端发给服务器端的心跳消息-4字节：消息头(消息总长度、命令类型)
+struct  netmsg_c2s_Heart :public netmsg_DataHeader
 {
 	netmsg_c2s_Heart()
 	{
@@ -124,8 +100,8 @@ struct  netmsg_c2s_Heart :public netmsg_Header
 	}
 };
 
-//心跳消息，服务器发送给客户端
-struct  netmsg_s2c_Heart :public netmsg_Header
+//服务器端发给客户端的心跳消息-4字节：消息头(消息总长度、命令类型)
+struct  netmsg_s2c_Heart :public netmsg_DataHeader
 {
 	netmsg_s2c_Heart()
 	{

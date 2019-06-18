@@ -20,18 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client\Client.cpp" />
-    <ClCompile Include="memory\MemoryAlloc.cpp" />
-    <ClCompile Include="memory\MemoryPool.cpp" />
     <ClCompile Include="test\TestClient.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="client\CellBuffer.h" />
+    <ClInclude Include="client\CellClient.h" />
     <ClInclude Include="client\Client.h" />
-    <ClInclude Include="memory\MemoryAlloc.h" />
-    <ClInclude Include="memory\MemoryPool.h" />
-    <ClInclude Include="memory\ObjectPool.h" />
-    <ClInclude Include="test\MyClient.h" />
-    <ClInclude Include="tool\CellBuffer.h" />
-    <ClInclude Include="tool\CellClient.h" />
+    <ClInclude Include="tool\CellConfig.h" />
+    <ClInclude Include="tool\CellFDSet.h" />
     <ClInclude Include="tool\CellLog.h" />
     <ClInclude Include="tool\CellMsgStream.h" />
     <ClInclude Include="tool\CellNetWork.h" />
@@ -40,6 +36,7 @@
     <ClInclude Include="tool\CellTask.h" />
     <ClInclude Include="tool\CellThread.h" />
     <ClInclude Include="tool\CellTimeStamp.h" />
+    <ClInclude Include="tool\Common.h" />
     <ClInclude Include="tool\Message.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

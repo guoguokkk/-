@@ -3,6 +3,7 @@
 #include<chrono>
 using namespace std::chrono;
 
+//获取时间
 class CellTime
 {
 public:
@@ -19,26 +20,29 @@ class CellTimeStamp
 public:
 	CellTimeStamp()
 	{
-		update();
+		update();//更新时间
 	}
-	~CellTimeStamp() = default;
+	~CellTimeStamp()
+	{
+
+	}
 
 	//更新时间
 	void update()
 	{
-		_begin = high_resolution_clock::now();
+		_begin = high_resolution_clock::now();//获取当前时间
 	}
 
 	//获取秒
 	double getElapsedSecond()
 	{
-		return getElapsedTimeInMicroSec()* 0.000001;
+		return getElapsedTimeInMicroSec() * 0.000001;
 	}
 
 	//获取毫秒
 	double getElapsedTimeInMillSec()
 	{
-		return getElapsedTimeInMicroSec()* 0.001;
+		return getElapsedTimeInMicroSec() * 0.001;
 	}
 	//获取微秒
 	long long getElapsedTimeInMicroSec()

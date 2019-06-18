@@ -158,11 +158,11 @@ int Client::recvData(SOCKET clientSock)
 	return 0;
 }
 
-void Client::onNetMsg(netmsg_Header* header)
+void Client::onNetMsg(netmsg_DataHeader* header)
 {
 }
 
-int Client::sendData(netmsg_Header* header)
+int Client::sendData(netmsg_DataHeader* header)
 {
 	if (isRun())
 	{

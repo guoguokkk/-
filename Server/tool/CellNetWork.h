@@ -1,16 +1,19 @@
 #ifndef CELL_NETWORK_H_
 #define CELL_NETWORK_H_
-#include"Message.h"
-#include<signal.h>
+#include"../tool/Common.h"
+#ifndef _WIN32
+#include<fcntl.h>
+#include<stdlib.h>
+#endif // !_WIN32
 
-//分离网络启动与关闭，避免多个服务器对象启动关闭时出现异常
+//鍒嗙缃戠粶鍚姩涓庡叧闂紝閬垮厤澶氫釜鏈嶅姟鍣ㄥ璞″惎鍔ㄥ叧闂椂鍑虹幇寮傚父
 class CellNetwork
 {
 private:
 	CellNetwork()
 	{
 #ifdef _WIN32
-		//启动 windows 环境
+		//鍚姩Windows socket 2.x鐜
 		WORD version = MAKEWORD(2, 2);
 		WSADATA data;
 		WSAStartup(version, &data);
@@ -19,7 +22,7 @@ private:
 #ifndef _WIN32
 		//if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 		//	return (1);
-		//忽略异常信号，默认情况会导致进程终止
+		//蹇界暐寮傚父淇″彿锛岄粯璁ゆ儏鍐典細瀵艰嚧杩涚▼缁堟
 		signal(SIGPIPE, SIG_IGN);
 #endif // !_WIN32
 	}
@@ -27,7 +30,7 @@ private:
 	~CellNetwork()
 	{
 #ifdef _WIN32
-		WSACleanup();//关闭 windows 环境
+		WSACleanup();//娓呴櫎Windows socket鐜
 #endif // _WIN32
 	}
 
@@ -36,7 +39,49 @@ public:
 	{
 		static CellNetwork obj;
 	}
+
+	static int make_nonblocking(SOCKET fd)
+	{
+#ifdef _WIN32
+		{
+			unsigned long nonblocking = 1;
+			if (ioctlsocket(fd, FIONBIO, &nonblocking) == SOCKET_ERROR)
+			{
+				CELLLOG_WARRING("fcntl(%d, F_GETFL)", (int)fd);
+				return -1;
+			}
+		}
+#else
+		{
+			int flags;
+			if ((flags = fcntl(fd, F_GETFL, NULL)) < 0) 
+			{
+				CELLLOG_WARRING("fcntl(%d, F_GETFL)", fd);
+				return -1;
+			}
+			if (!(flags & O_NONBLOCK))
+			{
+				if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1)
+				{
+					CELLLOG_WARRING("fcntl(%d, F_SETFL)", fd);
+					return -1;
+				}
+			}
+		}
+#endif
+		return 0;
+	}
+
+	static int make_reuseaddr(SOCKET fd)
+	{
+		int flag = 1;
+		if (SOCKET_ERROR == setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const char*)& flag, sizeof(flag)))
+		{
+			CELLLOG_WARRING("setsockopt socket<%d> SO_REUSEADDR fail", (int)fd);
+			return SOCKET_ERROR;
+		}
+		return 0;
+	}
 };
 
 #endif // !CELL_NETWORK_H_
-

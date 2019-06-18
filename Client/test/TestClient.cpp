@@ -1,122 +1,247 @@
-#include<iostream>
 #include"../client/Client.h"
+#include"../tool/Common.h"
+#include"../tool/CellThread.h"
+#include"../tool/CellConfig.h"
 #include<thread>
 #include<chrono>
 #include<stdio.h>
 #include<atomic>
-#include"../tool/CellTimeStamp.h"
-#include"MyClient.h"
-#include"../tool/CellLog.h"
-#include"../tool/CellThread.h"
-#include"../tool/CellStream.h".
-#include"../tool/CellMsgStream.h"
+#include<iostream>
+#include<vector>
 
-#define CLIENT_COUNT 1000//客户端数量
-#define THREAD_COUNT 4//线程数量
+const char* strIP = "127.0.0.1";//服务器IP地址
+uint16_t nPort = 8099;//服务器端口
+int nThread = 1;//发送线程的数量
+int nClient = 1;//客户端数量
 
-bool g_bRun = true;
-void cmdThread()
-{
-	while (true)
-	{
-		char cmdBuf[256] = {};
-		scanf("%s", cmdBuf);
-		if (strcmp(cmdBuf, "exit") == 0)
-		{
-			g_bRun = false;
-			CELLLOG_INFO("Client exit.");
-			break;
-		}
-		else
-		{
-			CELLLOG_INFO("Invalid input, please re-enter.");
-		}
-	}
-}
+int nMsg = 1;//客户端每次发几条消息
+int nSendSleep = 1;//写入消息到缓冲区的间隔时间
+int nWorkSleep = 1;//工作休眠时间
+int nSendBufSize = SEND_BUF_SIZE;//客户端发送缓冲区大小
+int nRecvBufSize = RECV_BUF_SIZE;//客户端接收缓冲区大小
 
-const int client_count = CLIENT_COUNT;//客户端数量
-Client* client[client_count];//客户端数组
-const int thread_count = THREAD_COUNT;//发送线程的数量
 std::atomic_int sendCount(0);
 std::atomic_int readyCount(0);
+std::atomic_int connectCount(0);
 
-void recvThread(int begin, int end)//1-4，四个线程
+class MyClient :public Client
 {
-	//CellTimeStamp t;
-	while (g_bRun)
+public:
+	MyClient()
 	{
-		for (int i = begin; i < end; ++i)
+		_bCheckMsgID = CellConfig::Instance().hasKey("-checkMsgID");
+	}
+
+	//处理消息
+	void onNetMsg(netmsg_DataHeader* header)
+	{
+		switch (header->cmd)
 		{
-			/*if (t.getElapsedSecond() > 3.0 && i == begin)
-				continue;*/
-			client[i]->onRun();
+		case CMD_LOGIN_RESULT:
+		{
+			netmsg_LoginResult* login_result = (netmsg_LoginResult*)header;
+
+			if (_bCheckMsgID)
+			{
+				//检测id是否连续
+				if (login_result->msgID != _nRecvMsgID)
+				{
+					//当前消息ID和本地收消息次数不匹配
+					CELLLOG_ERROR("OnNetMsg socket<%d> msgID<%d> _nRecvMsgID<%d> %d",
+						_pClient->getSockfd(), login_result->msgID, _nRecvMsgID, login_result->msgID - _nRecvMsgID);
+				}
+				++_nRecvMsgID;
+			}
+
+			/*CELLLOG_INFO("netmsg_Login result : socket = %d , data length= %d , result= %d",
+				(int)_clientSock, login_result->dataLength, login_result->result);*/
+		}
+		break;
+		case CMD_LOGOUT_RESULT:
+		{
+			CellReadStream r(header);
+			int8_t n1;
+			r.readInt8(n1);
+			int16_t n2;
+			r.readInt16(n2);
+			int32_t n3;
+			r.readInt32(n3);
+			float n4;
+			r.readFloat(n4);
+			double n5;
+			r.readDouble(n5);
+			char s[20] = {};
+			int a = r.readArray(s, 20);//返回的是数组元素个数
+			char name[20] = {};
+			int b = r.readArray(name, 20);//返回的是数组元素个数
+			int password[20] = {};
+			int c = r.readArray(password, 20);//返回的是数组元素个数
+
+			netmsg_LogoutResult* logout_result = (netmsg_LogoutResult*)header;
+			/*CELLLOG_INFO("netmsg_Logout result : socket = %d , data length= %d , result= %d",
+				(int)_client_sock, logout_result->dataLength, logout_result->result);*/
+		}
+		break;
+		case CMD_ERROR:
+		{
+			CELLLOG_INFO("error : socket = %d , data length= %d",
+				(int)_pClient->getSockfd(), header->dataLength);
+		}
+		break;
+		default:
+		{
+			CELLLOG_INFO("Undefined data : socket = %d , data length=  %d",
+				(int)_pClient->getSockfd(), header->dataLength);
+		}
+		break;
 		}
 	}
-}
 
-void sendThread(int id)//1-4，四个线程
+	int sendTest(netmsg_Login* login)
+	{
+		int ret = 0;
+
+		//如果剩余发送次数大于0
+		if (_nSendCount > 0)
+		{
+			login->msgID = _nSendMsgID;
+			ret = sendData(login);
+			if (ret != SOCKET_ERROR)
+			{
+				++_nSendMsgID;
+				--_nSendCount;
+			}
+		}
+		return ret;
+	}
+
+	bool checkSend(time_t dt)
+	{
+		_tRestTime += dt;
+		//每经过nSendSleep毫秒
+		if (_tRestTime >= nSendSleep)
+		{
+			_tRestTime -= nSendSleep;//重置计时			
+			_nSendCount = nMsg;//重置发送计数
+		}
+		return _nSendCount > 0;
+	}
+private:
+	int _nRecvMsgID = 1;//接收消息id计数	
+	int _nSendMsgID = 1;//发送消息id计数	
+	time_t _tRestTime = 0;//发送时间计数	
+	int _nSendCount = 0;//发送条数计数	
+	bool _bCheckMsgID = false;//检查接收到的服务端消息ID是否连续
+};
+
+//工作线程
+void workThread(CellThread* pThread, int id)
 {
-	CELLLOG_INFO("thread<%d>,start", id);
-	int c = client_count / thread_count;
-	int begin = (id - 1) * c;
-	int end = id * c;
-	for (int i = begin; i < end; ++i)
+	CELLLOG_INFO("thread<%d>,start", id);//threadCount个线程 id值为 1-threadCount	
+	std::vector<MyClient*> clients(nClient);//客户端数组	
+
+	int beginClients = 0;
+	int endClients = nClient;
+
+	/////////////////////////////////////////////////////////
+	//新建客户端，nClient个
+	for (int i = beginClients; i < endClients; ++i)
 	{
-		client[i] = new MyClient();
+		if (!pThread->isRun())
+			break;//输入了exit
+		clients[i] = new MyClient();
+		CellThread::sleepInThread(0);//多线程时让下CPU，线程休眠会让出CPU
 	}
 
-	for (int i = begin; i < end; ++i)
+	/////////////////////////////////////////////////////////
+	//初始化客户端，连接服务器
+	for (int i = beginClients; i < endClients; ++i)
 	{
-		client[i]->connectToServer(IP, PORT);
+		if (!pThread->isRun())
+			break;//输入了exit
+		if (clients[i]->initClient(nSendBufSize, nRecvBufSize) == INVALID_SOCKET)
+			break;//创建失败，端口用完
+		if (clients[i]->connectToServer(strIP, nPort) == SOCKET_ERROR)
+			break;
+		++connectCount;
+		CellThread::sleepInThread(0);
 	}
+	CELLLOG_INFO("thread<%d>, Connect<begin=%d, end=%d, connectCount=%d>", id, 0, nClient, (int)connectCount);
 
-	CELLLOG_INFO("thread<%d>,Connect<begin=%d, end=%d>", id, begin, end);
-
-	//等待其他线程准备好发送
 	++readyCount;
-	while (readyCount < thread_count)
+	while (readyCount < nThread && pThread->isRun())
 	{
+		//等待其他线程准备好发送
 		CellThread::sleepInThread(10);
 	}
 
-	std::thread t1(recvThread, begin, end);
-	t1.detach();
+	/////////////////////////////////////////////////////////
+	//需要发送的数据
+	netmsg_Login login;
+	strcpy(login.userName, "kzj");
+	strcpy(login.passWord, "12345");
 
-	netmsg_Login login[10];//提高发送频率，每次发送十个消息包
-	for (int i = 0; i < 10; ++i)
+	//收发数据都是通过onRun线程
+	//sendData只是将数据写入发送缓冲区
+	//等待select检测可写时才会发送数据	
+	auto tOld = CellTime::getNowInMillSec();//旧的时间点
+	auto tNew = tOld;//新的时间点
+	auto dt = tNew;//经过的时间
+	CellTimeStamp tTime;
+	while (pThread->isRun())
 	{
-		strcpy(login[i].userName, "kzj");
-		strcpy(login[i].passWord, "12345");
-	}
-	const int nLen = sizeof(login);
-	while (g_bRun)
-	{
-		for (int i = begin; i < end; ++i)
+		tNew = CellTime::getNowInMillSec();
+		dt = tNew - tOld;
+		tOld = tNew;
+
+		int count = 0;
+		//每轮每个客户端发送nMsg条数据
+		for (int m = 0; m < nMsg; ++m)
 		{
-			if (client[i]->sendData(login) != SOCKET_ERROR)
+			for (int j = beginClients; j < endClients; ++j)
 			{
-				++sendCount;//发送的数量
+				if (clients[j]->isRun())
+				{
+					if (clients[j]->sendTest(&login) > 0)
+						++sendCount;
+				}
 			}
 		}
 
-		std::chrono::milliseconds t(100);
-		std::this_thread::sleep_for(t);
+		for (int j = beginClients; j < endClients; ++j)
+		{
+			if (clients[j]->isRun())
+			{
+				//超时设置为0表示select检测状态后立即返回
+				if (!clients[j]->onRun(0))
+				{
+					--connectCount;
+					continue;
+				}
+				//检测发送计数 每1000毫秒只允许发送100次 可以少发，但不能多发
+				clients[j]->checkSend(dt);
+			}
+		}
+
+		CellThread::sleepInThread(nWorkSleep);
 	}
 
-	for (int i = begin; i < end; ++i)
+	/////////////////////////////////////////////////////////
+	//关闭客户端
+	for (int i = beginClients; i < endClients; ++i)
 	{
-		client[i]->closeClient();
-		delete client[i];
+		clients[i]->closeClient();
+		delete clients[i];
 	}
-
 	CELLLOG_INFO("thread<%d>,exit", id);
+	--readyCount;
 }
 
-int main()
+//字节流发送的代码
+void testStreamClient()
 {
-	CellLog::Instance().setLogPath("../../log/clientLog", "w");
-
-	/*CellWriteStream s;
+	//字节流发送
+	CellWriteStream s;
 	s.setNetCmd(CMD_LOGOUT);
 	s.writeInt8(1);
 	s.writeInt16(2);
@@ -130,51 +255,98 @@ int main()
 	s.finish();
 
 	MyClient client;
-	client.connectToServer(IP, PORT);
+	client.connectToServer(strIP, nPort);
 
 	while (client.isRun())
 	{
 		client.onRun();
 		client.sendData(s.getData(), s.getWritePos());
 		CellThread::sleepInThread(1000);
-	}*/
+	}
+}
 
-	//输入线程
-	std::thread cmd_t(cmdThread);
-	cmd_t.detach();
+void testClient(int argc, char* args[])
+{
+	/////////////////////////////////////////////////////////
+	//处理配置信息
+	CellConfig::Instance().Init(argc, args);
+	strIP = CellConfig::Instance().getStr("strIP", "127.0.0.1");
+	nPort = CellConfig::Instance().getInt("nPort", 8099);
+	nThread = CellConfig::Instance().getInt("threadCount", 1);
+	nClient = CellConfig::Instance().getInt("clientCount", 10000);
+	nMsg = CellConfig::Instance().getInt("nMsg", 10);
+	nSendSleep = CellConfig::Instance().getInt("nSendSleep", 100);
+	nSendBufSize = CellConfig::Instance().getInt("nSendBuffSize", SEND_BUF_SIZE);
+	nRecvBufSize = CellConfig::Instance().getInt("nRecvBuffSize", RECV_BUF_SIZE);
 
-	//启动发送线程
-	for (int i = 0; i < thread_count; ++i)
+	/////////////////////////////////////////////////////////
+	//启动终端命令线程，用于接收运行时用户输入的指令
+	CellThread tCmd;
+	tCmd.startThread(nullptr, [](CellThread* pThread) {
+		while (true)
+		{
+			char cmdBuf[256] = {};
+			scanf("%s", cmdBuf);
+			if (strcmp(cmdBuf, "exit") == 0)
+			{
+				CELLLOG_INFO("Client exit.");
+				break;
+			}
+			else
+			{
+				CELLLOG_ERROR("Invalid input, please re-enter.");
+			}
+		}
+		},
+		nullptr);
+
+	/////////////////////////////////////////////////////////
+	//启动模拟客户端线程
+	std::vector<CellThread*> threads;
+	for (int i = 0; i < nThread; ++i)
 	{
-		std::thread t(sendThread, i + 1);//传递的是线程的编号
-		t.detach();
+		CellThread* t = new CellThread();
+		t->startThread(nullptr, [i](CellThread* pThread) {
+			workThread(pThread, i + 1);
+			}, nullptr);
+		threads.push_back(t);
 	}
 
+	/////////////////////////////////////////////////////////
+	//每秒数据统计
 	CellTimeStamp tTime;
-
-	while (g_bRun)
+	while (tCmd.isRun())
 	{
 		auto t = tTime.getElapsedSecond();
 		if (t >= 1.0)
 		{
-			//!"std::atomic<int>::atomic(const std::atomic<int>&)": 尝试引用已删除的函数
-			//!将类 "std::atomic<int>" 作为可变参数函数的参数的非标准用法
-			/*CELLLOG_INFO("thread<%d>,clients<%d>,time<%lf>,send<%d>",
-				thread_count, client_count, t, sendCount);*/
-
-			CELLLOG_INFO("thread<%d>,clients<%d>,time<%lf>,send<%d>",
-				thread_count, client_count, t, (int)(sendCount.load() / t));
-
+			CELLLOG_INFO("thread<%d>,clients<%d>,connect<%d>,time<%lf>,send<%d>",
+				nThread, nClient, (int)connectCount, t, (int)sendCount);
 			sendCount = 0;
 			tTime.update();
 		}
-
-#ifdef _WIN32
-		Sleep(1);
-#else
-		sleep(1);
-#endif // _WIN32
+		CellThread::sleepInThread(1);
 	}
+
+	/////////////////////////////////////////////////////////
+	//关闭所有的线程
+	for (auto t : threads)
+	{
+		t->closeThread();
+		delete t;
+	}
+}
+
+int main(int argc, char* args[])
+{
+	//文件名不加日期
+	CellLog::Instance().setLogPath("F:/AA/guoguokkk/log/clientLog", "w", false);
+
+	////字节流发送测试
+	//testStreamClient();
+
+	//非字节流发送测试
+	testClient(argc, args);
 
 	std::cout << "EXIT...." << std::endl;
 	return 0;

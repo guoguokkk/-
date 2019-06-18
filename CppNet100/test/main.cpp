@@ -13,13 +13,13 @@
 
 extern "C"
 {
-	typedef void(*OnNetMsgCallBack)(void* csObj, void* data, int len);
+	typedef void(*OnNetMsgCallBack)(void* csObj, void* getData, int len);
 }
 
 class NativeTCPClient :public Client
 {
 public:
-	virtual void onNetMsg(netmsg_Header* header)
+	virtual void onNetMsg(netmsg_DataHeader* header)
 	{
 		if (_callBack)
 			_callBack(_csObj, header, header->dataLength);
@@ -180,9 +180,9 @@ extern "C"
 	}
 
 	//////////CellReadStream
-	EXPORT_DLL void* CellReadStream_Create(char* data, int len)
+	EXPORT_DLL void* CellReadStream_Create(char* getData, int len)
 	{
-		CellReadStream* rStream = new CellReadStream(data, len);
+		CellReadStream* rStream = new CellReadStream(getData, len);
 		return rStream;
 	}
 	EXPORT_DLL int8_t CellReadStream_ReadInt8(CellReadStream* rStream)

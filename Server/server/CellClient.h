@@ -2,11 +2,12 @@
 #define CELL_CLIENT_H_
 #include<memory>
 #include"../tool/Common.h"
-#include"../tool/CellBuffer.h"
+#include"../server/CellBuffer.h"
 #include"../memory/ObjectPool.h"
 
 //客户端，适用对象池原因：客户端频繁地退出连接
-class CellClient :public ObjectPoolBase<CellClient, 1000>
+class CellClient :public ObjectPoolBase<CellClient, 10050>
+//class CellClient
 {
 	//////////用于调试的成员变量////////////////////////////
 public:

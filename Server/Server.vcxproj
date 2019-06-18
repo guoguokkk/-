@@ -29,13 +29,13 @@
     <ClInclude Include="memory\MemoryAlloc.h" />
     <ClInclude Include="memory\MemoryPool.h" />
     <ClInclude Include="memory\ObjectPool.h" />
+    <ClInclude Include="server\CellBuffer.h" />
+    <ClInclude Include="server\CellClient.h" />
     <ClInclude Include="server\CellServer.h" />
     <ClInclude Include="server\INetEvent.h" />
     <ClInclude Include="server\Server.h" />
-    <ClInclude Include="test\MyServer.h" />
-    <ClInclude Include="tool\CellBuffer.h" />
-    <ClInclude Include="tool\CellClient.h" />
     <ClInclude Include="tool\CellConfig.h" />
+    <ClInclude Include="tool\CellFDSet.h" />
     <ClInclude Include="tool\CellLog.h" />
     <ClInclude Include="tool\CellMsgStream.h" />
     <ClInclude Include="tool\CellNetWork.h" />
@@ -44,6 +44,7 @@
     <ClInclude Include="tool\CellTask.h" />
     <ClInclude Include="tool\CellThread.h" />
     <ClInclude Include="tool\CellTimeStamp.h" />
+    <ClInclude Include="tool\Common.h" />
     <ClInclude Include="tool\Message.h" />
   </ItemGroup>
   <ItemGroup>

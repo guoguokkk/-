@@ -23,7 +23,7 @@
       <UniqueIdentifier>{8e16235b-6837-4bc8-b2b4-bdaf2db6dd46}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\memory">
-      <UniqueIdentifier>{7542e5bd-d2a0-4330-b563-c0b903576fdf}</UniqueIdentifier>
+      <UniqueIdentifier>{1a87cbdb-d9c8-48a7-8694-2d7d2ebc776b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -50,26 +50,8 @@
     <ClInclude Include="server\Server.h">
       <Filter>源文件\server</Filter>
     </ClInclude>
-    <ClInclude Include="test\MyServer.h">
-      <Filter>源文件\test</Filter>
-    </ClInclude>
     <ClInclude Include="server\CellServer.h">
       <Filter>源文件\server</Filter>
-    </ClInclude>
-    <ClInclude Include="memory\MemoryAlloc.h">
-      <Filter>源文件\memory</Filter>
-    </ClInclude>
-    <ClInclude Include="memory\MemoryPool.h">
-      <Filter>源文件\memory</Filter>
-    </ClInclude>
-    <ClInclude Include="memory\ObjectPool.h">
-      <Filter>源文件\memory</Filter>
-    </ClInclude>
-    <ClInclude Include="tool\CellBuffer.h">
-      <Filter>源文件\tool</Filter>
-    </ClInclude>
-    <ClInclude Include="tool\CellClient.h">
-      <Filter>源文件\tool</Filter>
     </ClInclude>
     <ClInclude Include="tool\CellLog.h">
       <Filter>源文件\tool</Filter>
@@ -100,6 +82,27 @@
     </ClInclude>
     <ClInclude Include="tool\CellConfig.h">
       <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\Common.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\CellFDSet.h">
+      <Filter>源文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="server\CellClient.h">
+      <Filter>源文件\server</Filter>
+    </ClInclude>
+    <ClInclude Include="server\CellBuffer.h">
+      <Filter>源文件\server</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\MemoryAlloc.h">
+      <Filter>源文件\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\MemoryPool.h">
+      <Filter>源文件\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\ObjectPool.h">
+      <Filter>源文件\memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

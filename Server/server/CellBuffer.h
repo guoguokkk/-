@@ -1,6 +1,5 @@
 #ifndef CELL_BUFFER_H_
 #define CELL_BUFFER_H_
-#include<memory>
 #include"../memory/MemoryAlloc.h"
 #include"../tool/Common.h"
 
@@ -8,14 +7,15 @@ class CellBuffer
 {
 public:
 	//构造函数，参数为缓冲区大小 size=8192
-	CellBuffer(int size = 8192) :_nSize(size)
+	CellBuffer(int nSize = 8192) 
 	{
+		_nSize = nSize;
 		_pBuf = new char[_nSize];//新建缓冲区
 	}
 
 	~CellBuffer()
 	{
-		if (!_pBuf)
+		if (_pBuf)
 		{
 			delete[] _pBuf;//删除缓冲区
 			_pBuf = nullptr;
@@ -33,7 +33,7 @@ public:
 		{			
 			memcpy(_pBuf + _nLast, pData, nLen);//将数据放入缓冲区
 			_nLast += nLen;//更新缓冲区尾部位置
-			if (_nLast == _nSize)
+			if (_nLast == SEND_BUF_SIZE)
 			{
 				++_fullCount;//写满了
 			}
@@ -106,12 +106,12 @@ public:
 		if (_nSize - _nLast > 0)
 		{
 			char* recvBuf = _pBuf + _nLast;
-			int nLen = recv(sockfd, recvBuf, _nSize - _nLast, 0);//接收客户端消息
+			int nLen = (int)recv(sockfd, recvBuf, _nSize - _nLast, 0);//接收客户端消息
 			//判断客户端是否退出
 			if (nLen <= 0)
 			{
 				CELLLOG_ERROR("read4socket:sockfd<%d> nSize<%d> nLast<%d> nLen<%d>", sockfd, _nSize, _nLast, nLen);
-				return -1;
+				return SOCKET_ERROR;
 			}
 			_nLast += nLen;//消息缓冲区的数据尾部位置后移
 			return nLen;
