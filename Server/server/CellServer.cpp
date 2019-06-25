@@ -181,18 +181,18 @@ void CellServer::readData()
 	}
 
 #else
-	for (auto iter = _clients.begin(); iter != _clients.end(); ++iter)
+	for (auto iter = _clients.begin(); iter != _clients.end(); )
 	{
 		if (_fdRead.has(iter->second->getSockfd()))
 		{
 			int ret = recvData(iter->second);//接收消息
-			if (ret == -1)
+			if (ret == SOCKET_ERROR)
 			{
 				//客户端离开
 				onClientLeave(iter->second);
 				auto iterOld = iter;
 				++iter;
-				_clients.erase(iter);
+				_clients.erase(iterOld);
 				continue;
 			}
 		}

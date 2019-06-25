@@ -148,7 +148,7 @@ int main(int argc, char* args[])
 	const char* strIP = CellConfig::Instance().getStr("strIP", "any");
 	uint16_t nPort = CellConfig::Instance().getInt("nPort", 8099);
 	int nThread = CellConfig::Instance().getInt("nThread", 1);//线程数量
-	int nClient = CellConfig::Instance().getInt("nClient", 1);//客户端数量
+	int nClient = CellConfig::Instance().getInt("nClient", 10000);//客户端数量
 	if (strcmp(strIP, "any") == 0)
 	{
 		strIP = nullptr;

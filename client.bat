@@ -10,7 +10,7 @@ set cmd=%cmd% nPort=8099
 set cmd=%cmd% nThread=1
 
 ::每个工作线程，创建多少个客户端
-set cmd=%cmd% nClient=10000
+set cmd=%cmd% nClient=3
 
 ::::::数据会先写入发送缓冲区
 ::::::等待socket可写时才实际发送

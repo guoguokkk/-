@@ -1,0 +1,41 @@
+<Info>[2019-6-25 15:45:4] CellLog::setLogPath success, <./serverLog.txt, w>
+<Error>[2019-6-25 15:45:4] CellConfig::getStr, not found <strIP>
+<Info>[2019-6-25 15:45:4] CellConfig::getStr,strIP=any
+<Error>[2019-6-25 15:45:4] CellConfig::getInt, not found <nPort>
+<Info>[2019-6-25 15:45:4] CellConfig::getInt,nPort=8099
+<Error>[2019-6-25 15:45:4] CellConfig::getInt, not found <nThread>
+<Info>[2019-6-25 15:45:4] CellConfig::getInt,nThread=1
+<Error>[2019-6-25 15:45:4] CellConfig::getInt, not found <nClient>
+<Info>[2019-6-25 15:45:4] CellConfig::getInt,nClient=10000
+<Error>[2019-6-25 15:45:4] CellConfig::getInt, not found <nSendBufSize>
+<Info>[2019-6-25 15:45:4] CellConfig::getInt,nSendBufSize=10240
+<Error>[2019-6-25 15:45:4] CellConfig::getInt, not found <nRecvBufSize>
+<Info>[2019-6-25 15:45:4] CellConfig::getInt,nRecvBufSize=8192
+<Error>[2019-6-25 15:45:4] CellConfig::getInt, not found <nClient>
+<Info>[2019-6-25 15:45:4] CellConfig::getInt,nClient=65535
+<Info>[2019-6-25 15:45:5] initObjectPool... :sizeof(objectNode)=16, nNodeNum=10050 
+<Info>[2019-6-25 15:45:5] malloc 1125600...
+<Info>[2019-6-25 15:45:5] thread<1>,time<1.000738>,socket<188>,clients<3>,recvCount<24>,msgCount<240>
+<Info>[2019-6-25 15:45:6] thread<1>,time<1.000324>,socket<188>,clients<3>,recvCount<30>,msgCount<300>
+<Info>[2019-6-25 15:45:7] thread<1>,time<1.000467>,socket<188>,clients<3>,recvCount<30>,msgCount<300>
+<Error>[2019-6-25 15:45:12] read4socket:sockfd<200> nSize<8192> nLast<0> nLen<0>
+<Info>[2019-6-25 15:45:15] thread<1>,time<1.505996>,socket<188>,clients<3>,recvCount<0>,msgCount<0>
+<Info>[2019-6-25 15:45:17] Client 200 exit.
+<Info>[2019-6-25 15:45:29] thread<1>,time<1.532877>,socket<188>,clients<3>,recvCount<0>,msgCount<0>
+<Info>[2019-6-25 15:45:29] ~CELLClient[sId=1 id=1 socket=200]
+<Info>[2019-6-25 15:45:29] thread<1>,time<1.554536>,socket<188>,clients<2>,recvCount<0>,msgCount<0>
+<Error>[2019-6-25 15:45:29] read4socket:sockfd<204> nSize<8192> nLast<0> nLen<0>
+<Info>[2019-6-25 15:45:29] thread<1>,time<1.875807>,socket<188>,clients<2>,recvCount<0>,msgCount<0>
+<Info>[2019-6-25 15:45:29] Client 204 exit.
+<Info>[2019-6-25 15:45:29] thread<1>,time<1.412924>,socket<188>,clients<2>,recvCount<0>,msgCount<0>
+<Info>[2019-6-25 15:45:29] ~CELLClient[sId=1 id=2 socket=204]
+<Info>[2019-6-25 15:45:38] thread<1>,time<1.824627>,socket<188>,clients<1>,recvCount<0>,msgCount<0>
+<Error>[2019-6-25 15:45:38] read4socket:sockfd<208> nSize<8192> nLast<0> nLen<0>
+<Info>[2019-6-25 15:45:38] Client 208 exit.
+<Info>[2019-6-25 15:45:38] thread<1>,time<3.394309>,socket<188>,clients<1>,recvCount<0>,msgCount<0>
+<Info>[2019-6-25 15:45:38] ~CELLClient[sId=1 id=3 socket=208]
+<Info>[2019-6-25 15:45:38] thread<1>,time<4.975544>,socket<188>,clients<0>,recvCount<0>,msgCount<0>
+<Info>[2019-6-25 15:45:38] thread<1>,time<1.755948>,socket<188>,clients<0>,recvCount<0>,msgCount<0>
+<Info>[2019-6-25 15:45:40] thread<1>,time<6.681608>,socket<188>,clients<0>,recvCount<0>,msgCount<0>
+<Info>[2019-6-25 15:45:41] thread<1>,time<2.543648>,socket<188>,clients<0>,recvCount<0>,msgCount<0>
+<Info>[2019-6-25 15:45:41] thread<1>,time<1.650780>,socket<188>,clients<0>,recvCount<0>,msgCount<0>

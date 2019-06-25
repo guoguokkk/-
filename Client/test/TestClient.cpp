@@ -12,7 +12,7 @@
 const char* strIP = "127.0.0.1";//服务器IP地址
 uint16_t nPort = 8099;//服务器端口
 int nThread = 1;//发送线程的数量
-int nClient = 1;//客户端数量
+int nClient = 3;//客户端数量
 
 int nMsg = 1;//客户端每次发几条消息
 int nSendSleep = 1;//写入消息到缓冲区的间隔时间
@@ -273,7 +273,7 @@ void testClient(int argc, char* args[])
 	strIP = CellConfig::Instance().getStr("strIP", "127.0.0.1");
 	nPort = CellConfig::Instance().getInt("nPort", 8099);
 	nThread = CellConfig::Instance().getInt("nThread", 1);
-	nClient = CellConfig::Instance().getInt("nClient", 10000);
+	nClient = CellConfig::Instance().getInt("nClient", 3);
 	nMsg = CellConfig::Instance().getInt("nMsg", 10);
 	nSendSleep = CellConfig::Instance().getInt("nSendSleep", 100);
 	nSendBufSize = CellConfig::Instance().getInt("nSendBufSize", SEND_BUF_SIZE);
