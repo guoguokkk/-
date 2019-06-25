@@ -58,7 +58,7 @@ public:
 		{
 			def = iter->second.c_str();
 		}
-		CELLLOG_INFO("CellConfig::getStr, %s=%s", argName, def);
+		CELLLOG_INFO("CellConfig::getStr,%s=%s", argName, def);
 		return def;
 	}
 

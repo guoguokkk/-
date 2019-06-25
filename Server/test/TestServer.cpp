@@ -140,7 +140,8 @@ private:
 int main(int argc, char* args[])
 {
 	//设置运行日志名称
-	CellLog::Instance().setLogPath("F:/AA/guoguokkk/log/serverLog", "w", false);
+	//CellLog::Instance().setLogPath("F:/AA/guoguokkk/log/serverLog", "w", false);
+	CellLog::Instance().setLogPath("./serverLog", "w", false);
 
 	//解析配置信息
 	CellConfig::Instance().Init(argc, args);

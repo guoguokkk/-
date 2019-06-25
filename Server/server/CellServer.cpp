@@ -183,7 +183,7 @@ void CellServer::readData()
 #else
 	for (auto iter = _clients.begin(); iter != _clients.end(); ++iter)
 	{
-		if (fd_read.has(iter->second->getSockfd()))
+		if (_fdRead.has(iter->second->getSockfd()))
 		{
 			int ret = recvData(iter->second);//接收消息
 			if (ret == -1)
@@ -193,7 +193,7 @@ void CellServer::readData()
 				auto iterOld = iter;
 				++iter;
 				_clients.erase(iter);
-				continue
+				continue;
 			}
 		}
 		++iter;
@@ -223,7 +223,7 @@ void CellServer::writeData()
 #else
 	for (auto iter = _clients.begin(); iter != _clients.end(); )
 	{
-		if (iter->second->needWrite() && FD_ISSET(iter->second->getSockfd(), &fd_write))
+		if (iter->second->needWrite() && _fdWrite.has(iter->second->getSockfd()))
 		{
 			int ret = iter->second->sendDataReal();//发送消息
 			if (ret == -1)

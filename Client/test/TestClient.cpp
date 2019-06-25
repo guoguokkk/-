@@ -137,7 +137,7 @@ private:
 //工作线程
 void workThread(CellThread* pThread, int id)
 {
-	CELLLOG_INFO("thread<%d>,start", id);//threadCount个线程 id值为 1-threadCount	
+	CELLLOG_INFO("thread<%d>,start", id);//nThread个线程 id值为 1-nThread
 	std::vector<MyClient*> clients(nClient);//客户端数组	
 
 	int beginClients = 0;
@@ -272,12 +272,12 @@ void testClient(int argc, char* args[])
 	CellConfig::Instance().Init(argc, args);
 	strIP = CellConfig::Instance().getStr("strIP", "127.0.0.1");
 	nPort = CellConfig::Instance().getInt("nPort", 8099);
-	nThread = CellConfig::Instance().getInt("threadCount", 1);
-	nClient = CellConfig::Instance().getInt("clientCount", 10000);
+	nThread = CellConfig::Instance().getInt("nThread", 1);
+	nClient = CellConfig::Instance().getInt("nClient", 10000);
 	nMsg = CellConfig::Instance().getInt("nMsg", 10);
 	nSendSleep = CellConfig::Instance().getInt("nSendSleep", 100);
-	nSendBufSize = CellConfig::Instance().getInt("nSendBuffSize", SEND_BUF_SIZE);
-	nRecvBufSize = CellConfig::Instance().getInt("nRecvBuffSize", RECV_BUF_SIZE);
+	nSendBufSize = CellConfig::Instance().getInt("nSendBufSize", SEND_BUF_SIZE);
+	nRecvBufSize = CellConfig::Instance().getInt("nRecvBufSize", RECV_BUF_SIZE);
 
 	/////////////////////////////////////////////////////////
 	//启动终端命令线程，用于接收运行时用户输入的指令
@@ -340,7 +340,8 @@ void testClient(int argc, char* args[])
 int main(int argc, char* args[])
 {
 	//文件名不加日期
-	CellLog::Instance().setLogPath("F:/AA/guoguokkk/log/clientLog", "w", false);
+	//CellLog::Instance().setLogPath("F:/AA/guoguokkk/log/clientLog", "w", false);
+	CellLog::Instance().setLogPath("./clientLog", "w", false);
 
 	////字节流发送测试
 	//testStreamClient();

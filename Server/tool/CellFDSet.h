@@ -11,7 +11,7 @@ public:
 	{
 		int nSockNum = CELL_MAX_FD;
 #ifdef _WIN32
-		_nfdSize = sizeof(u_int) + (sizeof(SOCKET) * nSockNum);
+		_nfdSize = sizeof(u_int) + sizeof(SOCKET) * nSockNum;
 #else
 		_nfdSize = nSockNum / (8 * sizeof(char));
 #endif // _WIN32
@@ -35,9 +35,9 @@ public:
 #else
 		if (s < CELL_MAX_FD)
 		{
-			FD_SET(s, _pFdset);
+			FD_SET(s, _pfdset);
 		}
-		else 
+		else
 		{
 			CELLLOG_ERROR("CellFDSet::add sock<%d>, CELL_MAX_FD<%d>", (int)s, CELL_MAX_FD);
 		}
@@ -54,7 +54,7 @@ public:
 #ifdef _WIN32
 		FD_ZERO(_pfdset);
 #else
-		memset(_pFdset, 0, _nfdSize);
+		memset(_pfdset, 0, _nfdSize);
 #endif // _WIN32
 	}
 

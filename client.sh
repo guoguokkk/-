@@ -1,14 +1,11 @@
-ulimit -n
-ulimit -n 10025
-ulimit -n
 #服务端IP地址
-cmd="strIP=any"
+cmd="strIP=127.0.0.1"
 #服务端端口
 cmd=$cmd" nPort=9006"
 #消息处理线程数量
 cmd=$cmd" nThread=1"
 #客户端连接上限
-cmd=$cmd" nClient=65530"
+cmd=$cmd" nClient=10000"
 #客户端发送缓冲区大小（字节）
 cmd=$cmd" nSendBufSize=10240"
 #客户端接收缓冲区大小（字节）
@@ -23,5 +20,5 @@ cmd=$cmd" -checkMsgID"
 #自定义标志 未使用
 cmd=$cmd" -p"
 #启动程序 传入参数
-./server $cmd
+./client $cmd
 read -p "..press any key to exit.." var

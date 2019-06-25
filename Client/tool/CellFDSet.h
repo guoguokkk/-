@@ -35,7 +35,7 @@ public:
 #else
 		if (s < CELL_MAX_FD)
 		{
-			FD_SET(s, _pFdset);
+			FD_SET(s, _pfdset);
 		}
 		else 
 		{
@@ -54,7 +54,7 @@ public:
 #ifdef _WIN32
 		FD_ZERO(_pfdset);
 #else
-		memset(_pFdset, 0, _nfdSize);
+		memset(_pfdset, 0, _nfdSize);
 #endif // _WIN32
 	}
 

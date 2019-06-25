@@ -8,9 +8,9 @@ Server::Server()
 	_clientCount = 0;//!一定要初始化
 	_msgCount = 0;//!一定要初始化
 
-	_nSendBufSize = CellConfig::Instance().getInt("nSendBuffSize",SEND_BUF_SIZE);
-	_nRecvBufSize = CellConfig::Instance().getInt("nRecvBuffSize",RECV_BUF_SIZE );
-	_nMaxClient = CellConfig::Instance().getInt("nMaxClient",FD_SETSIZE);
+	_nSendBufSize = CellConfig::Instance().getInt("nSendBufSize",SEND_BUF_SIZE);
+	_nRecvBufSize = CellConfig::Instance().getInt("nRecvBufSize",RECV_BUF_SIZE );
+	_nMaxClient = CellConfig::Instance().getInt("nClient",FD_SETSIZE);
 }
 
 Server::~Server()
