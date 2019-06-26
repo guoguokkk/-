@@ -1,16 +1,16 @@
 @echo off
 
 ::服务端IP地址
-set cmd="strIP=127.0.0.1"
+set cmd="strIP=192.168.153.129"
 
 ::服务端端口
-set cmd=%cmd% nPort=8099
+set cmd=%cmd% nPort=9066
 
 ::工作线程数量
 set cmd=%cmd% nThread=1
 
 ::每个工作线程，创建多少个客户端
-set cmd=%cmd% nClient=3
+set cmd=%cmd% nClient=1
 
 ::::::数据会先写入发送缓冲区
 ::::::等待socket可写时才实际发送
@@ -18,8 +18,8 @@ set cmd=%cmd% nClient=3
 ::最大可写入nMsg条Login消息
 
 ::每条消息100字节（Login）
-set cmd=%cmd% nMsg=10
-set cmd=%cmd% nSendSleep=1000
+set cmd=%cmd% nMsg=1
+set cmd=%cmd% nSendSleep=100
 
 ::客户端发送缓冲区大小（字节）
 set cmd=%cmd% nSendBufSize=81920

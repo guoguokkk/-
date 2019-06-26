@@ -1,26 +1,23 @@
-<Info>[2019-6-25 15:45:5] CellLog::setLogPath success, <./clientLog.txt, w>
-<Error>[2019-6-25 15:45:5] CellConfig::getStr, not found <strIP>
-<Info>[2019-6-25 15:45:5] CellConfig::getStr,strIP=127.0.0.1
-<Error>[2019-6-25 15:45:5] CellConfig::getInt, not found <nPort>
-<Info>[2019-6-25 15:45:5] CellConfig::getInt,nPort=8099
-<Error>[2019-6-25 15:45:5] CellConfig::getInt, not found <nThread>
-<Info>[2019-6-25 15:45:5] CellConfig::getInt,nThread=1
-<Error>[2019-6-25 15:45:5] CellConfig::getInt, not found <nClient>
-<Info>[2019-6-25 15:45:5] CellConfig::getInt,nClient=3
-<Error>[2019-6-25 15:45:5] CellConfig::getInt, not found <nMsg>
-<Info>[2019-6-25 15:45:5] CellConfig::getInt,nMsg=10
-<Error>[2019-6-25 15:45:5] CellConfig::getInt, not found <nSendSleep>
-<Info>[2019-6-25 15:45:5] CellConfig::getInt,nSendSleep=100
-<Error>[2019-6-25 15:45:5] CellConfig::getInt, not found <nSendBufSize>
-<Info>[2019-6-25 15:45:5] CellConfig::getInt,nSendBufSize=10240
-<Error>[2019-6-25 15:45:5] CellConfig::getInt, not found <nRecvBufSize>
-<Info>[2019-6-25 15:45:5] CellConfig::getInt,nRecvBufSize=8192
-<Info>[2019-6-25 15:45:5] thread<1>,start
-<Info>[2019-6-25 15:45:5] thread<1>, Connect<begin=0, end=3, connectCount=3>
-<Info>[2019-6-25 15:45:6] thread<1>,clients<3>,connect<3>,time<1.001462>,send<270>
-<Info>[2019-6-25 15:45:7] thread<1>,clients<3>,connect<3>,time<1.000378>,send<300>
-<Info>[2019-6-25 15:45:8] Client exit.
-<Info>[2019-6-25 15:45:8] ~CELLClient[sId=-1 id=1 socket=168]
-<Info>[2019-6-25 15:45:8] ~CELLClient[sId=-1 id=2 socket=180]
-<Info>[2019-6-25 15:45:8] ~CELLClient[sId=-1 id=3 socket=184]
-<Info>[2019-6-25 15:45:8] thread<1>,exit
+<Info>[2019-6-26 16:17:55] CellLog::setLogPath success, <./clientLog.txt, w>
+<Error>[2019-6-26 16:17:55] CellConfig::getStr, not found <strIP>
+<Info>[2019-6-26 16:17:55] CellConfig::getStr,strIP=127.0.0.1
+<Error>[2019-6-26 16:17:55] CellConfig::getInt, not found <nPort>
+<Info>[2019-6-26 16:17:55] CellConfig::getInt,nPort=8099
+<Error>[2019-6-26 16:17:55] CellConfig::getInt, not found <nThread>
+<Info>[2019-6-26 16:17:55] CellConfig::getInt,nThread=1
+<Error>[2019-6-26 16:17:55] CellConfig::getInt, not found <nClient>
+<Info>[2019-6-26 16:17:55] CellConfig::getInt,nClient=3
+<Error>[2019-6-26 16:17:55] CellConfig::getInt, not found <nMsg>
+<Info>[2019-6-26 16:17:55] CellConfig::getInt,nMsg=10
+<Error>[2019-6-26 16:17:55] CellConfig::getInt, not found <nSendSleep>
+<Info>[2019-6-26 16:17:55] CellConfig::getInt,nSendSleep=100
+<Error>[2019-6-26 16:17:55] CellConfig::getInt, not found <nSendBufSize>
+<Info>[2019-6-26 16:17:55] CellConfig::getInt,nSendBufSize=10240
+<Error>[2019-6-26 16:17:55] CellConfig::getInt, not found <nRecvBufSize>
+<Info>[2019-6-26 16:17:55] CellConfig::getInt,nRecvBufSize=8192
+<Info>[2019-6-26 16:17:55] thread<1>,start
+<Info>[2019-6-26 16:17:55] thread<1>, Connect<begin=0, end=3, connectCount=3>
+<Info>[2019-6-26 16:17:56] thread<1>,clients<3>,connect<3>,time<1.000026>,send<0>
+<Info>[2019-6-26 16:17:57] thread<1>,clients<3>,connect<3>,time<1.000367>,send<0>
+<Info>[2019-6-26 16:17:58] thread<1>,clients<3>,connect<3>,time<1.001409>,send<30>
+<Info>[2019-6-26 16:17:59] thread<1>,clients<3>,connect<3>,time<1.000367>,send<30>

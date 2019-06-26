@@ -16,7 +16,7 @@ int nClient = 3;//客户端数量
 
 int nMsg = 1;//客户端每次发几条消息
 int nSendSleep = 1;//写入消息到缓冲区的间隔时间
-int nWorkSleep = 1;//工作休眠时间
+int nWorkSleep = 999;//工作休眠时间
 int nSendBufSize = SEND_BUF_SIZE;//客户端发送缓冲区大小
 int nRecvBufSize = RECV_BUF_SIZE;//客户端接收缓冲区大小
 
@@ -37,6 +37,7 @@ public:
 	{
 		switch (header->cmd)
 		{
+		case CMD_LOGIN:
 		case CMD_LOGIN_RESULT:
 		{
 			netmsg_LoginResult* login_result = (netmsg_LoginResult*)header;
