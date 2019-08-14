@@ -21,7 +21,7 @@ SOCKET Client::initClient(int sendSize, int recvSize)
 
 	if (_pClient)
 	{
-		CELLLOG_INFO("<socket=%d> close old connections.", _pClient->getSockfd());
+		CELLLOG_INFO("<socket=%d> close old connections.", _pClient->GetSockfd());
 		closeClient();
 	}
 
@@ -57,10 +57,10 @@ int Client::connectToServer(const char* ip, unsigned short port)
 	server_addr.sin_addr.s_addr = inet_addr(ip);
 #endif // _WIN32
 
-	int ret = connect(_pClient->getSockfd(), (sockaddr*)& server_addr, sizeof(server_addr));
+	int ret = connect(_pClient->GetSockfd(), (sockaddr*)& server_addr, sizeof(server_addr));
 	if (ret == SOCKET_ERROR)
 	{
-		CELLLOG_ERROR("<socket=%d> connect error.", (int)_pClient->getSockfd());
+		CELLLOG_ERROR("<socket=%d> connect error.", (int)_pClient->GetSockfd());
 	}
 	else
 	{
@@ -86,24 +86,24 @@ bool Client::onRun(int microseconds)
 {
 	if (isRun())
 	{
-		SOCKET clientSock = _pClient->getSockfd();
+		SOCKET clientSock = _pClient->GetSockfd();
 
 		//计算可读集合
-		_fdRead.zero();
-		_fdRead.add(clientSock);
+		_fdRead.Zero();
+		_fdRead.Add(clientSock);
 
 		//计算可写集合
-		_fdWrite.zero();
+		_fdWrite.Zero();
 		timeval time = { 0,microseconds };
 		int ret = 0;
-		if (_pClient->needWrite())
+		if (_pClient->NeedWrite())
 		{
-			_fdWrite.add(clientSock);
-			ret = select(clientSock + 1, _fdRead.fdset(), _fdWrite.fdset(), nullptr, &time);//linux 需要+1
+			_fdWrite.Add(clientSock);
+			ret = select(clientSock + 1, _fdRead.GetFdSet(), _fdWrite.GetFdSet(), nullptr, &time);//linux 需要+1
 		}
 		else
 		{
-			ret = select(clientSock + 1, _fdRead.fdset(), nullptr, nullptr, &time);//linux 需要+1
+			ret = select(clientSock + 1, _fdRead.GetFdSet(), nullptr, nullptr, &time);//linux 需要+1
 		}
 
 		if (ret < 0)
@@ -113,7 +113,7 @@ bool Client::onRun(int microseconds)
 			return false;
 		}
 
-		if (_fdRead.has(clientSock))
+		if (_fdRead.Has(clientSock))
 		{
 			int ret = recvData(clientSock);//处理收到的消息
 			if (ret == -1)
@@ -124,9 +124,9 @@ bool Client::onRun(int microseconds)
 			}
 		}
 
-		if (_fdWrite.has(clientSock))
+		if (_fdWrite.Has(clientSock))
 		{
-			int ret = _pClient->sendDataReal();//处理收到的消息
+			int ret = _pClient->SendDataReal();//处理收到的消息
 			if (ret == -1)
 			{
 				CELLLOG_INFO("<socket=%d> select error 2.", (int)clientSock);
@@ -149,14 +149,14 @@ int Client::recvData(SOCKET clientSock)
 {
 	if (isRun())
 	{
-		int nLen = _pClient->recvData();
+		int nLen = _pClient->RecvData();
 		if (nLen > 0)
 		{
 			//判断是否有消息需要处理
-			while (_pClient->hasMsg())
+			while (_pClient->HasMsg())
 			{
-				onNetMsg(_pClient->front_msg());//处理第一个消息
-				_pClient->pop_front_msg();//移除第一个数据
+				onNetMsg(_pClient->GetFrontMsg());//处理第一个消息
+				_pClient->PopFrontMsg();//移除第一个数据
 			}
 		}
 		return nLen;
@@ -168,14 +168,14 @@ int Client::recvData(SOCKET clientSock)
 int Client::sendData(netmsg_DataHeader* header)
 {
 	if (isRun())
-		return _pClient->sendData(header);
+		return _pClient->SendData(header);
 	return SOCKET_ERROR;
 }
 
 int Client::sendData(const char* pData, int len)
 {
 	if (isRun())
-		return _pClient->sendData(pData, len);
+		return _pClient->SendData(pData, len);
 	return SOCKET_ERROR;
 }
 

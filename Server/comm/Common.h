@@ -22,20 +22,18 @@
 
 #include<stdio.h>
 
-#include"../tool/CellConfig.h" //读取配置数据
-#include"../tool/Message.h" //结构化消息定义
+#include"../comm/Message.h" //结构化消息定义
+#include"../conf/CellConfig.h" //读取配置数据
 #include"../tool/CellTimeStamp.h" //获取时间、高精度计时器
 #include"../tool/CellSemaphore.h" //信号量
 #include"../tool/CellThread.h" //线程控制类
 #include"../tool/CellLog.h" //日志记录
-#include"../tool/CellMsgStream.h" //收发字节流
+#include"../server/CellMsgStream.h" //收发字节流
 
 //缓冲区最小单元大小
 #ifndef RECV_BUF_SIZE
 #define RECV_BUF_SIZE 8192
 #define SEND_BUF_SIZE 10240
-//#define RECV_BUF_SIZE 10240
-//#define SEND_BUF_SIZE 1024000
 #endif // !RECV_BUF_SIZE
 
 #define CLIENT_HEART_DEAD_TIME 60000//客户端心跳检测死亡计时，60秒

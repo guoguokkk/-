@@ -39,7 +39,7 @@ protected:
 	void onRun(CellThread* pThread)
 	{
 		//工作线程还在运行
-		while (pThread->isRun())
+		while (pThread->IsRun())
 		{
 			//从任务缓冲区取出任务，放到任务队列
 			if (!_taskBuf.empty())

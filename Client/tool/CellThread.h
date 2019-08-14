@@ -65,7 +65,7 @@ public:
 	}
 
 	//线程是否启动运行状态
-	bool isRun()
+	bool IsRun()
 	{
 		return _isRun;
 	}

@@ -16,7 +16,7 @@ public:
 		_nReadPos = 0;//最后读取的位置
 	}
 
-	//构造函数，参数为长度 nSize
+	//构造函数，参数为数据长度 nSize
 	CellStream(int nSize = 1024) :
 		_nSize(nSize)
 	{

@@ -1,6 +1,7 @@
 #ifndef CELL_NETWORK_H_
 #define CELL_NETWORK_H_
-#include"../tool/Common.h"
+#include"../comm/Common.h"
+#include"../tool/CellLog.h"
 #ifndef _WIN32
 #include<fcntl.h>
 #include<stdlib.h>
@@ -35,6 +36,7 @@ private:
 	}
 
 public:
+	//初始化
 	static void Init()
 	{
 		static CellNetwork obj;
@@ -54,7 +56,7 @@ public:
 #else
 		{
 			int flags;
-			if ((flags = fcntl(fd, F_GETFL, NULL)) < 0) 
+			if ((flags = fcntl(fd, F_GETFL, NULL)) < 0)
 			{
 				CELLLOG_WARRING("fcntl(%d, F_GETFL)", fd);
 				return -1;
@@ -81,6 +83,19 @@ public:
 			return SOCKET_ERROR;
 		}
 		return 0;
+	}
+
+	static int DestorySocket(SOCKET sockfd)
+	{
+#ifdef _WIN32
+		int ret = closesocket(sockfd);
+#else
+		int ret = close(sockfd);
+#endif // _WIN32
+
+		if (ret < 0)
+			CELLLOG_ERROR("destory sockfd<%d>", (int)sockfd);
+		return ret;
 	}
 };
 

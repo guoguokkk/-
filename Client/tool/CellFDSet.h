@@ -28,7 +28,7 @@ public:
 		}
 	}
 
-	inline void add(SOCKET s)
+	inline void Add(SOCKET s)
 	{
 #ifdef _WIN32
 		FD_SET(s, _pfdset);
@@ -49,7 +49,7 @@ public:
 		FD_CLR(s, _pfdset);
 	}
 
-	inline void zero()
+	inline void Zero()
 	{
 #ifdef _WIN32
 		FD_ZERO(_pfdset);
@@ -58,19 +58,19 @@ public:
 #endif // _WIN32
 	}
 
-	inline bool has(SOCKET s)
+	inline bool Has(SOCKET s)
 	{
 		return FD_ISSET(s, _pfdset);
 	}
 
-	inline fd_set* fdset()
+	inline fd_set* GetFdSet()
 	{
 		return _pfdset;
 	}
 
-	void copy(CellFDSet& set)
+	void Copy(CellFDSet& set)
 	{
-		memcpy(_pfdset, set.fdset(), set._nfdSize);
+		memcpy(_pfdset, set.GetFdSet(), set._nfdSize);
 	}
 private:
 	fd_set* _pfdset = nullptr;

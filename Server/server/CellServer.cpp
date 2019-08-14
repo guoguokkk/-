@@ -4,27 +4,28 @@
 #include<chrono>
 #include<vector>
 
-CellServer::CellServer(int id) :_id(id)
-{
-	_pNetEvent = nullptr;
-	_taskServer.cellServerId = id;
-}
-
 CellServer::~CellServer()
 {
 	CELLLOG_INFO("CellServer%d.~CellServer exit begin", _id);
-	closeCellServer();
+	CloseCellServer();
 	CELLLOG_INFO("CellServer%d.~CellServer exit end", _id);
 }
 
+//设置id
+void CellServer::SetId(int id)
+{
+	_id = id;
+	_taskServer.cellServerId = id;
+}
+
 //绑定网络事件	
-void CellServer::setEventObj(INetEvent* event)
+void CellServer::SetEventObj(INetEvent* event)
 {
 	_pNetEvent = event;
 }
 
 //关闭消息处理业务
-void CellServer::closeCellServer()
+void CellServer::CloseCellServer()
 {
 	CELLLOG_INFO("CellServer%d.Close begin", _id);
 	_taskServer.closeTask();
@@ -33,9 +34,9 @@ void CellServer::closeCellServer()
 }
 
 //消息处理业务，参数为消息处理线程 pThread
-void CellServer::onRunCellServer(CellThread* pThread)
+void CellServer::OnRunCellServer(CellThread* pThread)
 {
-	while (pThread->isRun())
+	while (pThread->IsRun())
 	{
 		//从缓冲队列里取出客户数据，加入正式客户队列
 		if (!_clientsBuf.empty())
@@ -43,11 +44,13 @@ void CellServer::onRunCellServer(CellThread* pThread)
 			std::lock_guard<std::mutex> lock(_mutex);//自解锁
 			for (auto pClient : _clientsBuf)
 			{
-				_clients[pClient->getSockfd()] = pClient;//std::map
+				_clients[pClient->GetSockfd()] = pClient;//std::map
 				pClient->cellServerId = _id;
 
 				if (_pNetEvent)
 					_pNetEvent->onNetJoin(pClient);
+
+				OnClientJoin(pClient);
 			}
 			_clientsBuf.clear();
 			_clientsChange = true;
@@ -62,10 +65,10 @@ void CellServer::onRunCellServer(CellThread* pThread)
 		}
 
 		//检测心跳消息，完成定时发送数据(没有定时发送了)
-		checkTime();
+		CheckTime();
 
 		//计算可读集合、可写集合，并处理
-		int ret = doSelect();
+		int ret = DoNetEvents();
 		if (ret == false)
 		{
 			pThread->exitThread();
@@ -73,175 +76,13 @@ void CellServer::onRunCellServer(CellThread* pThread)
 		}
 
 		//处理消息
-		doMsg();
+		DoMsg();
 	}
 	CELLLOG_INFO("CellServer%d.OnRun exit", _id);
 }
 
-//计算可读、可写集合，并处理
-bool CellServer::doSelect()
-{
-	/////////////////////////////////////////////////////////
-	//计算可读集合	
-	if (_clientsChange)
-	{
-		//如果客户列表发生改变
-		_clientsChange = false;
-		_fdRead.zero();//清理集合
-
-		//将所有的描述符都添加到可读集合，并找到最大的描述符
-		_maxSock = _clients.begin()->second->getSockfd();
-		for (auto client : _clients)
-		{
-			_fdRead.add(client.second->getSockfd());
-			if (_maxSock < client.second->getSockfd())
-			{
-				_maxSock = client.second->getSockfd();
-			}
-		}
-
-		//备份可读集合
-		_fdReadBak.copy(_fdRead);
-	}
-	else
-	{
-		//可读集合没有改变，直接拷贝内容
-		_fdRead.copy(_fdReadBak);
-	}
-
-	/////////////////////////////////////////////////////////
-	//计算可写集合
-	bool bNeedWrite = false;//是否需要写数据
-	_fdWrite.zero();
-	for (auto client : _clients)
-	{
-		//需要写数据的客户端,才加入fd_set检测是否可写
-		if (client.second->needWrite())
-		{
-			bNeedWrite = true;
-			_fdWrite.add(client.second->getSockfd());
-		}
-	}
-
-	/////////////////////////////////////////////////////////
-	//计算可写集合
-	timeval time;
-	time.tv_sec = 0;//秒
-	time.tv_usec = 1;
-	int ret = 0;
-	if (bNeedWrite)
-	{
-		//返回发生可读事件的描述符和发生可写事件的描述符
-		ret = select(_maxSock + 1, _fdRead.fdset(), _fdWrite.fdset(), nullptr, &time);
-	}
-	else
-	{
-		//返回发生可读事件的描述符
-		ret = select(_maxSock + 1, _fdRead.fdset(), nullptr, nullptr, &time);
-	}
-
-	//select返回值：超时返回0;失败返回-1；成功返回大于0的整数，这个整数表示就绪描述符的数目
-	if (ret < 0)
-	{
-		CELLLOG_INFO("CELLServer%d.OnRun.select Error exit:errno<%d>,errmsg<%s>",
-			_id, errno, strerror(errno));
-		return false;
-	}
-	else if (ret == 0)
-	{
-		return true;
-	}
-
-	//处理可读集合数据
-	readData();
-
-	//处理可写集合数据
-	writeData();
-	return true;
-}
-
-//处理可读集合数据-接收消息
-void CellServer::readData()
-{
-#ifdef _WIN32
-	auto pfdset = _fdRead.fdset();
-	for (int i = 0; i < pfdset->fd_count; ++i)
-	{
-		auto iter = _clients.find(pfdset->fd_array[i]);
-		if (iter != _clients.end())
-		{
-			int ret = recvData(iter->second);//触发<接收到网络数据>事件
-			if (ret == SOCKET_ERROR)
-			{
-				//客户端离开
-				onClientLeave(iter->second);
-				_clients.erase(iter);
-			}
-		}
-	}
-
-#else
-	for (auto iter = _clients.begin(); iter != _clients.end(); )
-	{
-		if (_fdRead.has(iter->second->getSockfd()))
-		{
-			int ret = recvData(iter->second);//接收消息
-			if (ret == SOCKET_ERROR)
-			{
-				//客户端离开
-				onClientLeave(iter->second);
-				auto iterOld = iter;
-				++iter;
-				_clients.erase(iterOld);
-				continue;
-			}
-		}
-		++iter;
-	}
-#endif // _WIN32		
-}
-
-//处理可写集合数据-发送消息
-void CellServer::writeData()
-{
-#ifdef _WIN32
-	auto pfdset = _fdWrite.fdset();
-	for (int i = 0; i < pfdset->fd_count; ++i)
-	{
-		auto iter = _clients.find(pfdset->fd_array[i]);
-		if (iter != _clients.end())
-		{
-			int ret = iter->second->sendDataReal();//发送消息
-			if (ret == SOCKET_ERROR)
-			{
-				onClientLeave(iter->second);
-				_clients.erase(iter);
-			}
-		}
-	}
-
-#else
-	for (auto iter = _clients.begin(); iter != _clients.end(); )
-	{
-		if (iter->second->needWrite() && _fdWrite.has(iter->second->getSockfd()))
-		{
-			int ret = iter->second->sendDataReal();//发送消息
-			if (ret == -1)
-			{
-				onClientLeave(iter->second);
-				auto iterOld = iter;
-				++iter;
-				_clients.erase(iter);
-				continue;
-			}
-		}
-		++iter;
-	}
-#endif // _WIN32	
-}
-
 //检测心跳消息，完成定时发送数据 
-void CellServer::checkTime()
+void CellServer::CheckTime()
 {
 	auto nowTime = CellTime::getNowInMillSec();//获取当前时间
 	auto dt = nowTime - _oldTime;
@@ -250,13 +91,14 @@ void CellServer::checkTime()
 	for (auto iter = _clients.begin(); iter != _clients.end();)
 	{
 		//心跳检测
-		if (iter->second->checkHeart(dt))
+		if (iter->second->CheckHeart(dt))
 		{
 			//心跳检测结果为死亡，移除对应的客户端
 			if (_pNetEvent != nullptr)
 				_pNetEvent->onNetLeave(iter->second);
 
 			_clientsChange = true;
+			delete iter->second;
 			auto iterOld = iter;
 			++iter;
 			_clients.erase(iterOld);
@@ -271,30 +113,40 @@ void CellServer::checkTime()
 }
 
 //清理正式客户队列和缓冲客户队列
-void CellServer::clearClients()
+void CellServer::ClearClients()
 {
+	for (auto client : _clients)
+		delete client.second;
 	_clients.clear();
+
+	for (auto client : _clientsBuf)
+		delete client;
 	_clientsBuf.clear();
 }
 
 //客户端离开
-void CellServer::onClientLeave(std::shared_ptr<CellClient> pClient)
+void CellServer::OnClientLeave(CellClient* pClient)
 {
 	if (_pNetEvent)
 	{
 		_pNetEvent->onNetLeave(pClient);
 	}
 	_clientsChange = true;
+	delete pClient;
+}
+
+void CellServer::OnClientJoin(CellClient* pClient)
+{
 }
 
 //触发<接收到网络数据>事件，参数为CellClient对象指针 pClient
-int CellServer::recvData(std::shared_ptr<CellClient> pClient)
+int CellServer::RecvData(CellClient* pClient)
 {
-	int nLen = pClient->recvData();//接收客户端消息，直接使用每个客户端的消息缓冲区接收数据	
+	int nLen = pClient->RecvData();//接收客户端消息，直接使用每个客户端的消息缓冲区接收数据	
 	if (nLen <= 0)
 	{
 		//客户端退出
-		CELLLOG_INFO("Client %d exit.", (int)pClient->getSockfd());
+		CELLLOG_INFO("Client %d exit.", (int)pClient->GetSockfd());
 		return -1;
 	}
 	_pNetEvent->onNetRecv(pClient);//触发<接收到网络数据>事件
@@ -302,29 +154,29 @@ int CellServer::recvData(std::shared_ptr<CellClient> pClient)
 }
 
 //处理消息
-void CellServer::doMsg()
+void CellServer::DoMsg()
 {
-	std::shared_ptr<CellClient> pClient;
+	CellClient* pClient;
 	for (auto client : _clients)
 	{
 		pClient = client.second;
 		//循环 判断是否有消息需要处理
-		while (pClient->hasMsg())
+		while (pClient->HasMsg())
 		{
-			onNetMsg(pClient, pClient->front_msg());//处理第一条消息		
-			pClient->pop_front_msg();//移除第一条消息
+			onNetMsg(pClient, pClient->GetFrontMsg());//处理第一条消息		
+			pClient->PopFrontMsg();//移除第一条消息
 		}
 	}
 }
 
 //处理网络消息
-void CellServer::onNetMsg(std::shared_ptr<CellClient>& pClient, netmsg_DataHeader* header)
+void CellServer::onNetMsg(CellClient* pClient, netmsg_DataHeader* header)
 {
 	_pNetEvent->onNetMsg(this, pClient, header);
 }
 
 //把新连接到的客户端加入当前CellServer的客户端缓冲队列，参数为CellClient对象 pClient
-void CellServer::addClient(std::shared_ptr<CellClient> pClient)
+void CellServer::AddClient(CellClient* pClient)
 {
 	//加锁，自解锁
 	std::lock_guard<std::mutex> lock(_mutex);
@@ -332,7 +184,7 @@ void CellServer::addClient(std::shared_ptr<CellClient> pClient)
 }
 
 //启动任务执行和消息处理业务线程
-void CellServer::startCellServer()
+void CellServer::StartCellServer()
 {
 	//开启任务执行
 	_taskServer.startTask();
@@ -340,20 +192,20 @@ void CellServer::startCellServer()
 	//开启消息处理业务线程
 	_thread.startThread(nullptr,
 		[this](CellThread* pThread) {
-			onRunCellServer(pThread);
+			OnRunCellServer(pThread);
 		},
 		[this](CellThread* pThread) {
-			clearClients();
+			ClearClients();
 		});
 }
 
 //获取客户端总数
-size_t CellServer::getClientCount()
+size_t CellServer::GetClientCount()
 {
 	return size_t(_clients.size() + _clientsBuf.size());
 }
 
-//void CellServer::addSendTask(std::shared_ptr<CellClient> pClient, netmsg_DataHeader* header)
+//void CellServer::addSendTask(CellClient* pClient, netmsg_DataHeader* header)
 //{
 //	_taskServer.addTask([pClient,header]() {
 //		pClient->sendData(header);

@@ -8,9 +8,9 @@ class CellServer;
 class INetEvent
 {
 public:
-	virtual void onNetJoin(std::shared_ptr<CellClient>& pClient) = 0;//客户端加入事件
-	virtual void onNetLeave(std::shared_ptr<CellClient>& pClient) = 0;//客户端离开事件
-	virtual void onNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient>& pClient, netmsg_DataHeader* header) = 0;//客户端消息事件
-	virtual void onNetRecv(std::shared_ptr<CellClient>& pClient) = 0;//接收次数事件
+	virtual void onNetJoin(CellClient* pClient) = 0;//客户端加入事件
+	virtual void onNetLeave(CellClient* pClient) = 0;//客户端离开事件
+	virtual void onNetMsg(CellServer* pCellServer, CellClient* pClient, netmsg_DataHeader* header) = 0;//客户端消息事件
+	virtual void onNetRecv(CellClient* pClient) = 0;//接收次数事件
 };
 #endif // !INETEVENT_H_

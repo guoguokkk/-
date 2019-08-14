@@ -19,38 +19,39 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="memory\MemoryAlloc.cpp" />
-    <ClCompile Include="memory\MemoryPool.cpp" />
-    <ClCompile Include="server\CellServer.cpp" />
-    <ClCompile Include="server\Server.cpp" />
-    <ClCompile Include="test\TestServer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClInclude Include="comm\Common.h" />
+    <ClInclude Include="comm\Message.h" />
+    <ClInclude Include="conf\CellConfig.h" />
     <ClInclude Include="memory\MemoryAlloc.h" />
     <ClInclude Include="memory\MemoryPool.h" />
     <ClInclude Include="memory\ObjectPool.h" />
     <ClInclude Include="server\CellBuffer.h" />
     <ClInclude Include="server\CellClient.h" />
+    <ClInclude Include="server\CellFDSet.h" />
+    <ClInclude Include="server\CellMsgStream.h" />
     <ClInclude Include="server\CellServer.h" />
+    <ClInclude Include="server\CellServerEpoll.h" />
+    <ClInclude Include="server\CellServerSelect.h" />
+    <ClInclude Include="server\CellStream.h" />
     <ClInclude Include="server\INetEvent.h" />
     <ClInclude Include="server\Server.h" />
-    <ClInclude Include="tool\CellConfig.h" />
-    <ClInclude Include="tool\CellFDSet.h" />
+    <ClInclude Include="server\ServerEpoll.h" />
+    <ClInclude Include="server\ServerSelect.h" />
+    <ClInclude Include="test\MyServerEpoll.h" />
+    <ClInclude Include="test\MyServerSelect.h" />
     <ClInclude Include="tool\CellLog.h" />
-    <ClInclude Include="tool\CellMsgStream.h" />
     <ClInclude Include="tool\CellNetWork.h" />
     <ClInclude Include="tool\CellSemaphore.h" />
-    <ClInclude Include="tool\CellStream.h" />
     <ClInclude Include="tool\CellTask.h" />
     <ClInclude Include="tool\CellThread.h" />
     <ClInclude Include="tool\CellTimeStamp.h" />
-    <ClInclude Include="tool\Common.h" />
-    <ClInclude Include="tool\Message.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram.cd" />
-    <None Include="ClassDiagram1.cd" />
-    <None Include="ClassDiagram2.cd" />
+    <ClCompile Include="memory\MemoryAlloc.cpp" />
+    <ClCompile Include="memory\MemoryPool.cpp" />
+    <ClCompile Include="server\CellServer.cpp" />
+    <ClCompile Include="server\Server.cpp" />
+    <ClCompile Include="test\TestServer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

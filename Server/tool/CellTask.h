@@ -7,13 +7,14 @@
 #include<functional>
 #include"CellThread.h"
 
-//执行任务类
+//执行任务的服务类
 class CellTaskServer
 {
 private:
 	typedef std::function<void()> CellTask;//函数指针，返回值为void
+
 public:
-	//将任务添加到任务缓冲区
+	//将任务添加到任务缓冲队列
 	virtual void addTask(CellTask task)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);//对缓冲队列加锁
@@ -23,9 +24,12 @@ public:
 	//启动工作线程，一个任务对应一个线程
 	virtual void startTask()
 	{
-		_thread.startThread(nullptr, [this](CellThread* pThread) {
+		_thread.startThread(
+			nullptr,
+			[this](CellThread* pThread) {
 			onRun(pThread);
-			}, nullptr);
+			}, 
+			nullptr);
 	}
 
 	//关闭工作线程
@@ -39,9 +43,9 @@ protected:
 	void onRun(CellThread* pThread)
 	{
 		//工作线程还在运行
-		while (pThread->isRun())
+		while (pThread->IsRun())
 		{
-			//从任务缓冲区取出任务，放到任务队列
+			//从任务缓冲队列取出任务，放到任务队列
 			if (!_taskBuf.empty())
 			{
 				std::lock_guard<std::mutex> lock(_mutex);//对缓冲队列加锁，因为要清空缓冲队列
@@ -81,8 +85,8 @@ public:
 
 private:
 	std::list<CellTask> _tasks;//任务队列
-	std::list<CellTask> _taskBuf;//任务缓冲队列，生产者消费者操纵的是任务数据缓冲区
-	std::mutex _mutex;//任务缓冲区的锁
+	std::list<CellTask> _taskBuf;//任务缓冲队列，生产者消费者操纵的是任务缓冲队列
+	std::mutex _mutex;//任务缓冲队列的锁
 	CellThread _thread;
 };
 #endif // !CELL_TASK_H_

@@ -4,10 +4,10 @@
 //命令类型
 enum CMD
 {
-	CMD_LOGIN,//登入
-	CMD_LOGIN_RESULT,
+	CMD_LOGIN,//登录
+	CMD_LOGIN_RESULT,//登录结果
 	CMD_LOGOUT,//登出
-	CMD_LOGOUT_RESULT,
+	CMD_LOGOUT_RESULT,//登出结果
 	CMD_ERROR,//错误
 	CMD_NEW_USER_JOIN,//新用户加入
 	CMD_C2S_HEART,//客户端发给服务器端的心跳消息
@@ -17,6 +17,7 @@ enum CMD
 //消息头(消息总长度、命令类型)
 struct netmsg_DataHeader
 {
+	//构造函数
 	netmsg_DataHeader()
 	{
 		dataLength = sizeof(netmsg_DataHeader);
@@ -29,6 +30,7 @@ struct netmsg_DataHeader
 //登录消息-100字节：消息头(消息总长度、命令类型)、用户名、密码、数据、消息ID
 struct netmsg_Login :public netmsg_DataHeader
 {
+	//构造函数
 	netmsg_Login()
 	{
 		dataLength = sizeof(netmsg_Login);
@@ -43,6 +45,7 @@ struct netmsg_Login :public netmsg_DataHeader
 //登录结果消息-100字节：消息头(消息总长度、命令类型)、登录结果、数据、消息ID
 struct netmsg_LoginResult :public netmsg_DataHeader
 {
+	//构造函数
 	netmsg_LoginResult()
 	{
 		dataLength = sizeof(netmsg_LoginResult);
@@ -57,6 +60,7 @@ struct netmsg_LoginResult :public netmsg_DataHeader
 //登出消息-40字节：消息头(消息总长度、命令类型)、用户名
 struct netmsg_Logout :public netmsg_DataHeader
 {
+	//构造函数
 	netmsg_Logout()
 	{
 		dataLength = sizeof(netmsg_Logout);
@@ -69,6 +73,7 @@ struct netmsg_Logout :public netmsg_DataHeader
 //登出结果消息-8字节：消息头(消息总长度、命令类型)、结果
 struct  netmsg_LogoutResult :public netmsg_DataHeader
 {
+	//构造函数
 	netmsg_LogoutResult()
 	{
 		dataLength = sizeof(netmsg_LogoutResult);
@@ -81,6 +86,7 @@ struct  netmsg_LogoutResult :public netmsg_DataHeader
 //新用户加入消息-8字节：消息头(消息总长度、命令类型)、新加入用户的描述符
 struct  netmsg_NewUserJoin :public netmsg_DataHeader
 {
+	//构造函数
 	netmsg_NewUserJoin()
 	{
 		dataLength = sizeof(netmsg_NewUserJoin);
@@ -93,6 +99,7 @@ struct  netmsg_NewUserJoin :public netmsg_DataHeader
 //客户端发给服务器端的心跳消息-4字节：消息头(消息总长度、命令类型)
 struct  netmsg_c2s_Heart :public netmsg_DataHeader
 {
+	//构造函数
 	netmsg_c2s_Heart()
 	{
 		dataLength = sizeof(netmsg_c2s_Heart);
@@ -103,6 +110,7 @@ struct  netmsg_c2s_Heart :public netmsg_DataHeader
 //服务器端发给客户端的心跳消息-4字节：消息头(消息总长度、命令类型)
 struct  netmsg_s2c_Heart :public netmsg_DataHeader
 {
+	//构造函数
 	netmsg_s2c_Heart()
 	{
 		dataLength = sizeof(netmsg_s2c_Heart);

@@ -154,7 +154,7 @@ public:
 				fprintf(pLog->_logFile, pformat, args...);
 				fprintf(pLog->_logFile, "%s", "\n");
 				fflush(pLog->_logFile);
-			}
+			} 
 			printf("%s", type);
 			printf(pformat, args...);
 			printf("%s", "\n");

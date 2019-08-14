@@ -49,7 +49,7 @@ public:
 				{
 					//当前消息ID和本地收消息次数不匹配
 					CELLLOG_ERROR("OnNetMsg socket<%d> msgID<%d> _nRecvMsgID<%d> %d",
-						_pClient->getSockfd(), login_result->msgID, _nRecvMsgID, login_result->msgID - _nRecvMsgID);
+						_pClient->GetSockfd(), login_result->msgID, _nRecvMsgID, login_result->msgID - _nRecvMsgID);
 				}
 				++_nRecvMsgID;
 			}
@@ -86,13 +86,13 @@ public:
 		case CMD_ERROR:
 		{
 			CELLLOG_INFO("error : socket = %d , data length= %d",
-				(int)_pClient->getSockfd(), header->dataLength);
+				(int)_pClient->GetSockfd(), header->dataLength);
 		}
 		break;
 		default:
 		{
 			CELLLOG_INFO("Undefined data : socket = %d , data length=  %d",
-				(int)_pClient->getSockfd(), header->dataLength);
+				(int)_pClient->GetSockfd(), header->dataLength);
 		}
 		break;
 		}
@@ -148,7 +148,7 @@ void workThread(CellThread* pThread, int id)
 	//新建客户端，nClient个
 	for (int i = beginClients; i < endClients; ++i)
 	{
-		if (!pThread->isRun())
+		if (!pThread->IsRun())
 			break;//输入了exit
 		clients[i] = new MyClient();
 		CellThread::sleepInThread(0);//多线程时让下CPU，线程休眠会让出CPU
@@ -158,7 +158,7 @@ void workThread(CellThread* pThread, int id)
 	//初始化客户端，连接服务器
 	for (int i = beginClients; i < endClients; ++i)
 	{
-		if (!pThread->isRun())
+		if (!pThread->IsRun())
 			break;//输入了exit
 		if (clients[i]->initClient(nSendBufSize, nRecvBufSize) == INVALID_SOCKET)
 			break;//创建失败，端口用完
@@ -170,7 +170,7 @@ void workThread(CellThread* pThread, int id)
 	CELLLOG_INFO("thread<%d>, Connect<begin=%d, end=%d, connectCount=%d>", id, 0, nClient, (int)connectCount);
 
 	++readyCount;
-	while (readyCount < nThread && pThread->isRun())
+	while (readyCount < nThread && pThread->IsRun())
 	{
 		//等待其他线程准备好发送
 		CellThread::sleepInThread(10);
@@ -189,7 +189,7 @@ void workThread(CellThread* pThread, int id)
 	auto tNew = tOld;//新的时间点
 	auto dt = tNew;//经过的时间
 	CellTimeStamp tTime;
-	while (pThread->isRun())
+	while (pThread->IsRun())
 	{
 		tNew = CellTime::getNowInMillSec();
 		dt = tNew - tOld;
@@ -316,7 +316,7 @@ void testClient(int argc, char* args[])
 	/////////////////////////////////////////////////////////
 	//每秒数据统计
 	CellTimeStamp tTime;
-	while (tCmd.isRun())
+	while (tCmd.IsRun())
 	{
 		auto t = tTime.getElapsedSecond();
 		if (t >= 1.0)

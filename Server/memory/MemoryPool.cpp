@@ -31,7 +31,7 @@ void MemoryPool::initObjectPool()
 	}
 
 	//向系统申请池的内存
-	size_t realSize = _nChunkSize + sizeof(Chunk); //内存块描述信息 + 数据
+	size_t realSize = sizeof(Chunk) + _nChunkSize; //内存块描述信息 + 数据
 	_pBuf = (char*)malloc(_nChunkNum * realSize);
 
 	//初始化每个块

@@ -1,7 +1,7 @@
 #ifndef CELL_MSG_STREAM_H_
 #define CELL_MSG_STREAM_H_
-#include"../tool/CellStream.h"
-#include"../tool/Message.h"
+#include"../server/CellStream.h"
+#include"../comm/Message.h"
 #include<string>
 
 //读取字节流(接收数据时读取)

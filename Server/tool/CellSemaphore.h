@@ -5,17 +5,17 @@
 #include<thread>
 #include<condition_variable>//条件变量
 
-//信号量：保证在server对象被释放之前，在CellServer开辟的子线程可以正确退出，否则先释放server对象，CellServer无法正常退出
+//信号量
 class CellSemaphore
 {
 public:
-	//阻塞当前线程
+	//阻塞当前线程，等待_wakeup加1
 	void wait()
 	{
 		std::unique_lock<std::mutex> lock(_mutex);//加锁，线程安全
 		if (--_wait < 0)
 		{
-			//阻塞等待OnRun()退出
+			//阻塞等待
 			_cv.wait(lock, [this]()->bool {
 				return _wakeup > 0;
 				});
@@ -23,13 +23,14 @@ public:
 		}
 	}
 
+	//唤醒一个等待的线程
 	void wakeup()
 	{
 		std::lock_guard<std::mutex> lock(_mutex);//加锁，线程安全
 		if (++_wait <= 0)
 		{
 			++_wakeup;
-			_cv.notify_one();//唤醒
+			_cv.notify_one();//随机唤醒一个等待的线程
 		}
 	}
 

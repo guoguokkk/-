@@ -15,11 +15,12 @@ public:
 	static void sleepInThread(time_t dt)
 	{
 		std::chrono::milliseconds t(dt);
-		std::this_thread::sleep_for(t);//sleep_for: 线程休眠某个指定的时间片(time span)，该线程才被重新唤醒
+		std::this_thread::sleep_for(t);//当前线程休眠某个指定的时间片(time span)，该线程才被重新唤醒
 	}
 
-	//启动线程，参数为创建事件，运行事件，销毁事件
-	void startThread(EventCall onCreate = nullptr,
+	//启动线程，参数为创建事件onCreate，运行事件onRun，销毁事件onDestroy
+	void startThread(
+		EventCall onCreate = nullptr,
 		EventCall onRun = nullptr,
 		EventCall onDestroy = nullptr)
 	{
@@ -50,7 +51,7 @@ public:
 		if (_isRun)
 		{
 			_isRun = false;
-			_sem.wait();//阻塞线程，等待工作函数完成
+			_sem.wait();//阻塞线程，等待工作函数完成，喊醒该函数
 		}
 	}
 
@@ -65,7 +66,7 @@ public:
 	}
 
 	//线程是否启动运行状态
-	bool isRun()
+	bool IsRun()
 	{
 		return _isRun;
 	}

@@ -20,7 +20,7 @@ void Client::initClient(int sendSize, int recvSize)
 
 	if (_pClient)
 	{
-		CELLLOG_INFO("<socket=%d> close old connections.", _pClient->getSockfd());// cout语句不是原子操作
+		CELLLOG_INFO("<socket=%d> close old connections.", _pClient->GetSockfd());// cout语句不是原子操作
 		closeClient();
 	}
 
@@ -52,10 +52,10 @@ int Client::connectToServer(const char* ip, unsigned short port)
 	server_addr.sin_addr.s_addr = inet_addr(ip);
 #endif // _WIN32
 
-	int ret = connect(_pClient->getSockfd(), (sockaddr*)& server_addr, sizeof(server_addr));
+	int ret = connect(_pClient->GetSockfd(), (sockaddr*)& server_addr, sizeof(server_addr));
 	if (ret == SOCKET_ERROR)
 	{
-		CELLLOG_INFO("<socket=%d> connect error.", (int)_pClient->getSockfd());
+		CELLLOG_INFO("<socket=%d> connect error.", (int)_pClient->GetSockfd());
 	}
 	else
 	{
@@ -80,7 +80,7 @@ bool Client::onRun()
 {
 	if (isRun())
 	{
-		SOCKET clientSock = _pClient->getSockfd();
+		SOCKET clientSock = _pClient->GetSockfd();
 
 		fd_set fdRead;
 		FD_ZERO(&fdRead);
@@ -91,7 +91,7 @@ bool Client::onRun()
 
 		timeval time = { 0,1 };
 		int ret = 0;
-		if (_pClient->needWrite())
+		if (_pClient->NeedWrite())
 		{
 			FD_SET(clientSock, &fdWrite);
 			ret = select(clientSock + 1, &fdRead, &fdWrite, 0, &time);//linux 需要+1
@@ -121,7 +121,7 @@ bool Client::onRun()
 
 		if (FD_ISSET(clientSock, &fdWrite))
 		{
-			int ret = _pClient->sendDataReal();//处理收到的消息
+			int ret = _pClient->SendDataReal();//处理收到的消息
 			if (ret == -1)
 			{
 				CELLLOG_INFO("<socket=%d> select error 2.", (int)clientSock);
@@ -143,14 +143,14 @@ int Client::recvData(SOCKET clientSock)
 {
 	if (isRun())
 	{
-		int nLen = _pClient->recvData();
+		int nLen = _pClient->RecvData();
 		if (nLen > 0)
 		{
 			//判断是否有消息需要处理
-			if (_pClient->hasMsg())
+			if (_pClient->HasMsg())
 			{
-				onNetMsg(_pClient->front_msg());//处理第一个消息
-				_pClient->pop_front_msg();//移除第一个数据
+				onNetMsg(_pClient->GetFrontMsg());//处理第一个消息
+				_pClient->PopFrontMsg();//移除第一个数据
 			}
 		}
 		return nLen;
@@ -166,7 +166,7 @@ int Client::sendData(netmsg_DataHeader* header)
 {
 	if (isRun())
 	{
-		return _pClient->sendData(header);
+		return _pClient->SendData(header);
 	}
 	return 0;
 }
@@ -175,7 +175,7 @@ int Client::sendData(const char* pData, int len)
 {
 	if (isRun())
 	{
-		return _pClient->sendData(pData, len);
+		return _pClient->SendData(pData, len);
 	}
 	return 0;
 }

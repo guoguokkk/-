@@ -22,10 +22,10 @@ public:
 	}
 
 	//获取缓冲区
-	char* getData() { return _pBuf; }
+	char* GetData() { return _pBuf; }
 
 	//向缓冲区中添加数据，参数为要添加的数据 pData，数据的长度 nLen
-	bool push(const char* pData, int nLen)
+	bool Push(const char* pData, int nLen)
 	{
 		//没有满的情况下才可以放入，否则返回错误
 		if (_nLast + nLen <= _nSize)
@@ -57,7 +57,7 @@ public:
 	}
 
 	//弹出缓冲区头部的数据，参数为要弹出的数据长度 nLen
-	void pop(int nLen)
+	void Pop(int nLen)
 	{
 		int n = _nLast - nLen;
 		if (n > 0)
@@ -70,7 +70,7 @@ public:
 	}
 
 	//将数据写入内核-用于发送，参数为描述符 sockfd
-	int write2socket(SOCKET sockfd)
+	int Write2Socket(SOCKET sockfd)
 	{
 		int ret = 0;
 		//缓冲区有数据
@@ -100,7 +100,7 @@ public:
 	}
 
 	//从内核读取数据-用于接收，返回值为消息长度，参数为描述符 sockfd
-	int read4socket(SOCKET sockfd)
+	int Read4Socket(SOCKET sockfd)
 	{
 		if (_nSize - _nLast > 0)
 		{
@@ -119,7 +119,7 @@ public:
 	}
 
 	//是否包含至少一条消息
-	bool hasMsg()
+	bool HasMsg()
 	{
 		//判断消息缓冲区的数据长度大于消息头netmsg_DataHeader长度
 		if (_nLast >= sizeof(netmsg_DataHeader))
@@ -131,7 +131,7 @@ public:
 	}
 
 	//是否需要写
-	bool needWrite()
+	bool NeedWrite()
 	{
 		return _nLast > 0;
 	}

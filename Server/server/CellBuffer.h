@@ -1,13 +1,14 @@
 #ifndef CELL_BUFFER_H_
 #define CELL_BUFFER_H_
 #include"../memory/MemoryAlloc.h"
-#include"../tool/Common.h"
+#include"../comm/Common.h"
 
+//消息缓冲区
 class CellBuffer
 {
 public:
 	//构造函数，参数为缓冲区大小 size=8192
-	CellBuffer(int nSize = 8192) 
+	CellBuffer(int nSize = 8192)
 	{
 		_nSize = nSize;
 		_pBuf = new char[_nSize];//新建缓冲区
@@ -23,14 +24,14 @@ public:
 	}
 
 	//获取缓冲区
-	char* getData() { return _pBuf; }
+	char* GetData() { return _pBuf; }
 
 	//向缓冲区中添加数据，参数为要添加的数据 pData，数据的长度 nLen
-	bool push(const char* pData, int nLen)
+	bool Push(const char* pData, int nLen)
 	{
 		//没有满的情况下才可以放入，否则返回错误
 		if (_nLast + nLen <= _nSize)
-		{			
+		{
 			memcpy(_pBuf + _nLast, pData, nLen);//将数据放入缓冲区
 			_nLast += nLen;//更新缓冲区尾部位置
 			if (_nLast == SEND_BUF_SIZE)
@@ -52,13 +53,13 @@ public:
 			//delete[] _pBuf;
 			//_pBuf = buff;
 
-			++_fullCount;			
+			++_fullCount;
 		}
 		return false;
 	}
 
 	//弹出缓冲区头部的数据，参数为要弹出的数据长度 nLen
-	void pop(int nLen)
+	void Pop(int nLen)
 	{
 		int n = _nLast - nLen;
 		if (n > 0)
@@ -71,7 +72,7 @@ public:
 	}
 
 	//将数据写入内核-用于发送，参数为描述符 sockfd
-	int write2socket(SOCKET sockfd)
+	int Write2Socket(SOCKET sockfd)
 	{
 		int ret = 0;
 		//缓冲区有数据
@@ -101,7 +102,7 @@ public:
 	}
 
 	//从内核读取数据-用于接收，返回值为消息长度，参数为描述符 sockfd
-	int read4socket(SOCKET sockfd)
+	int Read4Socket(SOCKET sockfd)
 	{
 		if (_nSize - _nLast > 0)
 		{
@@ -120,7 +121,7 @@ public:
 	}
 
 	//是否包含至少一条消息
-	bool hasMsg()
+	bool HasMsg()
 	{
 		//判断消息缓冲区的数据长度大于消息头netmsg_DataHeader长度
 		if (_nLast >= sizeof(netmsg_DataHeader))
@@ -131,12 +132,12 @@ public:
 		return false;
 	}
 
-	//是否需要写
-	bool needWrite()
+	//是否能写入内核
+	bool NeedWrite()
 	{
 		return _nLast > 0;
 	}
-	
+
 private:
 	char* _pBuf = nullptr;//缓冲区
 	int _nLast = 0;//缓冲区尾部位置，已有数据长度
