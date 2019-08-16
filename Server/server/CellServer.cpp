@@ -50,7 +50,7 @@ void CellServer::OnRunCellServer(CellThread* pThread)
 				if (_pNetEvent)
 					_pNetEvent->onNetJoin(pClient);
 
-				OnClientJoin(pClient);
+				OnClientJoin(pClient);//向epoll对象注册需要管理、监听的客户端
 			}
 			_clientsBuf.clear();
 			_clientsChange = true;

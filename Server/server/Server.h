@@ -39,7 +39,7 @@ public:
 				OnRun(pThread);
 			});
 	}
-	
+
 	//网络事件，实现各种统计功能
 	virtual void onNetJoin(CellClient* pClient);//客户端加入事件
 	virtual void onNetLeave(CellClient* pClient);//客户端离开事件

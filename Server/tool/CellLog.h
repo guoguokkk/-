@@ -4,6 +4,7 @@
 #include"../tool/CellTimeStamp.h"
 #include<ctime>
 #include<stdio.h>
+#include<string.h>
 
 //日志记录
 class CellLog
@@ -12,13 +13,15 @@ class CellLog
 #ifndef CELLLOG_DEBUG
 #define CELLLOG_DEBUG(...) CellLog::Debug(__VA_ARGS__)//Debug 调式信息，只在debug模式下起作用
 #endif // !CELLLOG_DEBUG
+
 #else
 #define CELLLOG_DEBUG(...)
 #endif // _DEBUG
 
 
 #define CELLLOG_INFO(...) CellLog::Info(__VA_ARGS__)//Info 普通信息	
-#define CELLLOG_ERROR(...) CellLog::Error(__VA_ARGS__)//Error 错误信息	
+#define CELLLOG_ERROR(...) CellLog::Error(__VA_ARGS__)//Error 错误信息
+#define CELLLOG_PERROR(...) CellLog::PError(__VA_ARGS__)//PError 错误信息
 #define CELLLOG_WARRING(...) CellLog::Warring(__VA_ARGS__)//Warring 警告信息
 
 private:
@@ -93,12 +96,27 @@ public:
 		Error("%s", pStr);
 	}
 
+	//Error
 	template<typename ...Args>
 	static void Error(const char* pformat, Args... args)
 	{
-		Echo("<Error>", pformat, args...);
+		Echo("<Error> ", pformat, args...);
 	}
-	   
+
+	//PError
+	static void PError(const char* pStr)
+	{
+		PError("%s", pStr);
+	}
+
+	//PError
+	template<typename ...Args>
+	static void PError(const char* pformat, Args... args)
+	{
+		Echo("<PError> ", pformat, args...);
+		Echo("<PError> ", "errno<%d>, errmsg<%s>", errno, strerror(errno));
+	}
+
 	//Warring
 	static void Warring(const char* pStr)
 	{
@@ -108,7 +126,7 @@ public:
 	template<typename ...Args>
 	static void Warring(const char* pformat, Args... args)
 	{
-		Echo("<Warring>", pformat, args...);
+		Echo("<Warring> ", pformat, args...);
 	}
 
 	//Debug
@@ -120,7 +138,7 @@ public:
 	template<typename ...Args>
 	static void Debug(const char* pformat, Args... args)
 	{
-		Echo("<Debug>", pformat, args...);
+		Echo("<Debug> ", pformat, args...);
 	}
 
 	//Info
@@ -132,7 +150,7 @@ public:
 	template<typename ...Args>
 	static void Info(const char* pformat, Args... args)
 	{
-		Echo("<Info>", pformat, args...);
+		Echo("<Info> ", pformat, args...);
 	}
 
 	//输出函数
@@ -154,7 +172,7 @@ public:
 				fprintf(pLog->_logFile, pformat, args...);
 				fprintf(pLog->_logFile, "%s", "\n");
 				fflush(pLog->_logFile);
-			} 
+			}
 			printf("%s", type);
 			printf(pformat, args...);
 			printf("%s", "\n");

@@ -1,15 +1,16 @@
-#ifndef SERVERSELECT_H_
-#define SERVERSELECT_H_
+#ifndef SERVER_SELECT_H_
+#define SERVER_SELECT_H_
+
 #include"../server/Server.h"
 #include"../server/CellServerSelect.h"
 
-class ServerSelect :public Server
-{
+class ServerSelect : public Server {
 public:
 	void StartAllCellServer(int nCellServer)
 	{
 		Server::StartAllCellServer<CellServerSelect>(nCellServer);
 	}
+
 protected:
 	//只负责连接新客户端，参数为线程控制对象 pThread
 	void OnRun(CellThread* pThread)
@@ -43,4 +44,5 @@ protected:
 		}
 	}
 };
-#endif // !SERVERSELECT_H_
+
+#endif // !SERVER_SELECT_H_

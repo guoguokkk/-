@@ -27,6 +27,7 @@
     <ClInclude Include="memory\ObjectPool.h" />
     <ClInclude Include="server\CellBuffer.h" />
     <ClInclude Include="server\CellClient.h" />
+    <ClInclude Include="server\CellEpoll.h" />
     <ClInclude Include="server\CellFDSet.h" />
     <ClInclude Include="server\CellMsgStream.h" />
     <ClInclude Include="server\CellServer.h" />
@@ -52,6 +53,9 @@
     <ClCompile Include="server\CellServer.cpp" />
     <ClCompile Include="server\Server.cpp" />
     <ClCompile Include="test\TestServer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

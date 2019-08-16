@@ -31,12 +31,12 @@ SOCKET Server::InitServer()
 	_serverSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (_serverSock == INVALID_SOCKET)
 	{
-		CELLLOG_ERROR("create socket failed...");
+		CELLLOG_PERROR("create socket failed...");
 	}
 	else
 	{
 		CellNetwork::make_reuseaddr(_serverSock);
-		//CELLLOG_INFO("create socket<%d> success...",(int)_serverSock);
+		CELLLOG_INFO("create socket<%d> success...", (int)_serverSock);
 	}
 	return _serverSock;
 }
@@ -71,11 +71,11 @@ int Server::Bind(const char* ip, unsigned short port)
 	int ret = bind(_serverSock, (sockaddr*)& server_addr, sizeof(server_addr));
 	if (ret == SOCKET_ERROR)
 	{
-		CELLLOG_ERROR("bind port<%d> failed...", port);
+		CELLLOG_PERROR("bind port<%d> failed...", port);
 	}
 	else
 	{
-		//CELLLOG_INFO("bind port<%d> success...", port);
+		CELLLOG_INFO("bind port<%d> success...", port);
 	}
 	return ret;
 }
@@ -86,11 +86,11 @@ int Server::Listen(int n)
 	int ret = listen(_serverSock, n);
 	if (ret == SOCKET_ERROR)
 	{
-		CELLLOG_ERROR("listen socket<%d> failed...", (int)_serverSock);
+		CELLLOG_PERROR("listen socket<%d> failed...", (int)_serverSock);
 	}
 	else
 	{
-		//CELLLOG_INFO("listen port<%d> success...", (int)_serverSock);
+		CELLLOG_INFO("listen port<%d> success...", (int)_serverSock);
 	}
 	return ret;
 }
@@ -110,7 +110,7 @@ SOCKET Server::Accept()
 	clientSock = accept(_serverSock, (sockaddr*)& client_addr, &client_addr_size);
 	if (clientSock == INVALID_SOCKET)
 	{
-		CELLLOG_ERROR("<socket=%d> accept error.", (int)_serverSock);
+		CELLLOG_PERROR("<socket=%d> accept error.", (int)_serverSock);
 	}
 	else
 	{
@@ -123,11 +123,7 @@ SOCKET Server::Accept()
 		else
 		{
 			//超出最大连接数目，直接关闭该客户端
-#ifdef _WIN32
-			closesocket(clientSock);
-#else
-			close(clientSock);
-#endif // _WIN32
+			CellNetwork::DestorySocket(clientSock);
 			CELLLOG_WARRING("Accept to nMaxClient");
 		}
 	}
@@ -146,7 +142,7 @@ void Server::AddClientToCellServer(CellClient* pClient)
 			pMinCellServer = pCellServer;
 		}
 	}
-	pMinCellServer->AddClient(pClient);//加入客户端数量最小的消息处理线程	
+	pMinCellServer->AddClient(pClient);//加入客户端数量最小的消息处理线程
 }
 
 //关闭
@@ -164,11 +160,7 @@ void Server::CloseServer()
 		}
 		_cellServers.clear();
 
-#ifdef _WIN32
-		closesocket(_serverSock);
-#else
-		close(_serverSock);
-#endif // _WIN32
+		CellNetwork::DestorySocket(_serverSock);
 		_serverSock = INVALID_SOCKET;
 	}
 	CELLLOG_INFO("Server.Close end");

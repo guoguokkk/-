@@ -18,6 +18,7 @@
 #define SOCKET int
 #define INVALID_SOCKET (SOCKET)(~0)
 #define SOCKET_ERROR -1
+#define EPOLL_ERROR -1
 #endif // _WIN32
 
 #include<stdio.h>

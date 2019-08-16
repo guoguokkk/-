@@ -1,5 +1,6 @@
 #ifndef CELL_SERVER_H_
 #define CELL_SERVER_H_
+
 #include"../comm/Common.h"
 #include"../server/CellFDSet.h"
 #include"../tool/CellTask.h"
@@ -15,7 +16,7 @@
 //网络消息接收处理服务类
 class CellServer {
 public:
-	~CellServer();
+	virtual ~CellServer();
 
 	void CloseCellServer();//关闭消息处理业务
 	void SetId(int id);//设置id
@@ -30,15 +31,15 @@ public:
 	int RecvData(CellClient* pClient);//触发<接收到网络数据>事件
 	void OnClientLeave(CellClient* pClient);//客户端离开
 
-private:
+protected:
 	//消息处理业务
 	void OnRunCellServer(CellThread* pThread);//消息处理业务
-	void CheckTime();//检测心跳消息，完成定时发送数据 	
-	void DoMsg();//处理消息	
-	virtual bool DoNetEvents() = 0;//计算可读集合、可写集合，并处理
+	void CheckTime();//检测心跳消息，完成定时发送数据
+	void DoMsg();//处理消息
+	virtual bool DoNetEvents() = 0;//slect/epoll
 	virtual void onNetMsg(CellClient* pClient, netmsg_DataHeader* header);//处理网络消息
 
-	virtual void OnClientJoin(CellClient* pClient);//客户端加入
+	virtual void OnClientJoin(CellClient* pClient);//新客户端加入
 	void ClearClients();//清理正式客户队列和缓冲客户队列
 
 	//没有使用任务执行类，只用了一个线程来完成消息的处理
@@ -47,9 +48,7 @@ private:
 	std::vector<CellClient*> _clientsBuf;//缓冲客户队列，vector
 	std::mutex _mutex;//缓冲队列的锁
 	INetEvent* _pNetEvent = nullptr;//网络事件对象
-
-
-	CellTaskServer _taskServer;//执行任务类	
+	CellTaskServer _taskServer;//执行任务类
 
 	time_t _oldTime = CellTime::getNowInMillSec();//旧时间戳
 	CellThread _thread;//线程控制类

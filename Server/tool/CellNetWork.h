@@ -94,7 +94,7 @@ public:
 #endif // _WIN32
 
 		if (ret < 0)
-			CELLLOG_ERROR("destory sockfd<%d>", (int)sockfd);
+			CELLLOG_PERROR("destory sockfd<%d>", (int)sockfd);
 		return ret;
 	}
 };

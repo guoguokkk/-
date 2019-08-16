@@ -1,0 +1,37 @@
+<Info> [2019-8-16 9:28:2] CellLog::setLogPath success, <./serverLog.txt, w>
+<Error> [2019-8-16 9:28:2] CellConfig::getStr, not found <strIP>
+<Info> [2019-8-16 9:28:2] CellConfig::getStr,strIP=any
+<Error> [2019-8-16 9:28:2] CellConfig::getInt, not found <nPort>
+<Info> [2019-8-16 9:28:2] CellConfig::getInt,nPort=8099
+<Error> [2019-8-16 9:28:2] CellConfig::getInt, not found <nThread>
+<Info> [2019-8-16 9:28:2] CellConfig::getInt,nThread=1
+<Error> [2019-8-16 9:28:2] CellConfig::getInt, not found <nClient>
+<Info> [2019-8-16 9:28:2] CellConfig::getInt,nClient=10000
+<Error> [2019-8-16 9:28:2] CellConfig::getInt, not found <nSendBufSize>
+<Info> [2019-8-16 9:28:2] CellConfig::getInt,nSendBufSize=10240
+<Error> [2019-8-16 9:28:2] CellConfig::getInt, not found <nRecvBufSize>
+<Info> [2019-8-16 9:28:2] CellConfig::getInt,nRecvBufSize=8192
+<Error> [2019-8-16 9:28:2] CellConfig::getInt, not found <nClient>
+<Info> [2019-8-16 9:28:2] CellConfig::getInt,nClient=65535
+<Info> [2019-8-16 9:28:2] create socket<88> success...
+<Info> [2019-8-16 9:28:2] bind port<8099> success...
+<Info> [2019-8-16 9:28:2] listen port<88> success...
+<Info> [2019-8-16 9:28:3] initObjectPool... :sizeof(objectNode)=16, nNodeNum=10050 
+<Info> [2019-8-16 9:28:3] malloc 1125600...
+<Info> [2019-8-16 9:28:3] thread<1>,time<1.000468>,socket<88>,clients<3>,recvCount<0>,msgCount<0>
+<Info> [2019-8-16 9:28:4] thread<1>,time<1.000754>,socket<88>,clients<3>,recvCount<0>,msgCount<0>
+<Info> [2019-8-16 9:28:5] thread<1>,time<1.000250>,socket<88>,clients<3>,recvCount<3>,msgCount<30>
+<Info> [2019-8-16 9:28:6] thread<1>,time<1.000497>,socket<88>,clients<3>,recvCount<3>,msgCount<30>
+<Info> [2019-8-16 9:28:7] thread<1>,time<1.000021>,socket<88>,clients<3>,recvCount<3>,msgCount<30>
+<Info> [2019-8-16 9:28:8] thread<1>,time<1.000877>,socket<88>,clients<3>,recvCount<3>,msgCount<30>
+<Error> [2019-8-16 9:28:9] read4socket:sockfd<84> nSize<8192> nLast<0> nLen<-1>
+<Info> [2019-8-16 9:28:9] Client 84 exit.
+<Info> [2019-8-16 9:28:9] ~CELLClient[sId=1 id=1 socket=84]
+<Error> [2019-8-16 9:28:9] read4socket:sockfd<144> nSize<8192> nLast<0> nLen<-1>
+<Info> [2019-8-16 9:28:9] Client 144 exit.
+<Info> [2019-8-16 9:28:9] ~CELLClient[sId=1 id=3 socket=144]
+<Error> [2019-8-16 9:28:9] read4socket:sockfd<160> nSize<8192> nLast<0> nLen<-1>
+<Info> [2019-8-16 9:28:9] Client 160 exit.
+<Info> [2019-8-16 9:28:9] ~CELLClient[sId=1 id=2 socket=160]
+<Info> [2019-8-16 9:28:9] thread<1>,time<1.000560>,socket<88>,clients<0>,recvCount<3>,msgCount<30>
+<Info> [2019-8-16 9:28:10] thread<1>,time<1.000852>,socket<88>,clients<0>,recvCount<0>,msgCount<0>

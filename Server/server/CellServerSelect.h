@@ -1,26 +1,29 @@
-#ifndef CELL_SERVERSELECT_H_
-#define CELL_SERVERSELECT_H_
+#ifndef CELL_SERVER_SELECT_H_
+#define CELL_SERVER_SELECT_H_
 #include"../server/CellServer.h"
 
-class CellServerSelect :public CellServer {
+//select-ç½‘ç»œæ¶ˆæ¯æ¥æ”¶å¤„ç†æœåŠ¡ç±»
+class CellServerSelect :public CellServer
+{
 public:
+	//è·¨çº¿ç¨‹æ—¶ï¼Œçˆ¶ç±»ä¸­æœ‰çº¯è™šå‡½æ•°ï¼Œå­ç±»ä¸­å®ç°äº†ï¼Œå­ç±»å…ˆé‡Šæ”¾ï¼Œçˆ¶ç±»è¿˜æ²¡æœ‰é‡Šæ”¾ï¼Œçˆ¶ç±»ä»æœ‰å¯èƒ½æ‰§è¡Œçº¯è™šå‡½æ•°ï¼ŒæŠ¥é”™-éœ€è¦è™šææ„å‡½æ•°
 	~CellServerSelect()
 	{
 		CloseCellServer();
 	}
 
-	//¼ÆËã¿É¶Á¡¢¿ÉĞ´¼¯ºÏ£¬²¢´¦Àí
+	//select-è®¡ç®—å¯è¯»ã€å¯å†™é›†åˆï¼Œå¹¶å¤„ç†
 	bool DoNetEvents()
 	{
-		/////////////////////////////////////////////////////////
-		//¿É¶Á¼¯ºÏ	
+		///////////////////////////////////////////////////////////
+		//å¯è¯»é›†åˆ
 		if (_clientsChange)
 		{
-			//Èç¹û¿Í»§ÁĞ±í·¢Éú¸Ä±ä
+			//å¦‚æœå®¢æˆ·åˆ—è¡¨å‘ç”Ÿæ”¹å˜
 			_clientsChange = false;
-			_fdRead.Zero();//ÇåÀí¼¯ºÏ
+			_fdRead.Zero();//æ¸…ç†é›†åˆ
 
-			//½«ËùÓĞµÄÃèÊö·û¶¼Ìí¼Óµ½¿É¶Á¼¯ºÏ£¬²¢ÕÒµ½×î´óµÄÃèÊö·û
+			//å°†æ‰€æœ‰çš„æè¿°ç¬¦éƒ½æ·»åŠ åˆ°å¯è¯»é›†åˆï¼Œå¹¶æ‰¾åˆ°æœ€å¤§çš„æè¿°ç¬¦
 			_maxSock = _clients.begin()->second->GetSockfd();
 			for (auto client : _clients)
 			{
@@ -31,50 +34,49 @@ public:
 				}
 			}
 
-			//±¸·İ¿É¶Á¼¯ºÏ
+			//å¤‡ä»½å¯è¯»é›†åˆ
 			_fdReadBak.Copy(_fdRead);
 		}
 		else
 		{
-			//¿É¶Á¼¯ºÏÃ»ÓĞ¸Ä±ä£¬Ö±½Ó¿½±´ÄÚÈİ
+			//å¯è¯»é›†åˆæ²¡æœ‰æ”¹å˜ï¼Œç›´æ¥æ‹·è´å†…å®¹
 			_fdRead.Copy(_fdReadBak);
 		}
 
 		/////////////////////////////////////////////////////////
-		//¿ÉĞ´¼¯ºÏ
-		bool bNeedWrite = false;//ÊÇ·ñĞèÒªĞ´Êı¾İ
+		//å¯å†™é›†åˆ
+		bool bNeedWrite = false;//æ˜¯å¦éœ€è¦å†™æ•°æ®
 		_fdWrite.Zero();
 		for (auto client : _clients)
 		{
-			//ĞèÒªÏò¿Í»§¶Ë·¢ËÍÊı¾İ,²Å¼ÓÈëfd_set¼ì²âÊÇ·ñ¿ÉĞ´
-			if (client.second->NeedWrite())
-			{
+			//éœ€è¦å‘å®¢æˆ·ç«¯å‘é€æ•°æ®,æ‰åŠ å…¥fd_setæ£€æµ‹æ˜¯å¦å¯å†™
+			if (client.second->NeedWrite()) {
 				bNeedWrite = true;
 				_fdWrite.Add(client.second->GetSockfd());
 			}
 		}
 
 		/////////////////////////////////////////////////////////
-		//¼ÆËã¿É¶Á¡¢¿ÉĞ´¼¯ºÏ
+		//è®¡ç®—å¯è¯»ã€å¯å†™é›†åˆ
 		timeval time;
-		time.tv_sec = 0;//Ãë
+		time.tv_sec = 0;//ç§’
 		time.tv_usec = 1;
 		int ret = 0;
 		if (bNeedWrite)
 		{
-			//·µ»Ø·¢Éú¿É¶ÁÊÂ¼şµÄÃèÊö·ûºÍ·¢Éú¿ÉĞ´ÊÂ¼şµÄÃèÊö·û
+			//è¿”å›å‘ç”Ÿå¯è¯»äº‹ä»¶çš„æè¿°ç¬¦å’Œå‘ç”Ÿå¯å†™äº‹ä»¶çš„æè¿°ç¬¦
 			ret = select(_maxSock + 1, _fdRead.GetFdSet(), _fdWrite.GetFdSet(), nullptr, &time);
 		}
 		else
 		{
-			//·µ»Ø·¢Éú¿É¶ÁÊÂ¼şµÄÃèÊö·û
+			//è¿”å›å‘ç”Ÿå¯è¯»äº‹ä»¶çš„æè¿°ç¬¦
 			ret = select(_maxSock + 1, _fdRead.GetFdSet(), nullptr, nullptr, &time);
 		}
 
-		//select·µ»ØÖµ£º³¬Ê±·µ»Ø0;Ê§°Ü·µ»Ø-1£»³É¹¦·µ»Ø´óÓÚ0µÄÕûÊı£¬Õâ¸öÕûÊı±íÊ¾¾ÍĞ÷ÃèÊö·ûµÄÊıÄ¿
+		//selectè¿”å›å€¼ï¼šè¶…æ—¶è¿”å›0;å¤±è´¥è¿”å›-1ï¼›æˆåŠŸè¿”å›å¤§äº0çš„æ•´æ•°ï¼Œè¿™ä¸ªæ•´æ•°è¡¨ç¤ºå°±ç»ªæè¿°ç¬¦çš„æ•°ç›®
 		if (ret < 0)
 		{
-			CELLLOG_INFO("CELLServer%d.OnRun.select Error exit:errno<%d>,errmsg<%s>",
+			CELLLOG_PERROR("CELLServer%d.OnRun.select Error exit:errno<%d>,errmsg<%s>",
 				_id, errno, strerror(errno));
 			return false;
 		}
@@ -83,31 +85,30 @@ public:
 			return true;
 		}
 
-		//´¦Àí¿É¶Á¼¯ºÏÊı¾İ-½ÓÊÕÏûÏ¢
+		//å¤„ç†å¯è¯»é›†åˆæ•°æ®-æ¥æ”¶æ¶ˆæ¯
 		ReadData();
 
-		//´¦Àí¿ÉĞ´¼¯ºÏÊı¾İ-·¢ËÍÏûÏ¢
+		//å¤„ç†å¯å†™é›†åˆæ•°æ®-å‘é€æ¶ˆæ¯
 		WriteData();
 		return true;
 	}
 
 
-	//´¦Àí¿É¶Á¼¯ºÏÊı¾İ-½ÓÊÕÏûÏ¢
-	void ReadData()
-	{
+	//å¤„ç†å¯è¯»é›†åˆæ•°æ®-æ¥æ”¶æ¶ˆæ¯
+	void ReadData() {
 #ifdef _WIN32
 		auto pfdset = _fdRead.GetFdSet();
 
-		//windowsÏÂ¼ÇÂ¼ÁËÃèÊö·ûÊı×éµÄ´óĞ¡ºÍÃèÊö·ûÊı×é£¬±éÀúÊı×é
+		//windowsä¸‹è®°å½•äº†æè¿°ç¬¦æ•°ç»„çš„å¤§å°å’Œæè¿°ç¬¦æ•°ç»„ï¼Œéå†æ•°ç»„
 		for (int i = 0; i < pfdset->fd_count; ++i)
 		{
 			auto iter = _clients.find(pfdset->fd_array[i]);
 			if (iter != _clients.end())
 			{
-				int ret = RecvData(iter->second);//ÕÒµ½ÁË£¬½ÓÊÕÊı¾İ
+				int ret = RecvData(iter->second);//æ‰¾åˆ°äº†ï¼Œæ¥æ”¶æ•°æ®
 				if (ret == SOCKET_ERROR)
 				{
-					//¿Í»§¶ËÀë¿ª
+					//å®¢æˆ·ç«¯ç¦»å¼€
 					OnClientLeave(iter->second);
 					_clients.erase(iter);
 				}
@@ -115,14 +116,11 @@ public:
 		}
 
 #else
-		for (auto iter = _clients.begin(); iter != _clients.end(); )
-		{
-			if (_fdRead.Has(iter->second->getSockfd()))
-			{
-				int ret = RecvData(iter->second);//½ÓÊÕÏûÏ¢
-				if (ret == SOCKET_ERROR)
-				{
-					//¿Í»§¶ËÀë¿ª
+		for (auto iter = _clients.begin(); iter != _clients.end();) {
+			if (_fdRead.Has(iter->second->GetSockfd())) {
+				int ret = RecvData(iter->second);//æ¥æ”¶æ¶ˆæ¯
+				if (ret == SOCKET_ERROR) {
+					//å®¢æˆ·ç«¯ç¦»å¼€
 					OnClientLeave(iter->second);
 					auto iterOld = iter;
 					++iter;
@@ -132,22 +130,21 @@ public:
 			}
 			++iter;
 		}
-#endif // _WIN32		
+#endif // _WIN32
 	}
 
-	//´¦Àí¿ÉĞ´¼¯ºÏÊı¾İ-·¢ËÍÏûÏ¢
-	void WriteData()
-	{
+	//å¤„ç†å¯å†™é›†åˆæ•°æ®-å‘é€æ¶ˆæ¯
+	void WriteData() {
 #ifdef _WIN32
 		auto pfdset = _fdWrite.GetFdSet();
 
-		//windowsÏÂ¼ÇÂ¼ÁËÃèÊö·ûÊı×éµÄ´óĞ¡ºÍÃèÊö·ûÊı×é£¬±éÀúÊı×é
+		//windowsä¸‹è®°å½•äº†æè¿°ç¬¦æ•°ç»„çš„å¤§å°å’Œæè¿°ç¬¦æ•°ç»„ï¼Œéå†æ•°ç»„
 		for (int i = 0; i < pfdset->fd_count; ++i)
 		{
-			auto iter = _clients.find(pfdset->fd_array[i]);//ÔÚÕıÊ½¿Í»§¶Ë¶ÓÁĞÖĞÒªµ½Ä³¸ö·¢Éú¿ÉĞ´ÊÂ¼şµÄ¿Í»§¶Ë
+			auto iter = _clients.find(pfdset->fd_array[i]);//åœ¨æ­£å¼å®¢æˆ·ç«¯é˜Ÿåˆ—ä¸­è¦åˆ°æŸä¸ªå‘ç”Ÿå¯å†™äº‹ä»¶çš„å®¢æˆ·ç«¯
 			if (iter != _clients.end())
 			{
-				int ret = iter->second->SendDataReal();//ÕÒµ½ÁË£¬¾ÍÖ±½Ó·¢ËÍÏûÏ¢
+				int ret = iter->second->SendDataReal();//æ‰¾åˆ°äº†ï¼Œå°±ç›´æ¥å‘é€æ¶ˆæ¯
 				if (ret == SOCKET_ERROR)
 				{
 					OnClientLeave(iter->second);
@@ -157,13 +154,10 @@ public:
 		}
 
 #else
-		for (auto iter = _clients.begin(); iter != _clients.end(); )
-		{
-			if (iter->second->NeedWrite() && _fdWrite.Has(iter->second->getSockfd()))
-			{
-				int ret = iter->second->SendDataReal();//·¢ËÍÏûÏ¢
-				if (ret == -1)
-				{
+		for (auto iter = _clients.begin(); iter != _clients.end();) {
+			if (iter->second->NeedWrite() && _fdWrite.Has(iter->second->GetSockfd())) {
+				int ret = iter->second->SendDataReal();//å‘é€æ¶ˆæ¯
+				if (ret == -1) {
 					OnClientLeave(iter->second);
 					auto iterOld = iter;
 					++iter;
@@ -173,14 +167,15 @@ public:
 			}
 			++iter;
 		}
-#endif // _WIN32	
+#endif // _WIN32
 	}
+
 private:
 	CellFDSet _fdRead;
 	CellFDSet _fdWrite;
-	CellFDSet _fdReadBak;//¿Í»§ÁĞ±í±¸·İ
+	CellFDSet _fdReadBak;//å®¢æˆ·åˆ—è¡¨å¤‡ä»½
 
 	SOCKET _maxSock;
 };
 
-#endif // !CELL_SERVERSELECT_H_
+#endif // !CELL_SERVER_SELECT_H_
