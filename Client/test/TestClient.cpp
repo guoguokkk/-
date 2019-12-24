@@ -160,7 +160,7 @@ void workThread(CellThread* pThread, int id)
 	{
 		if (!pThread->IsRun())
 			break;//输入了exit
-		if (clients[i]->initClient(nSendBufSize, nRecvBufSize) == INVALID_SOCKET)
+		if (clients[i]->initClient(AF_INET6, nSendBufSize, nRecvBufSize) == INVALID_SOCKET)
 			break;//创建失败，端口用完
 		if (clients[i]->connectToServer(strIP, nPort) == SOCKET_ERROR)
 			break;
@@ -271,7 +271,8 @@ void testClient(int argc, char* args[])
 	/////////////////////////////////////////////////////////
 	//处理配置信息
 	CellConfig::Instance().Init(argc, args);
-	strIP = CellConfig::Instance().getStr("strIP", "127.0.0.1");
+	//strIP = CellConfig::Instance().getStr("strIP", "127.0.0.1");
+	strIP = CellConfig::Instance().getStr("strIP", "fe80::38a8:a8d7:9957:8ab1%20");
 	nPort = CellConfig::Instance().getInt("nPort", 8099);
 	nThread = CellConfig::Instance().getInt("nThread", 1);
 	nClient = CellConfig::Instance().getInt("nClient", 3);

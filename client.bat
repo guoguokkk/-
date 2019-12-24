@@ -1,10 +1,11 @@
 @echo off
 
 ::服务端IP地址
-set cmd="strIP=192.168.153.129"
+::set cmd="strIP=192.168.153.129"
+set cmd="strIP=fe80::61dd:873a:c1a0:ab7c%8"
 
 ::服务端端口
-set cmd=%cmd% nPort=9066
+set cmd=%cmd% nPort=8099
 
 ::工作线程数量
 set cmd=%cmd% nThread=1
@@ -31,7 +32,6 @@ set cmd=%cmd% nRecvBufSize=81920
 set cmd=%cmd% -checkMsgID
 
 ::启动程序 传入参数
-::F:\AA\guoguokkk\bin\x64\Debug\Client.exe %cmd%
-F:\AA\guoguokkk\bin\x64\Release\Client.exe %cmd%
+F:\AA\bin\x64\Release\Client.exe %cmd%
 
 pause

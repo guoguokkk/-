@@ -6,6 +6,8 @@
 #define WIN32_LEAN_AND_MEAN//解决 Windows.h 和 WinSock2.h 冲突
 #include<Windows.h>
 #include<WinSock2.h>
+#include<ws2tcpip.h>//sockaddr_in6
+#include<WS2tcpip.h>//inet_pton()
 #pragma comment(lib,"ws2_32.lib")
 
 #else

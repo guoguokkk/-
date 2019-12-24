@@ -1,0 +1,22 @@
+<Info>[2019-12-24 11:16:33] CellLog::setLogPath success, <./clientLog.txt, w>
+<Info>[2019-12-24 11:16:33] CellConfig::getStr,strIP=fe80::61dd:873a:c1a0:ab7c
+<Info>[2019-12-24 11:16:33] CellConfig::getInt,nPort=8099
+<Info>[2019-12-24 11:16:33] CellConfig::getInt,nThread=1
+<Info>[2019-12-24 11:16:33] CellConfig::getInt,nClient=1
+<Info>[2019-12-24 11:16:33] CellConfig::getInt,nMsg=1
+<Info>[2019-12-24 11:16:33] CellConfig::getInt,nSendSleep=100
+<Info>[2019-12-24 11:16:33] CellConfig::getInt,nSendBufSize=81920
+<Info>[2019-12-24 11:16:33] CellConfig::getInt,nRecvBufSize=81920
+<Info>[2019-12-24 11:16:33] thread<1>,start
+<Info>[2019-12-24 11:16:33] thread<1>, Connect<begin=0, end=1, connectCount=1>
+<Info>[2019-12-24 11:16:34] thread<1>,clients<1>,connect<1>,time<1.001583>,send<0>
+<Info>[2019-12-24 11:16:35] thread<1>,clients<1>,connect<1>,time<1.001259>,send<0>
+<Info>[2019-12-24 11:16:36] thread<1>,clients<1>,connect<1>,time<1.000321>,send<1>
+<Info>[2019-12-24 11:16:37] thread<1>,clients<1>,connect<1>,time<1.001358>,send<2>
+<Info>[2019-12-24 11:16:38] thread<1>,clients<1>,connect<1>,time<1.000328>,send<1>
+<Info>[2019-12-24 11:16:39] thread<1>,clients<1>,connect<1>,time<1.001321>,send<1>
+<Info>[2019-12-24 11:16:40] thread<1>,clients<1>,connect<1>,time<1.001333>,send<1>
+<Info>[2019-12-24 11:16:41] thread<1>,clients<1>,connect<1>,time<1.001301>,send<1>
+<Info>[2019-12-24 11:16:42] thread<1>,clients<1>,connect<1>,time<1.001244>,send<1>
+<Info>[2019-12-24 11:16:43] thread<1>,clients<1>,connect<1>,time<1.000262>,send<1>
+<Info>[2019-12-24 11:16:44] thread<1>,clients<1>,connect<1>,time<1.001408>,send<1>

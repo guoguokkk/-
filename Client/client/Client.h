@@ -9,7 +9,7 @@ public:
 	Client();
 	virtual ~Client();
 
-	SOCKET initClient(int sendSize = SEND_BUF_SIZE, int recvSize = RECV_BUF_SIZE);//初始化客户端
+	SOCKET initClient(int af, int sendSize = SEND_BUF_SIZE, int recvSize = RECV_BUF_SIZE);//初始化客户端,af表示ipv4或者ipv6
 	int connectToServer(const char* ip, unsigned short port);//连接服务器
 	void closeClient();//关闭客户端	
 	bool onRun(int microseconds = 1);//处理网络消息	
@@ -25,6 +25,7 @@ protected:
 	CellFDSet _fdWrite;
 	CellClient* _pClient = nullptr;
 	bool _isConnect = false;
+	int _addressFamily;//ipv4或者ipv6
 };
 
 #endif // !CLIENT_H_

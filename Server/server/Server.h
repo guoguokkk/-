@@ -14,7 +14,7 @@ public:
 	Server();
 	virtual ~Server();
 
-	SOCKET InitServer();//初始化服务器
+	SOCKET InitServer(int af);//初始化服务器
 	int Bind(const char* ip, unsigned short port);//绑定ip地址和端口
 	int Listen(int n);//监听端口号		
 	void CloseServer();//关闭服务器	  
@@ -47,7 +47,9 @@ public:
 	virtual void onNetRecv(CellClient* pClient);//消息接收统计事件
 
 protected:
-	SOCKET Accept();//接受客户端连接	
+	SOCKET Accept();//接受客户端连接
+	SOCKET AcceptIPV4();
+	SOCKET AcceptIPV6();
 	void AddClientToCellServer(CellClient* pClient);//将新客户端分配给客户数量最少的cellServer
 	virtual void OnRun(CellThread* pThread) = 0;//连接新客户端
 	void Time4Msg();//计算并输出每秒收到的网络消息
@@ -67,5 +69,6 @@ protected:
 	std::atomic_int _recvCount;//收到消息计数
 	std::atomic_int _clientCount;//客户端计数
 	std::atomic_int _msgCount;//收到消息包计数
+	int _addressFamily;
 };
 #endif // !SERVER_H_

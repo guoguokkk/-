@@ -7,6 +7,7 @@
 Client::Client()
 {
 	_isConnect = false;
+	_addressFamily = AF_INET;
 }
 
 Client::~Client()
@@ -14,9 +15,10 @@ Client::~Client()
 	closeClient();
 }
 
-//初始化客户端
-SOCKET Client::initClient(int sendSize, int recvSize)
+//初始化客户端，af表示ipv4或者ipv5
+SOCKET Client::initClient(int af, int sendSize, int recvSize)
 {
+	_addressFamily = af;
 	CellNetwork::Init();
 
 	if (_pClient)
@@ -25,7 +27,8 @@ SOCKET Client::initClient(int sendSize, int recvSize)
 		closeClient();
 	}
 
-	SOCKET clientSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	//AF_INET ipv4，AF_INET6 ipv6
+	SOCKET clientSock = socket(af, SOCK_STREAM, IPPROTO_TCP);
 	if (clientSock == INVALID_SOCKET)
 	{
 		CELLLOG_ERROR("<socket=%d> build socket error.", (int)clientSock);
@@ -43,21 +46,29 @@ SOCKET Client::initClient(int sendSize, int recvSize)
 int Client::connectToServer(const char* ip, unsigned short port)
 {
 	if (_pClient == nullptr)
-	{
-		if (initClient() == INVALID_SOCKET)
-			return SOCKET_ERROR;
-	}
+		return SOCKET_ERROR;
 
-	sockaddr_in server_addr;
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(port);
+	int ret = SOCKET_ERROR;
+	if (_addressFamily == AF_INET) {//ipv4
+		sockaddr_in server_addr;
+		server_addr.sin_family = AF_INET;
+		server_addr.sin_port = htons(port);
 #ifdef _WIN32
-	server_addr.sin_addr.S_un.S_addr = inet_addr(ip);
+		server_addr.sin_addr.S_un.S_addr = inet_addr(ip);
 #else
-	server_addr.sin_addr.s_addr = inet_addr(ip);
+		server_addr.sin_addr.s_addr = inet_addr(ip);
 #endif // _WIN32
 
-	int ret = connect(_pClient->GetSockfd(), (sockaddr*)& server_addr, sizeof(server_addr));
+		ret = connect(_pClient->GetSockfd(), (sockaddr*)& server_addr, sizeof(server_addr));
+	}
+	else {//ipv6
+		sockaddr_in6 server_addr;
+		server_addr.sin6_family = AF_INET6;
+		server_addr.sin6_port = htons(port);
+		inet_pton(AF_INET6, ip, &server_addr.sin6_addr);
+		ret = connect(_pClient->GetSockfd(), (sockaddr*)& server_addr, sizeof(server_addr));
+	}
+
 	if (ret == SOCKET_ERROR)
 	{
 		CELLLOG_ERROR("<socket=%d> connect error.", (int)_pClient->GetSockfd());

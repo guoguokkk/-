@@ -1,35 +1,21 @@
-<Info> [2019-12-22 21:31:7] CellLog::setLogPath success, <./serverLog.txt, w>
-<Error> [2019-12-22 21:31:7] CellConfig::getStr, not found <strIP>
-<Info> [2019-12-22 21:31:7] CellConfig::getStr,strIP=any
-<Error> [2019-12-22 21:31:7] CellConfig::getInt, not found <nPort>
-<Info> [2019-12-22 21:31:7] CellConfig::getInt,nPort=8099
-<Error> [2019-12-22 21:31:7] CellConfig::getInt, not found <nThread>
-<Info> [2019-12-22 21:31:7] CellConfig::getInt,nThread=1
-<Error> [2019-12-22 21:31:7] CellConfig::getInt, not found <nClient>
-<Info> [2019-12-22 21:31:7] CellConfig::getInt,nClient=10000
-<Error> [2019-12-22 21:31:7] CellConfig::getInt, not found <nSendBufSize>
-<Info> [2019-12-22 21:31:7] CellConfig::getInt,nSendBufSize=10240
-<Error> [2019-12-22 21:31:7] CellConfig::getInt, not found <nRecvBufSize>
-<Info> [2019-12-22 21:31:7] CellConfig::getInt,nRecvBufSize=8192
-<Error> [2019-12-22 21:31:7] CellConfig::getInt, not found <nClient>
-<Info> [2019-12-22 21:31:7] CellConfig::getInt,nClient=65535
-<Info> [2019-12-22 21:31:7] create socket<212> success...
-<Info> [2019-12-22 21:31:7] bind port<8099> success...
-<Info> [2019-12-22 21:31:7] listen port<212> success...
-<Info> [2019-12-22 21:31:7] initObjectPool... :sizeof(objectNode)=16, nNodeNum=10050 
-<Info> [2019-12-22 21:31:7] malloc 1125600...
-<Info> [2019-12-22 21:31:8] thread<1>,time<1.000791>,socket<212>,clients<3>,recvCount<0>,msgCount<0>
-<Info> [2019-12-22 21:31:9] thread<1>,time<1.000785>,socket<212>,clients<3>,recvCount<0>,msgCount<0>
-<Info> [2019-12-22 21:31:10] thread<1>,time<1.000393>,socket<212>,clients<3>,recvCount<3>,msgCount<30>
-<Info> [2019-12-22 21:31:11] thread<1>,time<1.000311>,socket<212>,clients<3>,recvCount<3>,msgCount<30>
-<Info> [2019-12-22 21:31:12] thread<1>,time<1.000245>,socket<212>,clients<3>,recvCount<3>,msgCount<30>
-<Error> [2019-12-22 21:31:13] read4socket:sockfd<232> nSize<8192> nLast<0> nLen<-1>
-<Info> [2019-12-22 21:31:13] Client 232 exit.
-<Info> [2019-12-22 21:31:13] ~CELLClient[sId=1 id=1 socket=232]
-<Error> [2019-12-22 21:31:13] read4socket:sockfd<236> nSize<8192> nLast<0> nLen<-1>
-<Info> [2019-12-22 21:31:13] Client 236 exit.
-<Info> [2019-12-22 21:31:13] ~CELLClient[sId=1 id=2 socket=236]
-<Error> [2019-12-22 21:31:13] read4socket:sockfd<240> nSize<8192> nLast<0> nLen<-1>
-<Info> [2019-12-22 21:31:13] Client 240 exit.
-<Info> [2019-12-22 21:31:13] ~CELLClient[sId=1 id=3 socket=240]
-<Info> [2019-12-22 21:31:13] thread<1>,time<1.000968>,socket<212>,clients<0>,recvCount<3>,msgCount<30>
+<Info> [2019-12-24 10:52:1] CellLog::setLogPath success, <./serverLog.txt, w>
+<Error> [2019-12-24 10:52:1] CellConfig::getStr, not found <strIP>
+<Info> [2019-12-24 10:52:1] CellConfig::getStr,strIP=any
+<Error> [2019-12-24 10:52:1] CellConfig::getInt, not found <nPort>
+<Info> [2019-12-24 10:52:1] CellConfig::getInt,nPort=8099
+<Error> [2019-12-24 10:52:1] CellConfig::getInt, not found <nThread>
+<Info> [2019-12-24 10:52:1] CellConfig::getInt,nThread=1
+<Error> [2019-12-24 10:52:1] CellConfig::getInt, not found <nClient>
+<Info> [2019-12-24 10:52:1] CellConfig::getInt,nClient=10000
+<Error> [2019-12-24 10:52:1] CellConfig::getInt, not found <nSendBufSize>
+<Info> [2019-12-24 10:52:1] CellConfig::getInt,nSendBufSize=10240
+<Error> [2019-12-24 10:52:1] CellConfig::getInt, not found <nRecvBufSize>
+<Info> [2019-12-24 10:52:1] CellConfig::getInt,nRecvBufSize=8192
+<Error> [2019-12-24 10:52:1] CellConfig::getInt, not found <nClient>
+<Info> [2019-12-24 10:52:5] CellConfig::getInt,nClient=65535
+<Info> [2019-12-24 10:52:5] create socket<224> success...
+<Info> [2019-12-24 10:52:5] bind port<8099> success...
+<Info> [2019-12-24 10:52:5] listen port<224> success...
+<Info> [2019-12-24 10:52:5] thread<1>,time<4.096138>,socket<224>,clients<0>,recvCount<0>,msgCount<0>
+<Info> [2019-12-24 10:52:8] thread<1>,time<2.359833>,socket<224>,clients<0>,recvCount<0>,msgCount<0>
+<Info> [2019-12-24 10:52:10] thread<1>,time<1.952321>,socket<224>,clients<0>,recvCount<0>,msgCount<0>

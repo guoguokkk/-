@@ -32,8 +32,7 @@ set cmd=%cmd% -checkMsgID
 ::自定义标志 未使用
 set cmd=%cmd% -p
 
-::F:\AA\guoguokkk\bin\x64\Debug\Server.exe %cmd%
-F:\AA\guoguokkk\bin\x64\Release\Server.exe %cmd%
+F:\AA\bin\x64\Release\Server.exe %cmd%
 
 ::暂停一下
 pause

@@ -32,7 +32,7 @@ int main(int argc, char* args[]) {
 	MyServerEpoll server;
 #endif
 
-	server.InitServer();
+	server.InitServer(AF_INET6);
 	server.Bind(strIP, nPort);
 	server.Listen(64);
 	server.StartAllCellServer(nThread);//启动所有的消息处理CellServer线程(nThread个)和新客户端连接线程
